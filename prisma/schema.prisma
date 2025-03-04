@@ -1,0 +1,164 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model - absolute minimum with only authentication data
+model User {
+  id                String    @id @default(uuid())
+  email             String    @unique
+  hashedPassword    String
+  
+  // One-to-one relation with Profile
+  profile           Profile?
+
+  @@index([email])
+}
+
+// Profile model - all user information including activity references
+model Profile {
+  id               String     @id @default(uuid())
+  userId           String     @unique
+  firstName        String
+  lastName         String
+  username         String     @unique
+  displayName      String
+  bio              String?    @db.Text
+  avatarUrl        String?
+  coverImageUrl    String?
+  location         String?
+  website          String?
+  birthday         DateTime?
+  phoneNumber      String?
+  isVerified       Boolean    @default(false)
+  isActive         Boolean    @default(true)
+  lastActive       DateTime   @default(now())
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  
+  // One-to-one relation with User
+  user             User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // One-to-many relations for user activities
+  posts            Post[]
+  likes            Like[]
+  comments         Comment[]
+  
+  // Friend system
+  sentRequests     FriendRequest[] @relation("RequestSender")
+  receivedRequests FriendRequest[] @relation("RequestReceiver")
+  
+  // Many-to-many self-relation through Friendship join table
+  friends          Friendship[]    @relation("UserFriends")
+  friendsOf        Friendship[]    @relation("FriendsOfUser")
+
+  @@index([username])
+  @@index([firstName, lastName])
+  @@index([displayName])
+}
+
+// Post model with efficient indexes
+model Post {
+  id               String     @id @default(uuid())
+  content          String     @db.Text
+  profileId        String
+  published        Boolean    @default(true)
+  imageUrls        String[]   // Array of image URLs
+  videoUrl         String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  
+  // Relations
+  profile          Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  likes            Like[]
+  comments         Comment[]
+  
+  @@index([profileId])
+  @@index([createdAt])
+}
+
+// Efficient Like model with composite primary key
+model Like {
+  postId           String
+  profileId        String
+  createdAt        DateTime   @default(now())
+  
+  // Relations
+  post             Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  profile          Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  // Composite primary key - more efficient than separate id + unique constraint
+  @@id([postId, profileId])
+  @@index([profileId])
+  @@index([createdAt])
+}
+
+// Comment model with parent-child relationship for nested comments
+model Comment {
+  id               String     @id @default(uuid())
+  content          String     @db.Text
+  postId           String
+  profileId        String
+  parentId         String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  
+  // Relations
+  post             Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  profile          Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  parent           Comment?   @relation("CommentReplies", fields: [parentId], references: [id], onDelete: SetNull)
+  replies          Comment[]  @relation("CommentReplies")
+  
+  @@index([postId])
+  @@index([profileId])
+  @@index([parentId])
+  @@index([createdAt])
+}
+
+// FriendRequest model with status enum
+model FriendRequest {
+  id               String         @id @default(uuid())
+  senderId         String
+  receiverId       String
+  status           RequestStatus  @default(PENDING)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  
+  // Relations
+  sender           Profile        @relation("RequestSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver         Profile        @relation("RequestReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  
+  // Unique constraint to prevent duplicate requests
+  @@unique([senderId, receiverId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Friendship model with composite primary key for efficiency
+model Friendship {
+  profileId        String
+  friendId         String
+  createdAt        DateTime       @default(now())
+  
+  // Relations - using explicit naming to avoid confusion
+  profile          Profile        @relation("UserFriends", fields: [profileId], references: [id], onDelete: Cascade)
+  friend           Profile        @relation("FriendsOfUser", fields: [friendId], references: [id], onDelete: Cascade)
+  
+  // Composite primary key - more efficient than separate id + unique constraint
+  @@id([profileId, friendId])
+  @@index([createdAt])
+}
+
+// Enum for friend request status
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
