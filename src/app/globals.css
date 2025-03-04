@@ -1,8 +1,21 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-@theme {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@font-face {
+  font-family: 'regular';
+  font-weight: 400;
+  src: url('/fonts/regular.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'bold';
+  font-weight: 700;
+  src: url('/fonts/bold.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'thin';
+  font-weight: 100;
+  src: url('/fonts/thin.otf') format('opentype');
 }
 
 :root {
@@ -10,15 +23,50 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+body {
+  font-family: 'regular', sans-serif;
+}
+
+@layer base {
+  body {
+    @apply m-0;
+    @apply p-0;
+    @apply box-border;
+    @apply min-h-screen;
+  }
+
+  html {
+    @apply leading-normal;
+    @apply scroll-smooth;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+
+  #root {
+    @apply flex;
+    @apply min-h-screen;
+  }
+
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .btn-submit {
+    @apply hover:bg-blue-400 hover:cursor-pointer transition-all hover:scale-105 font-bold bg-blue-500 text-white w-fit self-end py-1 px-3 mt-3 rounded-md;
+  }
+
+  .btn-auth {
+    @apply w-fit text-lg mt-3 px-3 py-1 rounded-md hover:cursor-pointer hover:scale-105 transition-all hover:underline;
+  }
+
+  .input-auth {
+    @apply mt-1 w-full px-4 mb-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none transition duration-300 ease-in-out;
+  }
 }
