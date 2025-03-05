@@ -29,14 +29,14 @@ model Profile {
   firstName        String
   lastName         String
   username         String     @unique
-  displayName      String
   bio              String?    @db.Text
   avatarUrl        String?
   coverImageUrl    String?
   location         String?
   website          String?
-  birthday         DateTime?
+  birthday         DateTime
   phoneNumber      String?
+  gender           GENDER     
   isVerified       Boolean    @default(false)
   isActive         Boolean    @default(true)
   lastActive       DateTime   @default(now())
@@ -61,7 +61,6 @@ model Profile {
 
   @@index([username])
   @@index([firstName, lastName])
-  @@index([displayName])
 }
 
 // Post model with efficient indexes
@@ -161,4 +160,10 @@ enum RequestStatus {
   PENDING
   ACCEPTED
   REJECTED
+}
+
+enum GENDER {
+  MALE
+  FEMALE
+  OTHER
 }
