@@ -1,8 +1,10 @@
 'use client';
+import { signUp } from '@/app/api/auth/actions';
 import { SignUpZ, SignUpContent } from '@/types/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 
 // maybe add a check so user is not born in the future?
 
@@ -17,14 +19,26 @@ export const useSignUpForm = () => {
   });
 
   const {
-    formState: { errors },
+    formState: { errors, isSubmitting },
     handleSubmit,
     register,
     watch,
   } = formMethods;
 
   const onSubmit: SubmitHandler<SignUpZ> = async (formData) => {
-    console.log(formData);
+    if (!isSubmitting) {
+      const result = await signUp(formData);
+      if (!result.success) {
+        console.log('error');
+        if (typeof result.error?.message === 'string') {
+          toast.error(result.error.message);
+        } else if (result.error) {
+          Object.entries(result.error).forEach(([key, value]) => {
+            toast.error(`${key}: ${value.message}`);
+          });
+        }
+      }
+    }
   };
 
   const watchMonth = watch('month');
@@ -48,6 +62,6 @@ export const useSignUpForm = () => {
     formErrors: errors,
     register,
     getDayOptions,
-    formMethods,
+    isSubmitting,
   };
 };
