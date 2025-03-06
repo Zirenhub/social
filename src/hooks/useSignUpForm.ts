@@ -2,6 +2,7 @@
 import { signUp } from '@/app/api/auth/actions';
 import { SignUpZ, SignUpContent } from '@/types/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { redirect } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -28,8 +29,9 @@ export const useSignUpForm = () => {
   const onSubmit: SubmitHandler<SignUpZ> = async (formData) => {
     if (!isSubmitting) {
       const result = await signUp(formData);
-      if (!result.success) {
-        console.log('error');
+      if (result.success) {
+        redirect('/home');
+      } else {
         if (typeof result.error?.message === 'string') {
           toast.error(result.error.message);
         } else if (result.error) {

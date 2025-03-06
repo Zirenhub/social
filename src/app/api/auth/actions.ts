@@ -4,10 +4,12 @@ import { SignUpContent, SignUpZ } from '@/types/auth';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma';
 import successResponse, { errorResponse } from '../response';
+import { createSession } from '@/lib/session';
 
 export async function signUp(formData: SignUpZ) {
   try {
     const parsed = SignUpContent.parse({
+      ...formData,
       day: Number(formData.day),
       month: Number(formData.month),
       year: Number(formData.year),
@@ -40,7 +42,7 @@ export async function signUp(formData: SignUpZ) {
       omit: { hashedPassword: true },
     });
 
-    // sign the cookie
+    await createSession(newUserWithProfile);
 
     return successResponse(newUserWithProfile);
   } catch (err) {

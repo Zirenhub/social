@@ -1,3 +1,5 @@
+import { Prisma } from '@prisma/client';
+
 export interface ApiResponse<T> {
   success: boolean;
   data: T | null;
@@ -13,3 +15,10 @@ export interface ApiResponse<T> {
       >
     | null;
 }
+
+export type SessionUser = Prisma.UserGetPayload<{
+  include: {
+    profile: true;
+  };
+  omit: { hashedPassword: true };
+}>;
