@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LogIn from '@/components/auth/LogIn';
 
-export default function Home() {
+export default function Auth() {
   const [authPage, setAuthPage] = useState<'signup' | 'login'>('signup');
 
   return (

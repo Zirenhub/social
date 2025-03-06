@@ -1,4 +1,3 @@
-'use client';
 import notifyFormErrors from '@/helpers/notifyFormErrors';
 import { useLogInForm } from '@/hooks/useLogInForm';
 import { useEffect } from 'react';

@@ -55,6 +55,20 @@ export const SignUpContent = z
     }
   });
 
-type SignUpZ = z.infer<typeof SignUpContent>;
+export const LogInContent = z.object({
+  email: z
+    .string()
+    .trim()
+    .max(32, { message: "Email address can't be longer than 32 characters" })
+    .email({ message: 'Invalid email address.' }),
+  password: z
+    .string()
+    .trim()
+    .min(3, getMinCharError('Password', 3))
+    .max(18, getMaxCharError('Password', 18)),
+});
 
-export type { SignUpZ };
+type SignUpZ = z.infer<typeof SignUpContent>;
+type LogInZ = z.infer<typeof LogInContent>;
+
+export type { SignUpZ, LogInZ };

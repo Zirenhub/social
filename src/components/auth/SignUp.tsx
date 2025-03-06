@@ -1,4 +1,3 @@
-'use client';
 import notifyFormErrors from '@/helpers/notifyFormErrors';
 import { useSignUpForm } from '@/hooks/useSignUpForm';
 import { MONTHS } from '@/types/constants';
@@ -14,7 +13,6 @@ export default function SignUp() {
   );
 
   useEffect(() => {
-    console.log(formErrors);
     notifyFormErrors(formErrors);
   }, [formErrors]);
 

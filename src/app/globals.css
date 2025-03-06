@@ -3,19 +3,19 @@
 @font-face {
   font-family: 'regular';
   font-weight: 400;
-  src: url('/fonts/regular.otf') format('opentype');
+  src: url('../../public/fonts/regular.otf') format('opentype');
 }
 
 @font-face {
   font-family: 'bold';
   font-weight: 700;
-  src: url('/fonts/bold.otf') format('opentype');
+  src: url('../../public/fonts/bold.otf') format('opentype');
 }
 
 @font-face {
   font-family: 'thin';
   font-weight: 100;
-  src: url('/fonts/thin.otf') format('opentype');
+  src: url('../../public/fonts/thin.otf') format('opentype');
 }
 
 :root {
@@ -55,6 +55,16 @@ body {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
   }
+}
+
+@theme {
+  --color-mint-500: oklch(0.72 0.11 178);
+  --color-sky-500: oklch(0.72 0.15 200);
+  --color-rose-500: oklch(0.72 0.18 350);
+  --color-amber-500: oklch(0.72 0.2 60);
+  --color-emerald-500: oklch(0.72 0.12 140);
+  --color-indigo-500: oklch(0.72 0.16 260);
+  --color-gray-500: oklch(0.72 0.02 0);
 }
 
 @layer components {
