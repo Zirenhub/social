@@ -3,7 +3,11 @@ import { useSignUpForm } from '@/hooks/useSignUpForm';
 import { MONTHS } from '@/types/constants';
 import { useEffect } from 'react';
 
-export default function SignUp() {
+export default function SignUp({
+  setPending,
+}: {
+  setPending: (pending: boolean) => void;
+}) {
   const { submit, formErrors, register, getDayOptions, isSubmitting } =
     useSignUpForm();
 
@@ -11,6 +15,10 @@ export default function SignUp() {
     { length: 100 },
     (_, i) => new Date().getFullYear() - i
   );
+
+  useEffect(() => {
+    setPending(isSubmitting);
+  }, [isSubmitting, setPending]);
 
   useEffect(() => {
     notifyFormErrors(formErrors);

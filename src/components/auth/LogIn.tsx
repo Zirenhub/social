@@ -2,8 +2,16 @@ import notifyFormErrors from '@/helpers/notifyFormErrors';
 import { useLogInForm } from '@/hooks/useLogInForm';
 import { useEffect } from 'react';
 
-export default function LogIn() {
-  const { register, submit, formErrors } = useLogInForm();
+export default function LogIn({
+  setPending,
+}: {
+  setPending: (pending: boolean) => void;
+}) {
+  const { register, submit, formErrors, isSubmitting } = useLogInForm();
+
+  useEffect(() => {
+    setPending(isSubmitting);
+  }, [isSubmitting, setPending]);
 
   useEffect(() => {
     notifyFormErrors(formErrors);

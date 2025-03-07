@@ -39,5 +39,6 @@ export const useLogInForm = () => {
     submit,
     formErrors: errors,
     register,
+    isSubmitting: formMethods.formState.isSubmitting,
   };
 };
