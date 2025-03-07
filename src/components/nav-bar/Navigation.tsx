@@ -1,66 +1,95 @@
 'use client';
-
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { toast } from 'react-toastify';
-import React from 'react';
+import React, { useTransition } from 'react';
 import { logOut } from '@/app/api/auth/actions';
-import { Home, Bell, User, LogOut, PlusCircle } from 'lucide-react';
+import { Home, Bell, User, LogOut, PlusCircle, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 export default function Navigation() {
   const router = useRouter();
+  const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
 
-  async function handleLogOut() {
-    const result = await logOut();
-    if (result.success) {
-      router.push('/');
-    } else {
-      toast.error('Failed to log out');
-    }
+  function handleLogOut() {
+    startTransition(async () => {
+      try {
+        const result = await logOut();
+        if (result.success) {
+          router.replace('/');
+        }
+      } catch (error) {
+        toast.error('An error occurred during logout');
+      }
+    });
   }
 
+  const navItems = [
+    { href: '/home', icon: Home, label: 'Home', color: 'bg-sky-400' },
+    {
+      href: '/notifications',
+      icon: Bell,
+      label: 'Alerts',
+      color: 'bg-indigo-400',
+    },
+    { href: '/profile', icon: User, label: 'Profile', color: 'bg-teal-400' },
+    {
+      href: '/create',
+      icon: PlusCircle,
+      label: 'Create',
+      color: 'bg-blue-400',
+    },
+  ];
+
   return (
-    <nav className="fixed left-0 top-0 h-full w-24 bg-gradient-to-b from-gray-800 to-gray-900 text-white flex flex-col items-center py-8 gap-10 shadow-lg">
+    <nav className="bg-white shadow-md flex flex-col items-center py-10 px-6 gap-12">
       {/* Logo */}
       <motion.div
-        whileHover={{ scale: 1.1 }}
-        className="text-4xl font-bold cursor-pointer"
+        whileHover={{ scale: 1.1, rotate: 5 }}
+        whileTap={{ scale: 0.95 }}
+        className="relative"
       >
-        <Link href="/" className="text-teal-400">
-          🔥
+        <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-cyan-500 via-blue-500 to-indigo-500 opacity-75 blur-sm"></div>
+        <Link
+          href="/home"
+          className="relative flex items-center justify-center w-12 h-12 bg-white rounded-full text-2xl font-bold shadow-md"
+        >
+          <span className="bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 text-transparent bg-clip-text">
+            🔥
+          </span>
         </Link>
       </motion.div>
 
       {/* Navigation Items */}
-      <div className="flex flex-col gap-8 mt-8">
-        <NavItem href="/home" icon={<Home size={32} />} color="text-sky-400" />
-        <NavItem
-          href="/notifications"
-          icon={<Bell size={32} />}
-          color="text-rose-400"
-        />
-        <NavItem
-          href="/profile"
-          icon={<User size={32} />}
-          color="text-emerald-400"
-        />
-        <NavItem
-          href="/create"
-          icon={<PlusCircle size={32} />}
-          color="text-amber-400"
-        />
+      <div className="flex flex-col gap-6">
+        {navItems.map((item) => (
+          <NavItem
+            key={item.href}
+            href={item.href}
+            icon={<item.icon size={24} />}
+            color={item.color}
+            isActive={pathname === item.href}
+            label={item.label}
+          />
+        ))}
       </div>
 
       {/* Logout Button */}
-      <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={handleLogOut}
-        className="mt-auto mb-8 p-4 cursor-pointer rounded-full bg-gray-700 hover:bg-rose-600 transition"
-      >
-        <LogOut size={32} className="text-white" />
-      </motion.button>
+      {isPending ? (
+        <div className="mt-auto mb-10 flex items-center justify-center w-12 h-12">
+          <Loader2 size={24} className="animate-spin text-gray-400" />
+        </div>
+      ) : (
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={handleLogOut}
+          className="cursor-pointer mt-auto mb-10 w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-r from-blue-400 to-cyan-500 hover:from-blue-300 hover:to-cyan-400 shadow-lg hover:shadow-blue-300/20 transition-all duration-300"
+        >
+          <LogOut size={20} className="text-white" />
+        </motion.button>
+      )}
     </nav>
   );
 }
@@ -70,22 +99,38 @@ function NavItem({
   href,
   icon,
   color,
+  isActive,
+  label,
 }: {
   href: string;
   icon: React.JSX.Element;
   color: string;
+  isActive: boolean;
+  label: string;
 }) {
   return (
     <motion.div
-      whileHover={{ scale: 1.2 }}
+      whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
-      className="cursor-pointer"
+      className="relative group"
     >
-      <Link
-        href={href}
-        className={`p-4 rounded-full ${color} hover:bg-opacity-20 transition`}
-      >
-        {icon}
+      <Link href={href}>
+        <div
+          className={`relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 ${
+            isActive ? `${color} shadow-md` : 'bg-gray-100 hover:bg-gray-200'
+          }`}
+        >
+          <div
+            className={`${isActive ? 'text-white' : 'text-gray-600'} ${isActive ? 'scale-110' : ''}`}
+          >
+            {icon}
+          </div>
+        </div>
+
+        {/* Tooltip */}
+        <div className="absolute left-full ml-4 px-3 py-1 bg-white text-gray-700 text-sm rounded-md shadow-md opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 whitespace-nowrap z-50">
+          {label}
+        </div>
       </Link>
     </motion.div>
   );
