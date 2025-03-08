@@ -1,9 +1,19 @@
 import { useTheme } from 'next-themes';
 import { Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import LoaderPlaceholder from '../loader/LoaderPlaceholder';
 
 export default function ThemeSwitcher() {
+  const [isMounted, setIsMounted] = useState(false);
   const { setTheme, resolvedTheme } = useTheme();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Only render the theme switcher after client-side hydration
+  if (!isMounted) return <LoaderPlaceholder />;
 
   function styledButton({
     icon,

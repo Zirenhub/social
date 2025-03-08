@@ -3,11 +3,12 @@ import { useRouter, usePathname } from 'next/navigation';
 import { toast } from 'react-toastify';
 import React, { useTransition } from 'react';
 import { logOut } from '@/app/api/auth/actions';
-import { Home, Bell, User, LogOut, PlusCircle, Loader2 } from 'lucide-react';
+import { Home, Bell, User, LogOut, PlusCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import ThemeSwitcher from './ThemeSwitcher';
 import ProfileOverview from './ProfileOverview';
+import LoaderPlaceholder from '../loader/LoaderPlaceholder';
 
 export default function Navigation() {
   const router = useRouter();
@@ -85,9 +86,7 @@ export default function Navigation() {
 
         {/* Logout Button */}
         {isPending ? (
-          <div className="flex items-center justify-center w-12 h-12">
-            <Loader2 size={24} className="animate-spin text-gray-400" />
-          </div>
+          <LoaderPlaceholder />
         ) : (
           <motion.button
             whileHover={{ scale: 1.1 }}
