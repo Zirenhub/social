@@ -1,14 +1,21 @@
-import Navigation from '@/components/nav-bar/Navigation';
+'use server';
+import ClientLayout from './ClientLayout';
+import { decrypt } from '@/lib/session';
+import { cookies } from 'next/headers';
+import React from 'react';
 
-export default function AppLayout({
+export default async function AppLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  return (
-    <div className="flex h-screen bg-black">
-      <Navigation />
-      <main className="flex-1 p-4">{children}</main>
-    </div>
-  );
+}) {
+  const cookieStore = await cookies();
+  const encryptedPayload = cookieStore.get('session')?.value;
+  const session = encryptedPayload ? await decrypt(encryptedPayload) : null;
+
+  if (!session) {
+    throw new Error('No session found in app layout');
+  }
+
+  return <ClientLayout user={session.user}>{children}</ClientLayout>;
 }
