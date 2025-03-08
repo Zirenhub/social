@@ -67,6 +67,8 @@ body {
   --color-gray-500: oklch(0.72 0.02 0);
 }
 
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 @layer components {
   .btn-submit {
     @apply hover:bg-blue-400 hover:cursor-pointer transition-all hover:scale-105 font-bold bg-blue-500 text-white w-fit self-end py-1 px-3 mt-3 rounded-md;

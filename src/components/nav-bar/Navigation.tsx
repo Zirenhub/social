@@ -6,6 +6,7 @@ import { logOut } from '@/app/api/auth/actions';
 import { Home, Bell, User, LogOut, PlusCircle, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import ThemeSwitcher from './ThemeSwitcher';
 
 export default function Navigation() {
   const router = useRouter();
@@ -43,7 +44,7 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="bg-white shadow-md flex flex-col items-center py-10 px-6 gap-12">
+    <nav className="light:bg-white dark:bg-black shadow-md flex flex-col items-center py-10 px-6 gap-12">
       {/* Logo */}
       <motion.div
         whileHover={{ scale: 1.1, rotate: 5 }}
@@ -53,7 +54,7 @@ export default function Navigation() {
         <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-cyan-500 via-blue-500 to-indigo-500 opacity-75 blur-sm"></div>
         <Link
           href="/home"
-          className="relative flex items-center justify-center w-12 h-12 bg-white rounded-full text-2xl font-bold shadow-md"
+          className="relative flex items-center justify-center w-12 h-12 light:bg-white dark:bg-gray-800 rounded-full text-2xl font-bold shadow-md"
         >
           <span className="bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 text-transparent bg-clip-text">
             🔥
@@ -75,21 +76,26 @@ export default function Navigation() {
         ))}
       </div>
 
-      {/* Logout Button */}
-      {isPending ? (
-        <div className="mt-auto mb-10 flex items-center justify-center w-12 h-12">
-          <Loader2 size={24} className="animate-spin text-gray-400" />
-        </div>
-      ) : (
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={handleLogOut}
-          className="cursor-pointer mt-auto mb-10 w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-r from-blue-400 to-cyan-500 hover:from-blue-300 hover:to-cyan-400 shadow-lg hover:shadow-blue-300/20 transition-all duration-300"
-        >
-          <LogOut size={20} className="text-white" />
-        </motion.button>
-      )}
+      <div className="mt-auto flex flex-col items-center justify-center">
+        {/* Theme Switcher */}
+        <ThemeSwitcher />
+
+        {/* Logout Button */}
+        {isPending ? (
+          <div className="flex mt-4 items-center justify-center w-12 h-12">
+            <Loader2 size={24} className="animate-spin text-gray-400" />
+          </div>
+        ) : (
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={handleLogOut}
+            className="cursor-pointer mt-4 w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-r from-blue-400 to-cyan-500 hover:from-blue-300 hover:to-cyan-400 shadow-lg hover:shadow-blue-300/20 transition-all duration-300"
+          >
+            <LogOut size={20} className="text-white" />
+          </motion.button>
+        )}
+      </div>
     </nav>
   );
 }
@@ -117,18 +123,20 @@ function NavItem({
       <Link href={href}>
         <div
           className={`relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 ${
-            isActive ? `${color} shadow-md` : 'bg-gray-100 hover:bg-gray-200'
+            isActive
+              ? `${color} shadow-md`
+              : 'light:bg-gray-100 dark:bg-gray-700 hover:light:bg-gray-200 dark:hover:bg-gray-600'
           }`}
         >
           <div
-            className={`${isActive ? 'text-white' : 'text-gray-600'} ${isActive ? 'scale-110' : ''}`}
+            className={`${isActive ? 'text-white' : 'light:text-gray-600 dark:text-gray-300'} ${isActive ? 'scale-110' : ''}`}
           >
             {icon}
           </div>
         </div>
 
         {/* Tooltip */}
-        <div className="absolute left-full ml-4 px-3 py-1 bg-white text-gray-700 text-sm rounded-md shadow-md opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 whitespace-nowrap z-50">
+        <div className="absolute left-full ml-4 px-3 py-1 light:bg-white dark:bg-gray-800 light:text-gray-700 dark:text-gray-300 text-sm rounded-md shadow-md opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 whitespace-nowrap z-50">
           {label}
         </div>
       </Link>

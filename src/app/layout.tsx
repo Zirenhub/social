@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { ToastContainer } from 'react-toastify';
 import './globals.css';
-import { Suspense } from 'react';
-import Loading from './loading';
+import Providers from './providers';
 
 export const metadata: Metadata = {
   title: 'Social app',
@@ -15,12 +14,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
       // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Suspense fallback={<Loading />}>{children}</Suspense>
-        <ToastContainer />
+        <Providers>
+          {children}
+          <ToastContainer />
+        </Providers>
       </body>
     </html>
   );
