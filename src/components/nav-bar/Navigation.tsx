@@ -1,32 +1,14 @@
-'use client';
-import { useRouter, usePathname } from 'next/navigation';
-import { toast } from 'react-toastify';
-import React, { useTransition } from 'react';
-import { logOut } from '@/app/api/auth/actions';
-import { Home, Bell, User, LogOut, PlusCircle } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import React from 'react';
+import { Home, Bell, User, PlusCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import ThemeSwitcher from './ThemeSwitcher';
 import ProfileOverview from './ProfileOverview';
-import LoaderPlaceholder from '../loader/LoaderPlaceholder';
+import LogOut from './LogOut';
 
 export default function Navigation() {
-  const router = useRouter();
   const pathname = usePathname();
-  const [isPending, startTransition] = useTransition();
-
-  function handleLogOut() {
-    startTransition(async () => {
-      try {
-        const result = await logOut();
-        if (result.success) {
-          router.replace('/');
-        }
-      } catch (error) {
-        toast.error('An error occurred during logout');
-      }
-    });
-  }
 
   const navItems = [
     { href: '/home', icon: Home, label: 'Home', color: 'bg-sky-500' },
@@ -36,7 +18,7 @@ export default function Navigation() {
       label: 'Alerts',
       color: 'bg-indigo-500',
     },
-    { href: '/profile', icon: User, label: 'Profile', color: 'bg-mint-500' },
+    { href: '/profile', icon: User, label: 'Profile', color: 'bg-orange-500' },
     {
       href: '/create',
       icon: PlusCircle,
@@ -83,20 +65,8 @@ export default function Navigation() {
         <ProfileOverview />
         {/* Theme Switcher */}
         <ThemeSwitcher />
-
         {/* Logout Button */}
-        {isPending ? (
-          <LoaderPlaceholder />
-        ) : (
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={handleLogOut}
-            className="cursor-pointer w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-400 hover:to-emerald-400 shadow-lg hover:shadow-sky-300/20 transition-all duration-300"
-          >
-            <LogOut size={20} className="text-white" />
-          </motion.button>
-        )}
+        <LogOut />
       </div>
     </nav>
   );
