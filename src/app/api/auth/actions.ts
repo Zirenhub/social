@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma';
 import successResponse, { errorResponse } from '../response';
 import { createSession, deleteSession } from '@/lib/session';
+import { SessionUser } from '@/types/api';
 
 export async function signUp(formData: SignUpZ) {
   try {
@@ -42,7 +43,7 @@ export async function signUp(formData: SignUpZ) {
       omit: { hashedPassword: true },
     });
 
-    await createSession(newUserWithProfile);
+    await createSession(newUserWithProfile as SessionUser);
 
     return successResponse(newUserWithProfile);
   } catch (err) {
@@ -76,7 +77,9 @@ export async function logIn(formData: LogInZ) {
       throw new Error('Password is incorrect');
     }
 
-    await createSession(user);
+    const { hashedPassword, ...safeUser } = user;
+
+    await createSession(safeUser as SessionUser);
 
     return successResponse(user);
   } catch (err) {
