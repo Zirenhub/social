@@ -13,9 +13,9 @@ export default function ClientLayout({
 }) {
   return (
     <UserContext.Provider value={{ user }}>
-      <div className="flex h-screen">
+      <div className="flex w-full">
         <Navigation />
-        <main className="flex-1 p-4">{children}</main>
+        <main className="flex-1 p-2">{children}</main>
       </div>
     </UserContext.Provider>
   );
