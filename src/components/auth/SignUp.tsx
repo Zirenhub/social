@@ -1,14 +1,11 @@
-import notifyFormErrors from '@/helpers/notifyFormErrors';
 import { useSignUpForm } from '@/hooks/useSignUpForm';
 import { MONTHS } from '@/types/constants';
+import { Loader2Icon } from 'lucide-react';
 import { useEffect } from 'react';
+import { toast } from 'react-toastify';
 
-export default function SignUp({
-  setPending,
-}: {
-  setPending: (pending: boolean) => void;
-}) {
-  const { submit, formErrors, register, getDayOptions, isSubmitting } =
+export default function SignUp() {
+  const { submit, register, formErrors, getDayOptions, isSubmitting } =
     useSignUpForm();
 
   const yearsRange = Array.from(
@@ -17,12 +14,14 @@ export default function SignUp({
   );
 
   useEffect(() => {
-    setPending(isSubmitting);
-  }, [isSubmitting, setPending]);
-
-  useEffect(() => {
-    notifyFormErrors(formErrors);
-  }, [formErrors]);
+    if (!isSubmitting) {
+      Object.values(formErrors).forEach((error) => {
+        if (error.message) {
+          toast.error(error.message);
+        }
+      });
+    }
+  }, [formErrors, isSubmitting]);
 
   return (
     <form onSubmit={submit} className="max-w-md mx-auto">
@@ -173,7 +172,14 @@ export default function SignUp({
         disabled={isSubmitting}
         className="w-full mt-4 py-3 px-6 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-bold rounded-xl shadow-xl transition transform hover:scale-105 cursor-pointer"
       >
-        {isSubmitting ? 'Creating...' : 'Create Account'}
+        {isSubmitting ? (
+          <div className="flex gap-3 items-center justify-center">
+            <Loader2Icon size={14} className="animate-spin" />
+            <p>Creating...</p>
+          </div>
+        ) : (
+          'Create Account'
+        )}
       </button>
     </form>
   );

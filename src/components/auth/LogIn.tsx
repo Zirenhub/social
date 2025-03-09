@@ -1,21 +1,7 @@
-import notifyFormErrors from '@/helpers/notifyFormErrors';
 import { useLogInForm } from '@/hooks/useLogInForm';
-import { useEffect } from 'react';
 
-export default function LogIn({
-  setPending,
-}: {
-  setPending: (pending: boolean) => void;
-}) {
-  const { register, submit, formErrors, isSubmitting } = useLogInForm();
-
-  useEffect(() => {
-    setPending(isSubmitting);
-  }, [isSubmitting, setPending]);
-
-  useEffect(() => {
-    notifyFormErrors(formErrors);
-  }, [formErrors]);
+export default function LogIn() {
+  const { register, submit, isSubmitting } = useLogInForm();
 
   return (
     <form onSubmit={submit} className="max-w-md mx-auto">
@@ -50,6 +36,7 @@ export default function LogIn({
 
       <button
         type="submit"
+        disabled={isSubmitting}
         className="w-full mt-4 py-3 px-6 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-bold rounded-xl shadow-xl transition transform hover:scale-105 cursor-pointer"
       >
         Log In

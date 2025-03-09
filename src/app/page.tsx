@@ -3,32 +3,12 @@ import SignUp from '@/components/auth/SignUp';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LogIn from '@/components/auth/LogIn';
-import Loading from './loading';
 
 export default function Auth() {
   const [authPage, setAuthPage] = useState<'signup' | 'login'>('signup');
-  const [isPending, setIsPending] = useState<boolean>(false);
-
-  function setPending(pending: boolean) {
-    setIsPending(pending);
-  }
-
-  if (isPending) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
-        className="absolute inset-0 z-50"
-      >
-        <Loading />
-      </motion.div>
-    );
-  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+    <div className="w-full flex items-center justify-center relative">
       <AnimatePresence mode="wait">
         <motion.div
           key={authPage}
@@ -38,11 +18,7 @@ export default function Auth() {
           transition={{ duration: 0.5, ease: 'easeInOut' }}
           className="bg-white/50 backdrop-blur-md rounded-lg shadow-lg p-8"
         >
-          {authPage === 'signup' ? (
-            <SignUp setPending={setPending} />
-          ) : (
-            <LogIn setPending={setPending} />
-          )}
+          {authPage === 'signup' ? <SignUp /> : <LogIn />}
         </motion.div>
       </AnimatePresence>
       <motion.button
