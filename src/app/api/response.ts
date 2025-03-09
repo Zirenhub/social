@@ -12,230 +12,56 @@ export default function successResponse<T>(data: T): ApiResponse<T> {
 
 export function errorResponse(
   error: unknown,
-  message: string
+  defaultMessage: string = 'An unexpected error occurred'
 ): ApiResponse<null> {
-  if (error instanceof PrismaClientKnownRequestError) {
-    switch (error.code) {
-      case 'P2002':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `The value for ${error.meta?.target} is already in use.`,
-          },
-        };
-      case 'P2025':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: error.message,
-          },
-        };
-      case 'P2003':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `Foreign key constraint failed on the field: ${error.meta?.field_name}`,
-          },
-        };
-      case 'P2004':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `A constraint failed on the database: ${error.meta?.database_name}`,
-          },
-        };
-      case 'P2005':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `The value provided for the field is invalid: ${error.meta?.field_name}`,
-          },
-        };
-      case 'P2006':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `The provided value for ${error.meta?.model_name} is not valid.`,
-          },
-        };
-      case 'P2007':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `Data validation error: ${error.meta?.details}`,
-          },
-        };
-      case 'P2008':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `Failed to parse the query: ${error.meta?.query}`,
-          },
-        };
-      case 'P2009':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `Failed to validate the query: ${error.meta?.query}`,
-          },
-        };
-      case 'P2010':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `Raw query failed: ${error.meta?.query}. Code: ${error.meta?.code}`,
-          },
-        };
-      case 'P2011':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `Null constraint violation on the ${error.meta?.constraint}`,
-          },
-        };
-      case 'P2012':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `Missing a required value: ${error.meta?.field_name}`,
-          },
-        };
-      case 'P2013':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `Missing the required argument: ${error.meta?.argument_name}`,
-          },
-        };
-      case 'P2014':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `The change you are trying to make would violate the required relation: ${error.meta?.relation_name}`,
-          },
-        };
-      case 'P2015':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `A related record could not be found: ${error.meta?.details}`,
-          },
-        };
-      case 'P2016':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `Query interpretation error: ${error.meta?.details}`,
-          },
-        };
-      case 'P2017':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `The records for relation ${error.meta?.relation_name} are not connected.`,
-          },
-        };
-      case 'P2018':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `The required connected records were not found: ${error.meta?.details}`,
-          },
-        };
-      case 'P2019':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `Input error: ${error.meta?.details}`,
-          },
-        };
-      case 'P2020':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `Value out of range for the type: ${error.meta?.field_name}`,
-          },
-        };
-      case 'P2021':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `The table does not exist in the current database: ${error.meta?.table}`,
-          },
-        };
-      case 'P2022':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `The column does not exist in the current database: ${error.meta?.column}`,
-          },
-        };
-      case 'P2023':
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `Inconsistent column data: ${error.meta?.details}`,
-          },
-        };
-      default:
-        return {
-          success: false,
-          data: null,
-          error: {
-            message: `An unknown error occurred: ${error.message}`,
-          },
-        };
-    }
-  }
-
-  if (error instanceof ZodError) {
-    const { fieldErrors } = error.flatten();
-
-    const formattedErrors = Object.keys(fieldErrors).reduce<
-      Record<string, { message: string }>
-    >(
-      (acc, field) => {
-        if (fieldErrors[field]?.length) {
-          acc[field] = { message: fieldErrors[field][0] };
-        }
-        return acc;
-      },
-      {} // Explicitly typed accumulator as Record<string, { message: string }>
-    );
-
-    return {
-      success: false,
-      data: null,
-      error: formattedErrors, // Directly associate errors with their fields
-    };
-  }
-
-  return {
+  // Base error response
+  const response: ApiResponse<null> = {
     success: false,
     data: null,
-    error: { message },
+    error: { message: defaultMessage },
   };
+
+  // Handle Prisma errors
+  if (error instanceof PrismaClientKnownRequestError) {
+    response.error.message = getPrismaErrorMessage(error);
+  }
+  // Handle Zod validation errors
+  else if (error instanceof ZodError) {
+    const { fieldErrors } = error.flatten();
+
+    // Create a user-friendly message
+    response.error.message = 'Please check the form for errors';
+
+    // Add field-specific errors
+    if (Object.keys(fieldErrors).length > 0) {
+      response.error.fields = {};
+
+      // Convert Zod's field errors to our format
+      for (const [field, errors] of Object.entries(fieldErrors)) {
+        if (errors?.length) {
+          response.error.fields[field] = errors[0];
+        }
+      }
+    }
+  }
+  // Handle standard Error objects
+  else if (error instanceof Error) {
+    response.error.message = error.message;
+  }
+
+  return response;
+}
+
+// Helper function to get prisma-specific error messages
+function getPrismaErrorMessage(error: PrismaClientKnownRequestError): string {
+  switch (error.code) {
+    case 'P2002':
+      return `This ${error.meta?.target} is already in use.`;
+    case 'P2025':
+      return `Record not found.`;
+    case 'P2003':
+      return `Referenced record not found.`;
+    default:
+      return `Database error: ${error.message}`;
+  }
 }

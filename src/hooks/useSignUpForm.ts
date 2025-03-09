@@ -5,6 +5,7 @@ import { useCallback, useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import { setFormErrors } from '@/helpers/setFormErrors';
 
 // maybe add a check so user is not born in the future?
 
@@ -33,13 +34,10 @@ export const useSignUpForm = () => {
       if (result.success) {
         router.replace('/home');
       } else {
-        if (typeof result.error?.message === 'string') {
-          toast.error(result.error.message);
-        } else if (result.error) {
-          Object.entries(result.error).forEach(([key, value]) => {
-            toast.error(`${key}: ${value.message}`);
-          });
-        }
+        // Display the general error message
+        toast.error(result.error.message);
+        // If there are field-specific errors, update the form
+        setFormErrors(formMethods, result.error);
       }
     }
   };
@@ -62,9 +60,9 @@ export const useSignUpForm = () => {
 
   return {
     submit,
-    formErrors: errors,
     register,
     getDayOptions,
+    formErrors: errors,
     isSubmitting,
   };
 };

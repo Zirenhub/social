@@ -1,4 +1,5 @@
 import { logIn } from '@/app/api/auth/actions';
+import { setFormErrors } from '@/helpers/setFormErrors';
 import { LogInZ, LogInContent } from '@/types/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation'; // Import useRouter
@@ -23,13 +24,10 @@ export const useLogInForm = () => {
     if (result.success) {
       router.replace('/home');
     } else {
-      if (typeof result.error?.message === 'string') {
-        toast.error(result.error.message);
-      } else if (result.error) {
-        Object.entries(result.error).forEach(([key, value]) => {
-          toast.error(`${key}: ${value.message}`);
-        });
-      }
+      // Display the general error message
+      toast.error(result.error.message);
+      // If there are field-specific errors, update the form
+      setFormErrors(formMethods, result.error);
     }
   };
 
