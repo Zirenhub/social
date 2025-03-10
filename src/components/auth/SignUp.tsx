@@ -1,12 +1,22 @@
+import showFormErrors from '@/helpers/showFormErrors';
 import { useSignUpForm } from '@/hooks/useSignUpForm';
 import { MONTHS } from '@/types/constants';
-import { Loader2Icon } from 'lucide-react';
 import { useEffect } from 'react';
-import { toast } from 'react-toastify';
+import LoaderPlaceholder from '../loader/LoaderPlaceholder';
 
-export default function SignUp() {
-  const { submit, register, formErrors, getDayOptions, isSubmitting } =
-    useSignUpForm();
+interface SignUpProps {
+  setLoading: (loading: boolean) => void;
+}
+
+export default function SignUp({ setLoading }: SignUpProps) {
+  const {
+    submit,
+    register,
+    getDayOptions,
+    hasErrors,
+    formMethods,
+    isSubmitting,
+  } = useSignUpForm();
 
   const yearsRange = Array.from(
     { length: 100 },
@@ -14,14 +24,14 @@ export default function SignUp() {
   );
 
   useEffect(() => {
-    if (!isSubmitting) {
-      Object.values(formErrors).forEach((error) => {
-        if (error.message) {
-          toast.error(error.message);
-        }
-      });
+    setLoading(isSubmitting);
+  }, [isSubmitting, setLoading]);
+
+  useEffect(() => {
+    if (hasErrors) {
+      showFormErrors(formMethods.formState.errors);
     }
-  }, [formErrors, isSubmitting]);
+  }, [hasErrors, formMethods]);
 
   return (
     <form onSubmit={submit} className="max-w-md mx-auto">
@@ -170,13 +180,10 @@ export default function SignUp() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full mt-4 py-3 px-6 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-bold rounded-xl shadow-xl transition transform hover:scale-105 cursor-pointer"
+        className="w-full mt-4 py-3 px-6 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-bold rounded-xl shadow-xl transition transform hover:scale-105 flex items-center justify-center cursor-pointer"
       >
         {isSubmitting ? (
-          <div className="flex gap-3 items-center justify-center">
-            <Loader2Icon size={14} className="animate-spin" />
-            <p>Creating...</p>
-          </div>
+          <LoaderPlaceholder text="Creating..." />
         ) : (
           'Create Account'
         )}

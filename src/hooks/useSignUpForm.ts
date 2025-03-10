@@ -1,7 +1,7 @@
 import { signUp } from '@/app/api/auth/actions';
 import { SignUpZ, SignUpContent } from '@/types/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
@@ -11,6 +11,8 @@ import { setFormErrors } from '@/helpers/setFormErrors';
 
 export const useSignUpForm = () => {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const hasErrorsRef = useRef<boolean>(false);
 
   const formMethods = useForm<SignUpZ>({
     resolver: zodResolver(SignUpContent),
@@ -21,24 +23,23 @@ export const useSignUpForm = () => {
     },
   });
 
-  const {
-    formState: { errors, isSubmitting },
-    handleSubmit,
-    register,
-    watch,
-  } = formMethods;
+  const { handleSubmit, register, watch } = formMethods;
 
   const onSubmit: SubmitHandler<SignUpZ> = async (formData) => {
-    if (!isSubmitting) {
-      const result = await signUp(formData);
-      if (result.success) {
-        router.replace('/home');
-      } else {
-        // Display the general error message
-        toast.error(result.error.message);
-        // If there are field-specific errors, update the form
-        setFormErrors(formMethods, result.error);
-      }
+    hasErrorsRef.current = false;
+    setIsSubmitting(true);
+
+    const result = await signUp(formData);
+
+    if (result.success) {
+      router.replace('/home');
+    } else {
+      setIsSubmitting(false);
+      // Display the general error message
+      toast.error(result.error.message);
+      // If there are field-specific errors, update the form
+      setFormErrors(formMethods, result.error);
+      hasErrorsRef.current = true;
     }
   };
 
@@ -62,7 +63,8 @@ export const useSignUpForm = () => {
     submit,
     register,
     getDayOptions,
-    formErrors: errors,
+    formMethods,
     isSubmitting,
+    hasErrors: hasErrorsRef.current,
   };
 };

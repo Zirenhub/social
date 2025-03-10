@@ -1,7 +1,25 @@
+import showFormErrors from '@/helpers/showFormErrors';
 import { useLogInForm } from '@/hooks/useLogInForm';
+import { useEffect } from 'react';
+import LoaderPlaceholder from '../loader/LoaderPlaceholder';
 
-export default function LogIn() {
-  const { register, submit, isSubmitting } = useLogInForm();
+interface LogInProps {
+  setLoading: (loading: boolean) => void;
+}
+
+export default function LogIn({ setLoading }: LogInProps) {
+  const { register, submit, formMethods, hasErrors, isSubmitting } =
+    useLogInForm();
+
+  useEffect(() => {
+    setLoading(isSubmitting);
+  }, [isSubmitting, setLoading]);
+
+  useEffect(() => {
+    if (hasErrors) {
+      showFormErrors(formMethods.formState.errors);
+    }
+  }, [hasErrors, formMethods]);
 
   return (
     <form onSubmit={submit} className="max-w-md mx-auto">
@@ -37,9 +55,9 @@ export default function LogIn() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full mt-4 py-3 px-6 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-bold rounded-xl shadow-xl transition transform hover:scale-105 cursor-pointer"
+        className="w-full mt-4 py-3 px-6 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-bold rounded-xl shadow-xl transition transform hover:scale-105 cursor-pointer flex items-center justify-center"
       >
-        Log In
+        {isSubmitting ? <LoaderPlaceholder text="Logging in..." /> : 'Log In'}
       </button>
     </form>
   );
