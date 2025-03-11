@@ -3,12 +3,23 @@ import SignUp from '@/components/auth/SignUp';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LogIn from '@/components/auth/LogIn';
+import Loading from './loading';
 
 export default function Auth() {
   const [authPage, setAuthPage] = useState<'signup' | 'login'>('signup');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLoading = (loading: boolean) => {
+    setIsLoading(loading);
+  };
 
   return (
     <div className="w-full flex items-center justify-center relative">
+      {isLoading && (
+        <div className="absolute top-0 left-0 h-full w-full z-10 bg-white">
+          <Loading />
+        </div>
+      )}
       <AnimatePresence mode="wait">
         <motion.div
           key={authPage}
@@ -18,7 +29,11 @@ export default function Auth() {
           transition={{ duration: 0.5, ease: 'easeInOut' }}
           className="bg-white/50 backdrop-blur-md rounded-lg shadow-lg p-8"
         >
-          {authPage === 'signup' ? <SignUp /> : <LogIn />}
+          {authPage === 'signup' ? (
+            <SignUp setLoading={handleLoading} />
+          ) : (
+            <LogIn setLoading={handleLoading} />
+          )}
         </motion.div>
       </AnimatePresence>
       <motion.button

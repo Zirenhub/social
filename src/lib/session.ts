@@ -1,6 +1,6 @@
 'use server-only';
 
-import { SessionUser } from '@/types/api';
+import { ApiResponse, SessionUser } from '@/types/api';
 import { SessionPayload } from '@/types/session';
 import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
@@ -38,8 +38,32 @@ export async function decrypt(session: string | undefined = '') {
     if (error instanceof Error) {
       console.log('Failed to decrypt session', error.message);
     }
+    return null; // Explicitly return null instead of undefined
+  }
+}
 
-    console.log('Failed to verify session');
+export async function getSession(): Promise<ApiResponse<SessionUser>> {
+  try {
+    const cookieStore = await cookies();
+    const encryptedPayload = cookieStore.get('session')?.value;
+
+    if (!encryptedPayload) {
+      throw new Error('No session cookie found.');
+    }
+
+    const session = await decrypt(encryptedPayload);
+
+    if (!session || !session.user) {
+      throw new Error('Session is undefined.');
+    }
+
+    return { data: session.user, success: true, error: null };
+  } catch (error) {
+    return {
+      data: null,
+      success: false,
+      error: { message: 'Failed getting session.' },
+    };
   }
 }
 

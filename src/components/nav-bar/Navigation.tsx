@@ -1,10 +1,10 @@
+'use client';
 import { usePathname } from 'next/navigation';
 import React from 'react';
 import { Home, Bell, User, PlusCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import ThemeSwitcher from './ThemeSwitcher';
-import ProfileOverview from './ProfileOverview';
 import LogOut from './LogOut';
 
 export default function Navigation() {
@@ -28,7 +28,7 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="shadow-md flex flex-col items-center py-10 px-6 gap-12 dark:bg-gray-800 bg-white rounded-r-2xl">
+    <nav className="shadow-md flex flex-col items-center py-10 px-6 gap-12 dark:bg-gray-800 bg-white h-full w-18">
       {/* Logo */}
       <motion.div
         whileHover={{ scale: 1.1, rotate: 5 }}
@@ -61,8 +61,6 @@ export default function Navigation() {
       </div>
 
       <div className="mt-auto flex flex-col gap-3 items-center justify-center">
-        {/* Profile Overview */}
-        <ProfileOverview />
         {/* Theme Switcher */}
         <ThemeSwitcher />
         {/* Logout Button */}
