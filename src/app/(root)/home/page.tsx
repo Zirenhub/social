@@ -46,7 +46,7 @@ export default async function Home({
             <CreatePost />
           </div>
           {/* Feed Filter */}
-          <div className="flex mb-4 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 sticky top-0">
+          <div className="flex mb-4 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 sticky top-0 z-20">
             {filters.map((filter) => {
               return (
                 <Link
