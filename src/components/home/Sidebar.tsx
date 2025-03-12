@@ -18,7 +18,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="sticky top-4 w-72 overflow-auto h-screen">
+    <div className="overflow-auto h-screen">
       {/* Search Box */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-4 border border-gray-200 dark:border-gray-700">
         <div className="relative">
