@@ -88,7 +88,7 @@ function NavItem({
     <motion.div
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
-      className="relative group"
+      className="relative group z-50"
     >
       <Link href={href}>
         <div
