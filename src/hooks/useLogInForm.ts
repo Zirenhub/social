@@ -16,7 +16,11 @@ export const useLogInForm = () => {
     resolver: zodResolver(LogInContent),
   });
 
-  const { handleSubmit, register } = formMethods;
+  const {
+    handleSubmit,
+    formState: { errors },
+    register,
+  } = formMethods;
 
   const onSubmit: SubmitHandler<LogInZ> = async (formData) => {
     hasErrorsRef.current = false;
@@ -41,7 +45,7 @@ export const useLogInForm = () => {
     submit,
     formMethods,
     register,
-    hasErrors: hasErrorsRef.current,
+    hasErrors: hasErrorsRef.current || Object.keys(errors).length,
     isSubmitting,
   };
 };

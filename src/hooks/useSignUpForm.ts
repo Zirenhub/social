@@ -23,7 +23,12 @@ export const useSignUpForm = () => {
     },
   });
 
-  const { handleSubmit, register, watch } = formMethods;
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+    watch,
+  } = formMethods;
 
   const onSubmit: SubmitHandler<SignUpZ> = async (formData) => {
     hasErrorsRef.current = false;
@@ -65,6 +70,6 @@ export const useSignUpForm = () => {
     getDayOptions,
     formMethods,
     isSubmitting,
-    hasErrors: hasErrorsRef.current,
+    hasErrors: hasErrorsRef.current || Object.values(errors).length,
   };
 };
