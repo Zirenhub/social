@@ -67,6 +67,16 @@ export async function getSession(): Promise<ApiResponse<SessionUser>> {
   }
 }
 
+export async function getUser() {
+  const user = await getSession();
+
+  if (!user.success || !user.data) {
+    throw new Error('User could not be verified.');
+  }
+
+  return user.data;
+}
+
 export async function deleteSession() {
   const cookieStore = await cookies();
   cookieStore.delete('session');

@@ -1,15 +1,11 @@
 import { getPostsCount } from '@/app/api/profile/fetching';
-import { getSession } from '@/lib/session';
+import { getUser } from '@/lib/session';
 import { Settings, User2Icon } from 'lucide-react';
 
 export default async function ProfileCard() {
-  const userResult = await getSession();
-  if (!userResult.success || !userResult.data) {
-    throw new Error(userResult.error.message);
-  }
+  const user = await getUser();
 
-  const { data } = userResult;
-  const postsCount = await getPostsCount(data.profile.id);
+  const postsCount = await getPostsCount(user.profile.id);
 
   const navs = [
     { label: 'Settings', icon: <Settings size={16} color="gray" /> },
@@ -24,10 +20,10 @@ export default async function ProfileCard() {
           </div>
           <div className="mb-1">
             <p className="font-semibold text-gray-600 dark:text-gray-100">
-              {data.profile.firstName} {data.profile.lastName}
+              {user.profile.firstName} {user.profile.lastName}
             </p>
             <p className="text-sm text-gray-400 dark:text-gray-400">
-              @{data.profile.username}
+              @{user.profile.username}
             </p>
           </div>
         </div>
