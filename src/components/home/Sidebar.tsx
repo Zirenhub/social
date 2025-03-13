@@ -44,7 +44,7 @@ export default function Sidebar() {
             className="flex justify-between items-center py-2 hover:bg-gray-50 dark:hover:bg-gray-700 px-2 rounded-lg transition-colors cursor-pointer"
           >
             <div className="flex items-center">
-              <span className="w-6 h-6 flex items-center justify-center rounded-full bg-[var(--color-cyan-500)] bg-opacity-10 text-[var(--color-cyan-500)] text-xs font-bold mr-3">
+              <span className="w-6 h-6 flex items-center justify-center rounded-full bg-[var(--color-cyan-500)] bg-opacity-10 text-[var(--color-cyan-100)] text-xs font-bold mr-3">
                 {index + 1}
               </span>
               <span className="text-gray-800 dark:text-gray-200 font-medium">
