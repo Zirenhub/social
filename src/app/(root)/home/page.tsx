@@ -31,15 +31,15 @@ export default async function Home({
   const currentFilter = (await searchParams).filter || 'forYou';
 
   return (
-    <div className="flex items-start">
+    <div className="flex items-start text-lg justify-between mx-14">
       {/* Left Sidebar */}
-      <aside className="hidden xl:flex flex-col gap-3 sticky top-4 ml-12 h-[calc(100vh-2rem)] flex-shrink">
+      <aside className="hidden xl:flex flex-col gap-3 sticky top-4 h-[calc(100vh-2rem)] flex-shrink 2xl:flex-1 items-start">
         <ProfileCard />
         <Notifications />
       </aside>
 
       {/* Main Feed */}
-      <div className="mt-4 flex flex-col w-xl justify-center mx-auto">
+      <div className="mt-4 flex flex-col not-2xl:w-[90%] not-2xl:ml-18 2xl:min-w-1/3 2xl:w-[600px] justify-center">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 mb-4">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--color-cyan-500)] to-[var(--color-blue-500)] bg-clip-text text-transparent mb-6 tracking-tight ">
             Share your thoughts!
@@ -76,9 +76,11 @@ export default async function Home({
         </Suspense>
       </div>
 
-      {/* Right Sidebar _ fix media block responsivenes */}
-      <aside className="hidden 2xl:block mr-12 mt-4 sticky top-4 w-72">
-        <Sidebar />
+      {/* Right Sidebar */}
+      <aside className="hidden 2xl:flex justify-end mt-4 sticky top-4 flex-1">
+        <div className="w-76">
+          <Sidebar />
+        </div>
       </aside>
     </div>
   );

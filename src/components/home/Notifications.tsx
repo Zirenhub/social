@@ -75,7 +75,7 @@ export default function Notifications() {
         </span>
       </div>
 
-      <div className="space-y-2 max-h-96 overflow-y-auto">
+      <div className="space-y-2 h-full overflow-y-auto pr-2">
         {notifications.map((notification) => (
           <div
             key={notification.id}
@@ -90,13 +90,13 @@ export default function Notifications() {
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+              <p className="text-lg font-['bold'] text-gray-900 dark:text-white truncate">
                 {notification.user}
               </p>
-              <p className="text-xs text-gray-600 dark:text-gray-300">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 {notification.content}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 {notification.time}
               </p>
             </div>
