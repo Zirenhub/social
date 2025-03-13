@@ -13,4 +13,6 @@ const MONTHS = [
   'December',
 ];
 
-export { MONTHS };
+const LAST_ACTIVE_THRESHOLD_S = 300; // 5 minutes,
+
+export { MONTHS, LAST_ACTIVE_THRESHOLD_S };

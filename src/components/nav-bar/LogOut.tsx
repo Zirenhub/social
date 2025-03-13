@@ -1,7 +1,5 @@
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'react-toastify';
-import { logOut } from '@/app/api/auth/actions';
 import LoaderPlaceholder from '../loader/LoaderPlaceholder';
 import { motion } from 'framer-motion';
 import { LogOut as LogOutIcon } from 'lucide-react';
@@ -12,14 +10,7 @@ export default function LogOut() {
 
   function handleLogOut() {
     startTransition(async () => {
-      try {
-        const result = await logOut();
-        if (result.success) {
-          router.replace('/');
-        }
-      } catch (error) {
-        toast.error('An error occurred during logout');
-      }
+      router.push('/logout');
     });
   }
 

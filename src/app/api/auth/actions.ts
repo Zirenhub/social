@@ -4,8 +4,9 @@ import { LogInContent, LogInZ, SignUpContent, SignUpZ } from '@/types/auth';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma';
 import successResponse, { errorResponse } from '../response';
-import { createSession, deleteSession } from '@/lib/session';
+import { createSession, getUser } from '@/lib/session';
 import { SessionUser } from '@/types/api';
+import { revalidateTag } from 'next/cache';
 
 export async function signUp(formData: SignUpZ) {
   try {
@@ -64,7 +65,7 @@ export async function logIn(formData: LogInZ) {
       },
     });
 
-    if (!user) {
+    if (!user || !user.profile) {
       throw new Error('User not found');
     }
 
@@ -81,13 +82,34 @@ export async function logIn(formData: LogInZ) {
 
     await createSession(safeUser as SessionUser);
 
-    return successResponse(user);
+    return successResponse(safeUser);
   } catch (err) {
     return errorResponse(err, 'An error occurred while creating the user.');
   }
 }
 
-export async function logOut() {
-  await deleteSession();
-  return successResponse(null);
+export async function updateLastActive() {
+  try {
+    console.log('updated');
+    const user = await getUser();
+
+    const updatedProfile = await prisma.profile.update({
+      where: { id: user.profile.id },
+      data: { lastActive: new Date() },
+      include: { user: true },
+    });
+
+    const { hashedPassword, ...safeUser } = updatedProfile.user;
+
+    await createSession({ ...safeUser, profile: updatedProfile });
+
+    revalidateTag(`profile-${updatedProfile.id}`);
+
+    return successResponse({ ...safeUser, profile: updatedProfile });
+  } catch (err) {
+    return errorResponse(
+      err,
+      'An error occurred while updating last active prop.'
+    );
+  }
 }

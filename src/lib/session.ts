@@ -71,13 +71,8 @@ export async function getUser() {
   const user = await getSession();
 
   if (!user.success || !user.data) {
-    throw new Error('User could not be verified.');
+    throw new Error(user.error.message);
   }
 
   return user.data;
-}
-
-export async function deleteSession() {
-  const cookieStore = await cookies();
-  cookieStore.delete('session');
 }
