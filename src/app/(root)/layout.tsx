@@ -1,8 +1,8 @@
 import Navigation from '@/components/nav-bar/Navigation';
 import { headers } from 'next/headers';
 import React from 'react';
-import { updateLastActive } from '../api/auth/actions';
 import { getUser } from '@/lib/session';
+import LastActiveUpdater from '@/components/LastActiveUpdater';
 
 export default async function AppLayout({
   children,
@@ -11,15 +11,14 @@ export default async function AppLayout({
 }) {
   const user = await getUser();
   const headersList = await headers();
-  const isUpdateLastActive = headersList.get('x-update-last-active') === 'true';
 
-  if (isUpdateLastActive) {
-    await updateLastActive();
-  }
+  // Check if we need to update last active
+  const shouldUpdateLastActive =
+    headersList.get('x-update-last-active') === 'true';
 
   return (
     <div className="flex w-full h-screen">
-      {/* <LastActiveUpdater shouldUpdate={isUpdateLastActive} /> */}
+      {shouldUpdateLastActive && <LastActiveUpdater />}
       <Navigation user={user} />
       <main className="flex-1 min-h-screen bg-gradient-to-br from-white to-[var(--color-cyan-500)]/5 dark:from-[var(--color-dark-500)] dark:to-[var(--color-purple-500)]/10 pb-12 overflow-auto">
         {children}
