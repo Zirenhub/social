@@ -67,9 +67,7 @@ export default function Notifications() {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 border border-gray-200 dark:border-gray-700 flex flex-col flex-grow min-h-0">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold text-gray-800 dark:text-white">
-          Notifications
-        </h2>
+        <h2 className="container-title">Notifications</h2>
         <span className="bg-[var(--color-cyan-500)] text-white text-xs font-medium px-2 py-1 rounded-full">
           {notifications.filter((n) => !n.read).length}
         </span>
