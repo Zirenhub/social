@@ -1,5 +1,5 @@
 import { ApiResponse } from '@/types/api';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { Prisma } from '@prisma/client';
 import { ZodError } from 'zod';
 
 export default function successResponse<T>(data: T): ApiResponse<T> {
@@ -21,8 +21,22 @@ export function errorResponse(
     error: { message: defaultMessage },
   };
 
+  // Check for DateTime validation errors specifically
+  if (error instanceof Error) {
+    const errorMessage = error.message;
+    if (errorMessage.includes('Expected ISO-8601 DateTime')) {
+      response.error.message =
+        'Invalid date format provided. Please use a valid date.';
+      return response;
+    }
+  }
+
+  if (error instanceof Prisma.PrismaClientValidationError) {
+    response.error.message = 'Invalid data provided.';
+  }
+
   // Handle Prisma errors
-  if (error instanceof PrismaClientKnownRequestError) {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
     response.error.message = getPrismaErrorMessage(error);
   }
   // Handle Zod validation errors
@@ -53,7 +67,9 @@ export function errorResponse(
 }
 
 // Helper function to get prisma-specific error messages
-function getPrismaErrorMessage(error: PrismaClientKnownRequestError): string {
+function getPrismaErrorMessage(
+  error: Prisma.PrismaClientKnownRequestError
+): string {
   switch (error.code) {
     case 'P2002':
       return `This ${error.meta?.target} is already in use.`;
@@ -61,6 +77,12 @@ function getPrismaErrorMessage(error: PrismaClientKnownRequestError): string {
       return `Record not found.`;
     case 'P2003':
       return `Referenced record not found.`;
+    // Add more detailed handling for specific validation error codes
+    case 'P2007': // validation error
+      if (error.message.includes('DateTime')) {
+        return 'Invalid date format. Please provide a valid date.';
+      }
+      return `Validation error: ${error.message}`;
     default:
       return `Database error: ${error.message}`;
   }
