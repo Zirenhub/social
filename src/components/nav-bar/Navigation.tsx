@@ -1,13 +1,18 @@
 'use client';
 import { usePathname } from 'next/navigation';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Home, Bell, User, PlusCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import ThemeSwitcher from './ThemeSwitcher';
 import LogOut from './LogOut';
+import { SessionUser } from '@/types/api';
 
-export default function Navigation() {
+type Props = {
+  user: SessionUser;
+};
+
+export default function Navigation({ user }: Props) {
   const pathname = usePathname();
 
   const navItems = [
@@ -18,7 +23,12 @@ export default function Navigation() {
       label: 'Alerts',
       color: 'bg-indigo-500',
     },
-    { href: '/profile', icon: User, label: 'Profile', color: 'bg-orange-500' },
+    {
+      href: `/profile/${user.profile.id}`,
+      icon: User,
+      label: 'Profile',
+      color: 'bg-orange-500',
+    },
     {
       href: '/create',
       icon: PlusCircle,
