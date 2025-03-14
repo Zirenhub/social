@@ -1,4 +1,5 @@
 import { SearchIcon } from 'lucide-react';
+import MightKnow from '../sidebar/MightKnow';
 
 export default function Sidebar() {
   // Sample trending topics
@@ -10,17 +11,10 @@ export default function Sidebar() {
     { topic: 'Food', posts: '489' },
   ];
 
-  // Sample suggested connections
-  const suggestedConnections = [
-    { name: 'Taylor Reed', mutual: 12 },
-    { name: 'Jordan Brown', mutual: 8 },
-    { name: 'Riley Smith', mutual: 5 },
-  ];
-
   return (
-    <div className="overflow-auto h-screen">
+    <div className="overflow-auto flex flex-col gap-3 no-scrollbar">
       {/* Search Box */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-4 border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-200 dark:border-gray-700">
         <div className="relative">
           <input
             type="text"
@@ -34,10 +28,8 @@ export default function Sidebar() {
       </div>
 
       {/* Trending Topics */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-4 border border-gray-200 dark:border-gray-700">
-        <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-4">
-          Trending Topics
-        </h3>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-200 dark:border-gray-700">
+        <h3 className="container-title mb-4">Trending Topics</h3>
         {trendingTopics.map((item, index) => (
           <div
             key={index}
@@ -62,30 +54,7 @@ export default function Sidebar() {
       </div>
 
       {/* Suggested Connections */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-4 border border-gray-200 dark:border-gray-700">
-        <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-4">
-          People You May Know
-        </h3>
-        {suggestedConnections.map((person, index) => (
-          <div
-            key={index}
-            className="flex items-center py-3 border-b border-gray-200 dark:border-gray-700 last:border-0"
-          >
-            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[var(--color-purple-500)] to-[var(--color-cyan-500)] mr-3"></div>
-            <div>
-              <p className="font-medium text-gray-900 dark:text-gray-100">
-                {person.name}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {person.mutual} mutual connections
-              </p>
-            </div>
-            <button className="ml-auto text-sm font-medium text-[var(--color-cyan-500)] hover:text-[var(--color-blue-500)] transition-colors">
-              Connect
-            </button>
-          </div>
-        ))}
-      </div>
+      <MightKnow />
 
       {/* Footer Links */}
       <div className="text-xs text-gray-500 dark:text-gray-400 px-4">
