@@ -6,11 +6,14 @@ import { LAST_ACTIVE_THRESHOLD_S } from './types/constants';
 export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const url = req.nextUrl.clone();
+
+  // Get the session from cookies
   const cookieStore = await cookies();
   const encryptedPayload = cookieStore.get('session')?.value;
-
-  // Parse the session if it exists
   const session = encryptedPayload ? await decrypt(encryptedPayload) : null;
+
+  // Create a response object that we'll modify
+  const response = NextResponse.next();
 
   // Case 1: Unauthenticated user trying to access any path except "/"
   if (session === null && pathname !== '/') {
@@ -18,42 +21,41 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Check if more than (n) minutes have passed from lastActive
+  // Check if user is authenticated
   if (session) {
+    // Case 2: Authenticated user trying to access root path "/"
+    if (pathname === '/') {
+      url.pathname = '/home';
+      return NextResponse.redirect(url);
+    }
+
+    // Case 3: Authenticated user trying to access path "/profile", redirect to own profile
+    if (pathname === '/profile') {
+      url.pathname = `/profile/${session.user.profile.id}`;
+      return NextResponse.redirect(url);
+    }
+
+    // Check if more than threshold seconds have passed from lastActive
     const lastActive = new Date(session.user.profile.lastActive).getTime();
     const currentTime = Date.now();
+    const timeSinceLastActive = currentTime - lastActive;
 
-    const newHeaders = new Headers(req.headers);
-    if (currentTime - lastActive > LAST_ACTIVE_THRESHOLD_S * 1000) {
-      // Add a custom header to trigger lastActive update in a subsequent API route
-      newHeaders.set('x-update-last-active', 'true');
-    } else {
-      newHeaders.set('x-update-last-active', 'false');
+    // Only set the update header if enough time has passed
+    if (timeSinceLastActive > LAST_ACTIVE_THRESHOLD_S * 1000) {
+      // Add update signal to a header so we can check it in layout
+      response.headers.set('x-update-last-active', 'true');
     }
-    NextResponse.next({ request: { headers: newHeaders } });
   }
 
-  // Case 2: Authenticated user trying to access root path "/"
-  if (session && pathname === '/') {
-    url.pathname = '/home';
-    return NextResponse.redirect(url);
-  }
-
+  // Handle logout separately
   if (pathname === '/logout') {
-    // Clear the session cookie
     url.pathname = '/';
-    cookieStore.delete('session');
-    return NextResponse.redirect(url);
+    const logoutResponse = NextResponse.redirect(url);
+    logoutResponse.cookies.delete('session');
+    return logoutResponse;
   }
 
-  // Case 3: Authenticated user trying to access path "/profile", redirect to own profile
-  if (session && pathname === '/profile') {
-    url.pathname = `/profile/${session.user.profile.id}`;
-    return NextResponse.redirect(url);
-  }
-
-  // If none of the redirect conditions are met, allow the request to continue
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {
