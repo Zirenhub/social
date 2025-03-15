@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import successResponse, { errorResponse } from '../response';
 import { unstable_cache } from 'next/cache';
-import { LAST_ACTIVE_THRESHOLD_S } from '@/types/constants';
+import { API } from '@/types/constants';
 
 export const getPostsCount = unstable_cache(
   async (profileId: string) => {
@@ -43,7 +43,7 @@ export const getProfile = (profileId: string) => {
     {
       // Use string array for tags
       tags: [cacheKey, 'profile'],
-      revalidate: LAST_ACTIVE_THRESHOLD_S,
+      revalidate: API.PROFILE.LAST_ACTIVE_THRESHOLD_S,
     }
   )();
 };

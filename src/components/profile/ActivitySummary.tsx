@@ -1,4 +1,4 @@
-import { LAST_ACTIVE_THRESHOLD_S } from '@/types/constants';
+import { API } from '@/types/constants';
 import Profile from '@/types/profile';
 import {
   differenceInMinutes,
@@ -28,7 +28,7 @@ export default function ActivitySummary({ profile }: Props) {
           </span>
           <span className="text-sm font-medium">
             {Math.abs(minutesDifference) <
-            secondsToMinutes(LAST_ACTIVE_THRESHOLD_S)
+            secondsToMinutes(API.PROFILE.LAST_ACTIVE_THRESHOLD_S)
               ? 'Now'
               : formatDistance(profile.lastActive, new Date(), {
                   addSuffix: true,
