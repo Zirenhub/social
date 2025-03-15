@@ -4,7 +4,7 @@ import { LogInContent, LogInZ, SignUpContent, SignUpZ } from '@/types/auth';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma';
 import successResponse, { errorResponse } from '../response';
-import { createSession, getUser } from '@/lib/session';
+import { createSession, deleteSession, getUser } from '@/lib/session';
 import { SessionUser } from '@/types/api';
 import { revalidateTag } from 'next/cache';
 
@@ -90,26 +90,40 @@ export async function logIn(formData: LogInZ) {
 
 export async function updateLastActive() {
   try {
-    console.log('updated');
+    // Get the current user from the session
     const user = await getUser();
 
+    // Update the profile's lastActive timestamp
     const updatedProfile = await prisma.profile.update({
       where: { id: user.profile.id },
       data: { lastActive: new Date() },
       include: { user: true },
     });
 
+    // Remove sensitive data before storing in session
     const { hashedPassword, ...safeUser } = updatedProfile.user;
 
+    // Update the session with new lastActive time
     await createSession({ ...safeUser, profile: updatedProfile });
 
+    // Revalidate any cached data that depends on the profile
     revalidateTag(`profile-${updatedProfile.id}`);
 
     return successResponse({ ...safeUser, profile: updatedProfile });
   } catch (err) {
+    console.error('Failed to update last active:', err);
     return errorResponse(
       err,
       'An error occurred while updating last active prop.'
     );
+  }
+}
+
+export async function logOut() {
+  try {
+    await deleteSession();
+    return successResponse(null);
+  } catch (err) {
+    return errorResponse(err, 'An error occurred while logging out.');
   }
 }

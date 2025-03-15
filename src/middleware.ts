@@ -1,7 +1,7 @@
 import { decrypt } from '@/lib/session';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import { LAST_ACTIVE_THRESHOLD_S } from './types/constants';
+import { API } from './types/constants';
 
 export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -12,17 +12,17 @@ export default async function middleware(req: NextRequest) {
   const encryptedPayload = cookieStore.get('session')?.value;
   const session = encryptedPayload ? await decrypt(encryptedPayload) : null;
 
-  // Create a response object that we'll modify
-  const response = NextResponse.next();
-
   // Case 1: Unauthenticated user trying to access any path except "/"
   if (session === null && pathname !== '/') {
+    console.log('unauthorized:');
     url.pathname = '/';
     return NextResponse.redirect(url);
   }
 
   // Check if user is authenticated
   if (session) {
+    console.log('authorized:');
+
     // Case 2: Authenticated user trying to access root path "/"
     if (pathname === '/') {
       url.pathname = '/home';
@@ -41,21 +41,17 @@ export default async function middleware(req: NextRequest) {
     const timeSinceLastActive = currentTime - lastActive;
 
     // Only set the update header if enough time has passed
-    if (timeSinceLastActive > LAST_ACTIVE_THRESHOLD_S * 1000) {
-      // Add update signal to a header so we can check it in layout
+    if (timeSinceLastActive > API.PROFILE.LAST_ACTIVE_THRESHOLD_S * 1000) {
+      // This will trigger our client component to call the server action
+      const response = NextResponse.next();
       response.headers.set('x-update-last-active', 'true');
+      return response;
     }
   }
 
-  // Handle logout separately
-  if (pathname === '/logout') {
-    url.pathname = '/';
-    const logoutResponse = NextResponse.redirect(url);
-    logoutResponse.cookies.delete('session');
-    return logoutResponse;
-  }
+  console.log('Middleware pathname:', pathname);
 
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {

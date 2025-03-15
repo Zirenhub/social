@@ -1,9 +1,9 @@
 'use server-only';
-
 import { ApiResponse, SessionUser } from '@/types/api';
 import { SessionPayload } from '@/types/session';
 import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 const secretKey = process.env.SESSION_SECRET;
 const encodedKey = new TextEncoder().encode(secretKey);
@@ -67,11 +67,16 @@ export async function getSession(): Promise<ApiResponse<SessionUser>> {
   }
 }
 
+export async function deleteSession() {
+  const cookieStore = await cookies();
+  cookieStore.delete('session');
+}
+
 export async function getUser() {
   const user = await getSession();
 
   if (!user.success || !user.data) {
-    throw new Error(user.error.message);
+    redirect('/');
   }
 
   return user.data;
