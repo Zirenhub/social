@@ -1,6 +1,4 @@
 'use client';
-
-import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import LoaderPlaceholder from '../loader/LoaderPlaceholder';
 import { motion } from 'framer-motion';
@@ -8,7 +6,6 @@ import { LogOut as LogOutIcon } from 'lucide-react';
 import { logOut as logOutAction } from '@/app/api/auth/actions';
 
 export default function LogOut() {
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   function handleLogOut() {
