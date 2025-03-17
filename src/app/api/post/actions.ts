@@ -4,6 +4,9 @@ import successResponse, { errorResponse } from '../response';
 import { PostContent } from '@/types/post';
 import { revalidateTag } from 'next/cache';
 import { getUser } from '@/lib/session';
+import { CACHE_TAGS } from '@/types/constants';
+
+// update last active on actions
 
 export async function createPost({ content }: { content: string }) {
   try {
@@ -13,7 +16,9 @@ export async function createPost({ content }: { content: string }) {
       data: { content: parsed.content, profileId: user.profile.id },
     });
 
-    revalidateTag('posts');
+    revalidateTag(CACHE_TAGS.POSTS); // revalidate home page since new post will alawys show there
+    revalidateTag(CACHE_TAGS.PROFILE_POSTSCOUNT(user.profile.id));
+    // revalidate this user's profile page posts
 
     return successResponse(post);
   } catch (error) {
@@ -32,7 +37,8 @@ export async function deletePost({ postId }: { postId: string }) {
 
     const deletedPost = await prisma.post.delete({ where: { id: postId } });
 
-    revalidateTag('posts');
+    revalidateTag(CACHE_TAGS.POSTS);
+    revalidateTag(CACHE_TAGS.PROFILE_POSTSCOUNT(user.profile.id));
 
     return successResponse(deletedPost);
   } catch (error) {
