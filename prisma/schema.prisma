@@ -10,6 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 // User model - absolute minimum with only authentication data
 model User {
   id                String    @id @default(uuid())
@@ -51,13 +52,9 @@ model Profile {
   likes            Like[]
   comments         Comment[]
   
-  // Friend system
-  sentRequests     FriendRequest[] @relation("RequestSender")
-  receivedRequests FriendRequest[] @relation("RequestReceiver")
-  
-  // Many-to-many self-relation through Friendship join table
-  friends          Friendship[]    @relation("UserFriends")
-  friendsOf        Friendship[]    @relation("FriendsOfUser")
+  // Followers/Following system
+  followers        Follow[]   @relation("ProfileFollowers")
+  following        Follow[]   @relation("ProfileFollowing")
 
   @@index([username])
   @@index([firstName, lastName])
@@ -121,45 +118,19 @@ model Comment {
   @@index([createdAt])
 }
 
-// FriendRequest model with status enum
-model FriendRequest {
-  id               String         @id @default(uuid())
-  senderId         String
-  receiverId       String
-  status           RequestStatus  @default(PENDING)
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+// Follow model with composite primary key for followers/following relationship
+model Follow {
+  followerId       String
+  followingId      String
+  createdAt        DateTime   @default(now())
   
   // Relations
-  sender           Profile        @relation("RequestSender", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver         Profile        @relation("RequestReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
-  
-  // Unique constraint to prevent duplicate requests
-  @@unique([senderId, receiverId])
-  @@index([status])
-  @@index([createdAt])
-}
-
-// Friendship model with composite primary key for efficiency
-model Friendship {
-  profileId        String
-  friendId         String
-  createdAt        DateTime       @default(now())
-  
-  // Relations - using explicit naming to avoid confusion
-  profile          Profile        @relation("UserFriends", fields: [profileId], references: [id], onDelete: Cascade)
-  friend           Profile        @relation("FriendsOfUser", fields: [friendId], references: [id], onDelete: Cascade)
+  follower         Profile    @relation("ProfileFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following        Profile    @relation("ProfileFollowers", fields: [followingId], references: [id], onDelete: Cascade)
   
   // Composite primary key - more efficient than separate id + unique constraint
-  @@id([profileId, friendId])
+  @@id([followerId, followingId])
   @@index([createdAt])
-}
-
-// Enum for friend request status
-enum RequestStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
 }
 
 enum GENDER {
