@@ -6,7 +6,9 @@ import { prisma } from '@/lib/prisma';
 import successResponse, { errorResponse } from '../response';
 import { createSession, deleteSession, getUser } from '@/lib/session';
 import { SessionUser } from '@/types/api';
-import { revalidateTag } from 'next/cache';
+import { ACTIVITY_THRESHOLDS } from '@/types/constants';
+
+let lastUpdateTimestamp = 0;
 
 export async function signUp(formData: SignUpZ) {
   try {
@@ -88,8 +90,26 @@ export async function logIn(formData: LogInZ) {
   }
 }
 
-export async function updateLastActive() {
+export async function updateLastActive(
+  actionType: 'browse' | 'post' | 'like' | 'comment' = 'browse'
+) {
   try {
+    const now = Date.now();
+
+    // Different minimum intervals based on action importance
+    const minIntervals = {
+      browse: ACTIVITY_THRESHOLDS.UPDATE_LAST_ACTIVE_MINUTES * 60 * 1000.0,
+      comment: 30000, // 30 seconds
+      like: 10000, // 10 seconds
+      post: 0, // always update on post
+    };
+
+    // Check if we've updated too recently for this action type
+    if (now - lastUpdateTimestamp < minIntervals[actionType]) {
+      // Skip update but return success (silent throttling)
+      return { success: true, data: { throttled: true }, error: null };
+    }
+
     // Get the current user from the session
     const user = await getUser();
 
@@ -106,8 +126,8 @@ export async function updateLastActive() {
     // Update the session with new lastActive time
     await createSession({ ...safeUser, profile: updatedProfile });
 
-    // Revalidate any cached data that depends on the profile
-    revalidateTag(`profile-${updatedProfile.id}`);
+    // Update our timestamp tracker
+    lastUpdateTimestamp = now;
 
     return successResponse({ ...safeUser, profile: updatedProfile });
   } catch (err) {
