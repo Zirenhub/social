@@ -1,12 +1,13 @@
-import { getPosts } from '@/app/api/post/fetching';
+import { getHomePosts } from '@/app/api/post/fetching';
 import PostContainer from '../post/PostContainer';
+import { HomePagePostsFilter } from '@/types/constants';
 
 type Props = {
-  filter: string;
+  filter: HomePagePostsFilter;
 };
 
 export default async function Feed({ filter }: Props) {
-  const result = await getPosts({ filter });
+  const result = await getHomePosts({ filter });
 
   if (!result.success || !result.data) {
     return <p>{result.error?.message}</p>;
