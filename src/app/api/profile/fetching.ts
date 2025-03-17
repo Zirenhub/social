@@ -25,6 +25,52 @@ export const getPostsCount = (profileId: string, since?: Date) => {
   )();
 };
 
+export const getFollowingCount = (profileId: string) => {
+  return unstable_cache(
+    async () => {
+      try {
+        const {
+          _count: { following: count },
+        } = await prisma.profile.findUniqueOrThrow({
+          where: { id: profileId },
+          select: {
+            _count: { select: { following: true } },
+          },
+        });
+
+        return successResponse(count);
+      } catch (error) {
+        return errorResponse(error, 'Failed getting profile following count.');
+      }
+    },
+    [CACHE_TAGS.PROFILE_FOLLOWINGCOUNT(profileId)],
+    { tags: [CACHE_TAGS.PROFILE_FOLLOWINGCOUNT(profileId)] }
+  )();
+};
+
+export const getFollowersCount = (profileId: string) => {
+  return unstable_cache(
+    async () => {
+      try {
+        const {
+          _count: { followers: count },
+        } = await prisma.profile.findUniqueOrThrow({
+          where: { id: profileId },
+          select: {
+            _count: { select: { followers: true } },
+          },
+        });
+
+        return successResponse(count);
+      } catch (error) {
+        return errorResponse(error, 'Failed getting profile followers count.');
+      }
+    },
+    [CACHE_TAGS.PROFILE_FOLLOWINGCOUNT(profileId)],
+    { tags: [CACHE_TAGS.PROFILE_FOLLOWINGCOUNT(profileId)] }
+  )();
+};
+
 export const getProfileBasic = (profileId: string) => {
   // Create a profile-specific cache key
   const cacheKey = CACHE_TAGS.PROFILE(profileId);

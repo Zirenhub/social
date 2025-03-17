@@ -1,4 +1,4 @@
-import { getPostsCount } from '@/app/api/profile/fetching';
+import { getFollowingCount, getPostsCount } from '@/app/api/profile/fetching';
 import { getUser } from '@/lib/session';
 import { Settings, User2Icon } from 'lucide-react';
 
@@ -6,6 +6,7 @@ export default async function ProfileCard() {
   const user = await getUser();
 
   const postsCount = await getPostsCount(user.profile.id);
+  const followingCount = await getFollowingCount(user.profile.id);
 
   const navs = [
     { label: 'Settings', icon: <Settings size={16} color="gray" /> },
@@ -30,18 +31,20 @@ export default async function ProfileCard() {
       <div className="grid grid-cols-3 text-center py-2 border-t border-b border-gray-200 dark:border-gray-700 mb-4 gap-6">
         <div>
           <p className="font-['bold'] text-gray-900 dark:text-gray-100">
-            {postsCount.data}
+            {postsCount.data === null ? 'Error' : postsCount.data}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400">Posts</p>
         </div>
         <div>
           <p className="font-['bold'] text-gray-900 dark:text-gray-100">
-            12.4k
+            12.4m
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400">Followers</p>
         </div>
         <div>
-          <p className="font-['bold'] text-gray-900 dark:text-gray-100">567</p>
+          <p className="font-['bold'] text-gray-900 dark:text-gray-100">
+            {followingCount.data === null ? 'Error' : followingCount.data}
+          </p>
           <p className="text-xs text-gray-500 dark:text-gray-400">Following</p>
         </div>
       </div>
