@@ -4,6 +4,10 @@ import ProfileCard from '@/components/home/ProfileCard';
 import Sidebar from '@/components/home/Sidebar';
 import LoaderPlaceholder from '@/components/loader/LoaderPlaceholder';
 import CreatePost from '@/components/post/CreatePost';
+import {
+  HOME_PAGE_POSTS_FILTERS,
+  HomePagePostsFilter,
+} from '@/types/constants';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -18,9 +22,11 @@ export default async function Home({
 }: {
   searchParams: Promise<{ filter: string | undefined }>;
 }) {
-  const filters = [
+  const currentFilter = (await searchParams).filter;
+
+  const filters: { label: string; url: HomePagePostsFilter }[] = [
     { label: 'For You', url: 'forYou' },
-    { label: 'Friends', url: 'friends' },
+    { label: 'Friends', url: 'following' },
     { label: 'Trending', url: 'trending' },
   ];
 
@@ -28,7 +34,13 @@ export default async function Home({
     return `?filter=${filter}`;
   };
 
-  const currentFilter = (await searchParams).filter || 'forYou';
+  const getCurrentFilter = (): HomePagePostsFilter => {
+    if (HOME_PAGE_POSTS_FILTERS.some((filter) => filter === currentFilter)) {
+      return currentFilter as HomePagePostsFilter;
+    } else {
+      return 'forYou';
+    }
+  };
 
   return (
     <div className="flex items-start text-lg justify-between mx-14 pr-[72px]">
@@ -54,7 +66,7 @@ export default async function Home({
                 href={getFilterUrl(filter.url)}
                 key={filter.label}
                 className={`flex-1 py-2 font-medium text-center ${
-                  currentFilter === filter.url
+                  getCurrentFilter() === filter.url
                     ? 'text-[var(--color-cyan-500)] border-b-2 border-[var(--color-cyan-500)]'
                     : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
@@ -65,14 +77,14 @@ export default async function Home({
           })}
         </div>
         <Suspense
-          key={currentFilter}
+          key={getCurrentFilter()}
           fallback={
             <div className="flex items-center justify-center">
               <LoaderPlaceholder size={32} text="Loading posts..." />
             </div>
           }
         >
-          <Feed filter={currentFilter} />
+          <Feed filter={getCurrentFilter()} />
         </Suspense>
       </div>
 
