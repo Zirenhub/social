@@ -13,21 +13,29 @@ import {
 import MightKnow from '@/components/sidebar/MightKnow';
 import ActivitySummary from '@/components/profile/ActivitySummary';
 import Feed from '@/components/home/Feed';
-import { getProfile } from '@/app/api/profile/fetching';
+import {
+  getProfileBasic,
+  getProfileLastActive,
+} from '@/app/api/profile/fetching';
+import { formatJoinedDate } from '@/helpers/formatDate';
 
 type Props = { params: Promise<{ slug: string }> };
 
 export default async function Profile({ params }: Props) {
   const { slug } = await params;
-  const result = await getProfile(slug);
+  const profileResult = await getProfileBasic(slug);
 
-  if (!result.success || !result.data) {
+  if (!profileResult.success || !profileResult.data) {
     return (
       <p className="text-center h-full text-lg text-red-400">
-        {result.error?.message}
+        {profileResult.error?.message}
       </p>
     );
   }
+
+  const lastActiveResult = await getProfileLastActive(slug);
+
+  const result = { ...profileResult.data, lastActive: lastActiveResult };
 
   return (
     <div className="mx-14 mt-6">
@@ -79,27 +87,27 @@ export default async function Profile({ params }: Props) {
 
               {/* Profile content */}
               <div className="pt-16 pb-8 px-8">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-[var(--color-cyan-500)] to-[var(--color-blue-500)] bg-clip-text text-transparent">
-                  {`${result.data.firstName} ${result.data.lastName}` || 'User'}
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-[var(--color-cyan-500)] to-[var(--color-blue-500)] bg-clip-text text-transparent pb-1">
+                  {`${result.firstName} ${result.lastName}`}
                 </h1>
 
-                <p className="mt-1 text-[var(--color-dark-500)]/60 dark:text-white/60">
-                  @{result.data.username}
+                <p className="text-[var(--color-dark-500)]/60 dark:text-white/60">
+                  @{result.username}
                 </p>
 
                 <p className="mt-4 text-[var(--color-dark-500)]/80 dark:text-white/80">
-                  {result.data.bio ||
+                  {result.bio ||
                     'No bio yet. Click on Edit Profile to add your bio.'}
                 </p>
 
                 <div className="flex flex-wrap gap-4 mt-6">
-                  {result.data.location && (
+                  {result.location && (
                     <div className="flex items-center gap-1 text-sm text-[var(--color-dark-500)]/60 dark:text-white/60">
                       <MapPin
                         size={16}
                         className="text-[var(--color-cyan-500)]"
                       />
-                      {result.data.location}
+                      {result.location}
                     </div>
                   )}
 
@@ -108,13 +116,7 @@ export default async function Profile({ params }: Props) {
                       size={16}
                       className="text-[var(--color-cyan-500)]"
                     />
-                    Joined{' '}
-                    {new Date(
-                      result.data.createdAt || Date.now()
-                    ).toLocaleDateString('en-US', {
-                      month: 'long',
-                      year: 'numeric',
-                    })}
+                    Joined {formatJoinedDate(result.createdAt)}
                   </div>
                 </div>
 
@@ -174,7 +176,7 @@ export default async function Profile({ params }: Props) {
           {/* Right side - Additional info */}
           <aside className="md:w-1/3 space-y-6 sticky top-4 self-start">
             {/* Activity summary */}
-            <ActivitySummary profile={result.data} />
+            <ActivitySummary lastActive={result.lastActive} />
             {/* Suggested connections */}
             <MightKnow />
           </aside>
