@@ -1,17 +1,17 @@
-import {
-  getFollowersCount,
-  getFollowingCount,
-  getPostsCount,
-} from '@/app/api/profile/fetching';
+import { getProfile } from '@/app/api/profile/fetching';
 import { getUser } from '@/lib/session';
 import { Settings, User2Icon } from 'lucide-react';
+import ErrorParagraph from '../error/ErrorParagraph';
+import ProfileStats from '../profile/ProfileStats';
 
 export default async function ProfileCard() {
   const user = await getUser();
+  const profileResult = await getProfile(user.profile.id);
 
-  const postsCount = await getPostsCount(user.profile.id);
-  const followingCount = await getFollowingCount(user.profile.id);
-  const followersCount = await getFollowersCount(user.profile.id);
+  if (!profileResult.success || !profileResult.data) {
+    return <ErrorParagraph message={profileResult.error?.message} />;
+  }
+  const { _count } = profileResult.data;
 
   const navs = [
     { label: 'Settings', icon: <Settings size={16} color="gray" /> },
@@ -25,36 +25,21 @@ export default async function ProfileCard() {
         </div>
         <div className="mb-1">
           <p className="font-['bold'] text-gray-600 dark:text-gray-100">
-            {user.profile.firstName} {user.profile.lastName}
+            {profileResult.data.firstName} {profileResult.data.lastName}
           </p>
           <p className="text-sm text-gray-400 dark:text-gray-400">
-            @{user.profile.username}
+            @{profileResult.data.username}
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 text-center py-2 border-t border-b border-gray-200 dark:border-gray-700 mb-4 gap-6">
-        <div>
-          <p className="font-['bold'] text-gray-900 dark:text-gray-100">
-            {postsCount.data === null ? 'Error' : postsCount.data}
-          </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Posts</p>
-        </div>
-        <div>
-          <p className="font-['bold'] text-gray-900 dark:text-gray-100">
-            {followersCount.data === null ? 'Error' : followersCount.data}
-          </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Followers</p>
-        </div>
-        <div>
-          <p className="font-['bold'] text-gray-900 dark:text-gray-100">
-            {followingCount.data === null ? 'Error' : followingCount.data}
-          </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Following</p>
-        </div>
-      </div>
+      <ProfileStats
+        postsCount={_count.posts}
+        followersCount={_count.followers}
+        followingCount={_count.following}
+      />
 
-      <nav>
+      <nav className="mt-3 pt-3 border-t border-[var(--color-dark-500)]/10 dark:border-white/10 ">
         {navs.map((item) => (
           <button
             key={item.label}
