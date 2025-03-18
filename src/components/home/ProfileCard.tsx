@@ -1,4 +1,8 @@
-import { getFollowingCount, getPostsCount } from '@/app/api/profile/fetching';
+import {
+  getFollowersCount,
+  getFollowingCount,
+  getPostsCount,
+} from '@/app/api/profile/fetching';
 import { getUser } from '@/lib/session';
 import { Settings, User2Icon } from 'lucide-react';
 
@@ -7,6 +11,7 @@ export default async function ProfileCard() {
 
   const postsCount = await getPostsCount(user.profile.id);
   const followingCount = await getFollowingCount(user.profile.id);
+  const followersCount = await getFollowersCount(user.profile.id);
 
   const navs = [
     { label: 'Settings', icon: <Settings size={16} color="gray" /> },
@@ -37,7 +42,7 @@ export default async function ProfileCard() {
         </div>
         <div>
           <p className="font-['bold'] text-gray-900 dark:text-gray-100">
-            12.4m
+            {followersCount.data === null ? 'Error' : followersCount.data}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400">Followers</p>
         </div>

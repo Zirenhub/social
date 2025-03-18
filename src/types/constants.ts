@@ -30,6 +30,8 @@ const CACHE_TAGS = {
   POST: (id: string) => `post:${id}`,
   PROFILE: (id: string) => `profile:${id}`,
   PROFILE_POSTSCOUNT: (id: string) => `profile:${id}:postsCount`,
+  PROFILE_FOLLOWINGCOUNT: (id: string) => `profile:${id}:followingCount`,
+  PROFILE_FOLLOWERSCOUNT: (id: string) => `profile:${id}:followersCount`,
 };
 const CACHE_DURATION = {
   NEVER: false,
