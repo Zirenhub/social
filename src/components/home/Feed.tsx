@@ -1,19 +1,12 @@
-import { getHomePosts } from '@/app/api/post/fetching';
 import PostContainer from '../post/PostContainer';
-import { HomePagePostsFilter } from '@/types/constants';
+import { PostWithProfileAndCounts } from '@/types/post';
 
 type Props = {
-  filter: HomePagePostsFilter;
+  posts: PostWithProfileAndCounts[];
 };
 
-export default async function Feed({ filter }: Props) {
-  const result = await getHomePosts({ filter });
-
-  if (!result.success || !result.data) {
-    return <p>{result.error?.message}</p>;
-  }
-
-  if (result.data.length === 0) {
+export default async function Feed({ posts }: Props) {
+  if (posts.length === 0) {
     return (
       <div className="p-12 text-center bg-white rounded-xl shadow-md dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <p className="text-[var(--color-dark-500)]/60 dark:text-white/60">
@@ -29,7 +22,7 @@ export default async function Feed({ filter }: Props) {
   return (
     <main>
       {/* Posts Feed */}
-      {result.data.map((post) => (
+      {posts.map((post) => (
         <PostContainer key={post.id} post={post} />
       ))}
       <div className="flex justify-center">

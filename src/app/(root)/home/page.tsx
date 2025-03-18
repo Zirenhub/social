@@ -1,3 +1,5 @@
+import { getHomePosts } from '@/app/api/post/fetching';
+import ErrorParagraph from '@/components/error/ErrorParagraph';
 import Feed from '@/components/home/Feed';
 import Notifications from '@/components/home/Notifications';
 import ProfileCard from '@/components/home/ProfileCard';
@@ -42,6 +44,8 @@ export default async function Home({
     }
   };
 
+  const result = await getHomePosts({ filter: getCurrentFilter() });
+
   return (
     <div className="flex items-start text-lg justify-between mx-14 pr-[72px]">
       {/* Left Sidebar */}
@@ -84,7 +88,11 @@ export default async function Home({
             </div>
           }
         >
-          <Feed filter={getCurrentFilter()} />
+          {!result.success || !result.data ? (
+            <ErrorParagraph message={result.error?.message} />
+          ) : (
+            <Feed posts={result.data} />
+          )}
         </Suspense>
       </div>
 
