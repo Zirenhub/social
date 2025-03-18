@@ -17,8 +17,7 @@ export async function createPost({ content }: { content: string }) {
     });
 
     revalidateTag(CACHE_TAGS.POSTS); // revalidate home page since new post will alawys show there
-    revalidateTag(CACHE_TAGS.PROFILE_POSTSCOUNT(user.profile.id));
-    // revalidate this user's profile page posts
+    revalidateTag(CACHE_TAGS.PROFILE(user.profile.id)); // revalidate profile page since new post will show there (this will also revalidate the count)
 
     return successResponse(post);
   } catch (error) {
@@ -38,7 +37,7 @@ export async function deletePost({ postId }: { postId: string }) {
     const deletedPost = await prisma.post.delete({ where: { id: postId } });
 
     revalidateTag(CACHE_TAGS.POSTS);
-    revalidateTag(CACHE_TAGS.PROFILE_POSTSCOUNT(user.profile.id));
+    revalidateTag(CACHE_TAGS.PROFILE(user.profile.id)); // revalidate profile page since post will be removed (this will also revalidate the count)
 
     return successResponse(deletedPost);
   } catch (error) {
