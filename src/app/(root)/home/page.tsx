@@ -67,7 +67,7 @@ export default async function Home({
                 key={filter.label}
                 className={`flex-1 py-2 font-medium text-center ${
                   getCurrentFilter() === filter.url
-                    ? 'text-[var(--color-cyan-500)] border-b-2 border-[var(--color-cyan-500)]'
+                    ? 'text-[var(--color-cyan-500)] border-b-2 border-[var(--color-cyan-500)] pointer-events-none '
                     : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >

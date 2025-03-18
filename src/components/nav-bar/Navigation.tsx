@@ -1,6 +1,6 @@
 'use client';
 import { usePathname } from 'next/navigation';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Home, Bell, User, PlusCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -100,7 +100,7 @@ function NavItem({
       whileTap={{ scale: 0.9 }}
       className="relative group z-50"
     >
-      <Link href={href}>
+      <Link href={href} className={isActive ? 'pointer-events-none' : ''}>
         <div
           className={`relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 ${
             isActive
