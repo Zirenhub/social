@@ -44,7 +44,7 @@ export function errorResponse(
     const { fieldErrors } = error.flatten();
 
     // Create a user-friendly message
-    response.error.message = 'Please check the form for errors';
+    // response.error.message = 'Please check the form for errors';
 
     // Add field-specific errors
     if (Object.keys(fieldErrors).length > 0) {
