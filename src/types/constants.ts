@@ -29,6 +29,7 @@ const CACHE_TAGS = {
   // Specific resources (for targeted invalidation)
   POST: (id: string) => `post:${id}`,
   PROFILE: (id: string) => `profile:${id}`,
+  PROFILE_POSTS: (id: string) => `profile:${id}:posts`,
   PROFILE_POSTSCOUNT: (id: string) => `profile:${id}:postsCount`,
   PROFILE_FOLLOWINGCOUNT: (id: string) => `profile:${id}:followingCount`,
   PROFILE_FOLLOWERSCOUNT: (id: string) => `profile:${id}:followersCount`,
