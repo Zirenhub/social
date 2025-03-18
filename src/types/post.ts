@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Post, Prisma } from '@prisma/client';
+import { Post, Prisma } from '@prisma/client';
 
 export const MAX_POST_CHARS = 256;
 
@@ -20,6 +20,16 @@ type PostWithProfileAndCounts = Prisma.PostGetPayload<{
     profile: true;
     _count: { select: { likes: true; comments: true } };
   };
+  orderBy: { createdAt: typeof Prisma.SortOrder.desc };
 }>;
+
+export const postQuery = (profileId?: string) => ({
+  where: profileId ? { profileId } : {},
+  include: {
+    profile: true,
+    _count: { select: { likes: true, comments: true } },
+  },
+  orderBy: { createdAt: Prisma.SortOrder.desc },
+});
 
 export type { PostContentZ, Post, PostWithProfileAndCounts };
