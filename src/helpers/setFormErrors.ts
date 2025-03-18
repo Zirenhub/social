@@ -1,4 +1,4 @@
-import { UseFormReturn } from 'react-hook-form';
+import { UseFormReturn, Path } from 'react-hook-form';
 import { ApiError } from '@/types/api';
 
 /**
@@ -13,24 +13,22 @@ export function setFormErrors<T extends Record<string, any>>(
   apiError: ApiError | undefined | null,
   shouldFocus: boolean = true
 ): void {
-  // If no error or no field errors, do nothing
-  if (!apiError || !apiError.fields) {
-    return;
-  }
+  if (!apiError?.fields) return;
 
   const fieldEntries = Object.entries(apiError.fields);
-  let isFirstError = true;
+  let firstField: Path<T> | null = null;
 
   fieldEntries.forEach(([field, message]) => {
-    // Set the error for each field
-    formMethods.setError(field as keyof T, {
-      message,
-      // Only set `shouldFocus` for the first error if requested
-      shouldFocus: shouldFocus && isFirstError,
-    });
+    const typedField = field as Path<T>;
 
-    if (isFirstError) {
-      isFirstError = false;
+    formMethods.setError(typedField, { message });
+
+    if (shouldFocus && !firstField) {
+      firstField = typedField;
     }
   });
+
+  if (firstField) {
+    formMethods.setFocus(firstField);
+  }
 }
