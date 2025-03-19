@@ -33,13 +33,15 @@ export default async function ProfileCard() {
         </div>
       </div>
 
-      <ProfileStats
-        postsCount={_count.posts}
-        followersCount={_count.followers}
-        followingCount={_count.following}
-      />
+      <div className="top-seperator pt-2">
+        <ProfileStats
+          postsCount={_count.posts}
+          followersCount={_count.followers}
+          followingCount={_count.following}
+        />
+      </div>
 
-      <nav className="mt-3 pt-3 border-t border-[var(--color-dark-500)]/10 dark:border-white/10 ">
+      <nav className="mt-3 pt-3 top-seperator">
         {navs.map((item) => (
           <button
             key={item.label}

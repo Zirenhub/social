@@ -47,7 +47,7 @@ export default function ActivitySummary({ lastActive }: Props) {
           <span className="text-sm font-medium">0</span>
         </div>
       </div>
-      <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+      <div className="mt-6 pt-4 top-seperator">
         <button className="cursor-pointer w-full py-2 text-sm font-medium text-[var(--color-cyan-500)] hover:text-[var(--color-blue-500)] transition-colors">
           View detailed stats
         </button>

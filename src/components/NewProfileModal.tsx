@@ -185,7 +185,7 @@ export default function NewProfileModal({ user }: Props) {
             <button
               type="submit"
               disabled={formMethods.formState.isSubmitting}
-              className="px-6 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-medium shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all duration-200 ease-in-out"
+              className="primary-button"
             >
               {formMethods.formState.isSubmitting
                 ? 'Saving...'

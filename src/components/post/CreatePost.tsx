@@ -32,7 +32,7 @@ export default function CreatePost() {
         <button
           type="submit"
           disabled={isSubmitting || isOverLimit}
-          className="ml-auto px-6 py-3 rounded-lg bg-gradient-to-r from-[var(--color-cyan-500)] to-[var(--color-blue-500)] text-white font-medium shadow-md hover:shadow-xl transform hover:-translate-y-1 active:translate-y-0 transition-all duration-300 disabled:opacity-50 disabled:transform-none disabled:hover:shadow-md flex items-center gap-2 group cursor-pointer"
+          className="primary-button"
         >
           {isSubmitting ? (
             <LoaderPlaceholder text="Posting..." />

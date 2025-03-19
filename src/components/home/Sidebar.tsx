@@ -48,7 +48,7 @@ export default function Sidebar() {
             </span>
           </div>
         ))}
-        <button className="w-full text-[var(--color-cyan-500)] text-sm font-medium mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+        <button className="w-full text-[var(--color-cyan-500)] text-sm font-medium mt-2 pt-2 top-seperator">
           Show more
         </button>
       </div>

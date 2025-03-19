@@ -10,7 +10,7 @@ export default function ProfileStats({
   followingCount,
 }: Props) {
   return (
-    <div className="flex mt-3 pt-3 gap-8 border-t border-[var(--color-dark-500)]/10 dark:border-white/10">
+    <div className="flex gap-8">
       <div className="text-center">
         <div className="text-2xl font-semibold text-[var(--color-dark-500)] dark:text-white">
           {postsCount}

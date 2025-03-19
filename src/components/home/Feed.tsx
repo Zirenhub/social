@@ -12,9 +12,7 @@ export default async function Feed({ posts }: Props) {
         <p className="text-[var(--color-dark-500)]/60 dark:text-white/60">
           No posts yet
         </p>
-        <button className="px-6 py-3 mt-4 text-white rounded-lg bg-gradient-to-r from-[var(--color-cyan-500)] to-[var(--color-blue-500)] hover:from-[var(--color-cyan-500)]/90 hover:to-[var(--color-blue-500)]/90 transition-colors shadow-md hover:shadow-lg">
-          Create a post
-        </button>
+        <button className="primary-button">Create a post</button>
       </div>
     );
   }
