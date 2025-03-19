@@ -4,9 +4,6 @@ import {
   MapPin,
   Edit,
   Settings,
-  Grid,
-  BookmarkIcon,
-  Heart,
   Share2,
   User2Icon,
 } from 'lucide-react';
@@ -22,6 +19,10 @@ import { formatJoinedDate } from '@/helpers/formatDate';
 import { getUser } from '@/lib/session';
 import ErrorParagraph from '@/components/error/ErrorParagraph';
 import ProfileStats from '@/components/profile/ProfileStats';
+import Follow from '@/components/profile/profile-interactions/Follow';
+import Message from '@/components/profile/profile-interactions/Message';
+import Filter from '@/components/filter/Filter';
+import { profileFilters } from '@/types/constants';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -34,6 +35,7 @@ export default async function Profile({ params }: Props) {
   }
 
   const profilePosts = await getProfilePosts(slug);
+  // maybe check if lastActive threshold has passed, if yes, fetch and if not, use the cached value
   const profileLastActive = await getProfileLastActive(slug);
 
   const result = {
@@ -140,31 +142,25 @@ export default async function Profile({ params }: Props) {
                   </div>
                 </div>
 
-                <ProfileStats
-                  postsCount={_count.posts}
-                  followersCount={_count.followers}
-                  followingCount={_count.following}
-                />
+                <div className="flex justify-between top-seperator mt-3 pt-3">
+                  <ProfileStats
+                    postsCount={_count.posts}
+                    followersCount={_count.followers}
+                    followingCount={_count.following}
+                  />
+
+                  <div className="flex gap-4">
+                    {/* <!-- Follow Button --> */}
+                    <Follow />
+                    {/* <!-- Message Button --> */}
+                    <Message />
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Tabs navigation - styled similar to home page filters */}
-            <div className="flex mb-6 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 sticky top-0 z-20">
-              <button className="flex-1 flex items-center justify-center gap-2 py-2 text-[var(--color-cyan-500)] border-b-2 border-[var(--color-cyan-500)] font-medium">
-                <Grid size={18} />
-                <span>Posts</span>
-              </button>
-
-              <button className="flex-1 flex items-center justify-center gap-2 py-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 font-medium transition-colors">
-                <BookmarkIcon size={18} />
-                <span>Saved</span>
-              </button>
-
-              <button className="flex-1 flex items-center justify-center gap-2 py-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 font-medium transition-colors">
-                <Heart size={18} />
-                <span>Liked</span>
-              </button>
-            </div>
+            {/* Profile Filters */}
+            <Filter currentFilter="posts" filters={profileFilters} />
 
             {/* Posts */}
             {result.posts === null ? (

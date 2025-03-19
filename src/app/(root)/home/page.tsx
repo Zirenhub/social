@@ -1,17 +1,14 @@
 import { getHomePosts } from '@/app/api/post/fetching';
 import ErrorParagraph from '@/components/error/ErrorParagraph';
+import Filter from '@/components/filter/Filter';
 import Feed from '@/components/home/Feed';
 import Notifications from '@/components/home/Notifications';
 import ProfileCard from '@/components/home/ProfileCard';
 import Sidebar from '@/components/home/Sidebar';
 import LoaderPlaceholder from '@/components/loader/LoaderPlaceholder';
 import CreatePost from '@/components/post/CreatePost';
-import {
-  HOME_PAGE_POSTS_FILTERS,
-  HomePagePostsFilter,
-} from '@/types/constants';
+import { HOME_PAGE_POSTS_FILTERS, homeFilters } from '@/types/constants';
 import { Metadata } from 'next';
-import Link from 'next/link';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
@@ -26,19 +23,12 @@ export default async function Home({
 }) {
   const currentFilter = (await searchParams).filter;
 
-  const filters: { label: string; url: HomePagePostsFilter }[] = [
-    { label: 'For You', url: 'forYou' },
-    { label: 'Friends', url: 'following' },
-    { label: 'Trending', url: 'trending' },
-  ];
-
-  const getFilterUrl = (filter: string) => {
-    return `?filter=${filter}`;
-  };
-
-  const getCurrentFilter = (): HomePagePostsFilter => {
-    if (HOME_PAGE_POSTS_FILTERS.some((filter) => filter === currentFilter)) {
-      return currentFilter as HomePagePostsFilter;
+  const getCurrentFilter = () => {
+    const matchingFilter = HOME_PAGE_POSTS_FILTERS.find(
+      (filter) => filter === currentFilter
+    );
+    if (matchingFilter) {
+      return matchingFilter;
     } else {
       return 'forYou';
     }
@@ -63,23 +53,7 @@ export default async function Home({
           <CreatePost />
         </div>
         {/* Feed Filter */}
-        <div className="flex mb-4 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 sticky top-0 z-20">
-          {filters.map((filter) => {
-            return (
-              <Link
-                href={getFilterUrl(filter.url)}
-                key={filter.label}
-                className={`flex-1 py-2 font-medium text-center ${
-                  getCurrentFilter() === filter.url
-                    ? 'text-[var(--color-cyan-500)] border-b-2 border-[var(--color-cyan-500)] pointer-events-none '
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                }`}
-              >
-                {filter.label}
-              </Link>
-            );
-          })}
-        </div>
+        <Filter currentFilter={getCurrentFilter()} filters={homeFilters} />
         <Suspense
           key={getCurrentFilter()}
           fallback={
