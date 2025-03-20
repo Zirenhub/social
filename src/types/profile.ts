@@ -1,5 +1,5 @@
 import { getMaxCharError, getMinCharError } from '@/helpers/charLenghtError';
-import type { Profile } from '@prisma/client';
+import { Prisma, Profile } from '@prisma/client';
 import { z } from 'zod';
 
 export const BasicProfileContent = z.object({
@@ -71,6 +71,33 @@ export const AdditinalProfileInfoContent = z.object({
 export const FullProfileContent = BasicProfileContent.merge(
   AdditinalProfileInfoContent
 );
+
+export type GetProfileType = Prisma.ProfileGetPayload<{
+  include: {
+    _count: {
+      select: {
+        posts: true;
+        followers: true;
+        following: true;
+      };
+    };
+    followers: {
+      where: {
+        followerId: string;
+      };
+      take: 1;
+    };
+    following: {
+      where: {
+        followingId: string;
+      };
+      take: 1;
+    };
+  };
+  omit: {
+    lastActive: true;
+  };
+}>;
 
 export type AdditinalProfileInfoZ = z.infer<typeof AdditinalProfileInfoContent>;
 export type FullProfileZ = z.infer<typeof FullProfileContent>;
