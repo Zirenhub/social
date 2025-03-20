@@ -3,6 +3,7 @@ import successResponse, { errorResponse } from '../response';
 import { unstable_cache } from 'next/cache';
 import { CACHE_TAGS } from '@/types/constants';
 import { postQuery } from '@/types/post';
+import { getUser } from '@/lib/session';
 
 // export const getPostsCount = (profileId: string, since?: Date) => {
 //   return unstable_cache(
@@ -71,7 +72,9 @@ import { postQuery } from '@/types/post';
 //   )();
 // };
 
-export const getProfile = (profileId: string) => {
+export const getProfile = async (profileId: string) => {
+  const user = await getUser();
+
   return unstable_cache(
     async () => {
       try {
@@ -87,9 +90,22 @@ export const getProfile = (profileId: string) => {
                 following: true,
               },
             },
+            followers: {
+              where: {
+                followerId: user.profile.id,
+              },
+              take: 1,
+            },
+            following: {
+              where: {
+                followingId: user.profile.id,
+              },
+              take: 1,
+            },
           },
           omit: { lastActive: true },
         });
+
         return successResponse(profile);
       } catch (error) {
         return errorResponse(error, 'Failed getting profile.');
@@ -100,6 +116,7 @@ export const getProfile = (profileId: string) => {
     {
       // Use string array for tags
       tags: [CACHE_TAGS.PROFILE(profileId)],
+      revalidate: 60,
     }
   )();
 };

@@ -26,3 +26,67 @@ export async function updateProfile(updatedData: AdditinalProfileInfoZ) {
     return errorResponse(error, 'Something went wrong updating profile.');
   }
 }
+
+export async function followProfile(profileId: string) {
+  try {
+    const user = await getUser();
+    if (user.profile.id === profileId) {
+      return errorResponse(null, 'You cannot follow yourself.');
+    }
+
+    const profile = await prisma.profile.findUnique({
+      where: { id: profileId },
+    });
+
+    if (!profile) {
+      return errorResponse(null, 'Profile not found.');
+    }
+
+    await prisma.follow.create({
+      data: {
+        followerId: user.profile.id,
+        followingId: profileId,
+      },
+    });
+
+    revalidateTag(CACHE_TAGS.PROFILE(profileId)); // revalidate since followers count has changed
+    revalidateTag(CACHE_TAGS.PROFILE(user.profile.id)); // revalidate since following count has changed
+
+    return successResponse(null);
+  } catch (error) {
+    return errorResponse(error, 'Something went wrong following profile.');
+  }
+}
+
+export async function unfollowProfile(profileId: string) {
+  try {
+    const user = await getUser();
+    if (user.profile.id === profileId) {
+      return errorResponse(null, 'You cannot unfollow yourself.');
+    }
+
+    const profile = await prisma.profile.findUnique({
+      where: { id: profileId },
+    });
+
+    if (!profile) {
+      return errorResponse(null, 'Profile not found.');
+    }
+
+    await prisma.follow.delete({
+      where: {
+        followerId_followingId: {
+          followerId: user.profile.id,
+          followingId: profileId,
+        },
+      },
+    });
+
+    revalidateTag(CACHE_TAGS.PROFILE(profileId)); // revalidate since followers count has changed
+    revalidateTag(CACHE_TAGS.PROFILE(user.profile.id)); // revalidate since following count has changed
+
+    return successResponse(null);
+  } catch (error) {
+    return errorResponse(error, 'Something went wrong unfollowing profile.');
+  }
+}

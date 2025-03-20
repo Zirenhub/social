@@ -23,6 +23,7 @@ import Follow from '@/components/profile/profile-interactions/Follow';
 import Message from '@/components/profile/profile-interactions/Message';
 import Filter from '@/components/filter/Filter';
 import { profileFilters } from '@/types/constants';
+import Search from '@/components/sidebar/Search';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -149,12 +150,14 @@ export default async function Profile({ params }: Props) {
                     followingCount={_count.following}
                   />
 
-                  <div className="flex gap-4">
-                    {/* <!-- Follow Button --> */}
-                    <Follow />
-                    {/* <!-- Message Button --> */}
-                    <Message />
-                  </div>
+                  {!isCurrentUser && (
+                    <div className="flex gap-4">
+                      {/* <!-- Follow Button --> */}
+                      <Follow profile={profileResult.data} />
+                      {/* <!-- Message Button --> */}
+                      <Message />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -172,6 +175,7 @@ export default async function Profile({ params }: Props) {
 
           {/* Right side - Additional info */}
           <aside className="md:w-1/3 space-y-6 sticky top-4 self-start">
+            <Search />
             {/* Activity summary */}
             <ActivitySummary lastActive={result.lastActive} />
             {/* Suggested connections */}
