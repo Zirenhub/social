@@ -94,6 +94,14 @@ body {
   .secondary-button {
     @apply ml-auto px-6 py-3 rounded-lg bg-transparent border-2 border-[var(--color-cyan-500)] text-[var(--color-cyan-500)] font-medium shadow-sm hover:shadow-md transform hover:-translate-y-1 active:translate-y-0 transition-all duration-300 disabled:opacity-50 disabled:transform-none disabled:hover:shadow-sm flex items-center gap-2 cursor-pointer dark:text-white dark:border-[var(--color-cyan-500)];
   }
+
+  .input-text {
+    @apply rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 shadow-sm dark:text-gray-100 focus:ring-1 focus:ring-[var(--color-cyan-500)] focus:border-[var(--color-cyan-500)] outline-none transition-all duration-300;
+  }
+
+  .input-text:focus {
+    --tw-ring-opacity: 0.3;
+  }
 }
 
 @layer utilities {

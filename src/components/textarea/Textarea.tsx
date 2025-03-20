@@ -25,7 +25,7 @@ export default function Textarea({
       <textarea
         {...register(name)}
         placeholder={placeholder ? placeholder : "Tell us what's on your mind."}
-        className="w-full p-5 h-40 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-1 focus:ring-[var(--color-cyan-500)] focus:ring-opacity-30 focus:border-[var(--color-cyan-500)] outline-none transition-all duration-300 resize-none"
+        className="w-full h-40 input-text resize-none p-5"
       />
 
       {/* Character count indicator with progress bar */}
