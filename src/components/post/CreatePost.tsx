@@ -10,7 +10,6 @@ export default function CreatePost() {
     useCreatePost();
 
   // Calculate percentage for progress bar
-  const percentUsed = Math.min((charCount / MAX_POST_CHARS) * 100, 100);
   const isOverLimit = charCount > MAX_POST_CHARS;
 
   return (
