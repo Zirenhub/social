@@ -1,51 +1,54 @@
 'use client';
 import { usePathname } from 'next/navigation';
-import React from 'react';
-import { Home, Bell, User, PlusCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useMemo, useCallback, memo } from 'react';
+import { MoreVertical } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import ThemeSwitcher from './ThemeSwitcher';
 import LogOut from './LogOut';
 import { SessionUser } from '@/types/api';
+import useNavigationState from '@/hooks/useNavigationState';
 
 type Props = {
   user: SessionUser;
 };
 
 export default function Navigation({ user }: Props) {
+  const { state, setState, visibleItems, hiddenItems, handleResize } =
+    useNavigationState(user);
+
   const pathname = usePathname();
 
-  const navItems = [
-    { href: '/home', icon: Home, label: 'Home', color: 'bg-sky-500' },
-    {
-      href: '/notifications',
-      icon: Bell,
-      label: 'Alerts',
-      color: 'bg-indigo-500',
-    },
-    {
-      href: `/profile/${user.profile.id}`,
-      icon: User,
-      label: 'Profile',
-      color: 'bg-orange-500',
-    },
-    {
-      href: '/create',
-      icon: PlusCircle,
-      label: 'Create',
-      color: 'bg-rose-500',
-    },
-  ];
+  // Setup ResizeObserver for better performance than window events
+  useEffect(() => {
+    setState((prev) => ({ ...prev, isMounted: true }));
+
+    const resizeObserver = new ResizeObserver(() => {
+      handleResize();
+    });
+
+    resizeObserver.observe(document.documentElement);
+    return () => resizeObserver.disconnect();
+  }, [handleResize]);
+
+  // Memoized callback for dropdown toggle
+  const toggleExpanded = useCallback(() => {
+    setState((prev) => ({ ...prev, isExpanded: !prev.isExpanded }));
+  }, [setState]);
 
   return (
-    <nav className="shadow-md flex flex-col items-center py-10 px-6 gap-12 dark:bg-gray-800 bg-white h-full w-18">
+    <nav
+      className="shadow-md flex flex-col items-center py-10 px-6 gap-12 
+                 dark:bg-[#1d1620] bg-white h-full w-18 relative
+                 transition-all duration-300 ease-in-out"
+    >
       {/* Logo */}
       <motion.div
         whileHover={{ scale: 1.1, rotate: 5 }}
         whileTap={{ scale: 0.95 }}
         className="relative"
       >
-        <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-emerald-500 via-sky-500 to-indigo-500 opacity-75 blur-sm"></div>
+        <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-emerald-500 via-sky-500 to-indigo-500 opacity-75 blur-sm" />
         <Link
           href="/home"
           className="relative flex items-center justify-center w-12 h-12 bg-white dark:bg-gray-800 rounded-full text-2xl font-bold shadow-md"
@@ -56,9 +59,9 @@ export default function Navigation({ user }: Props) {
         </Link>
       </motion.div>
 
-      {/* Navigation Items */}
+      {/* Main Navigation Items */}
       <div className="flex flex-col gap-6">
-        {navItems.map((item) => (
+        {visibleItems.map((item) => (
           <NavItem
             key={item.href}
             href={item.href}
@@ -68,12 +71,57 @@ export default function Navigation({ user }: Props) {
             label={item.label}
           />
         ))}
+
+        {/* More Button and Dropdown */}
+        {state.activeLevel !== 'FULL' && (
+          <div className="relative">
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={toggleExpanded}
+              className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 ${
+                state.isExpanded
+                  ? 'bg-rose-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              <MoreVertical size={24} />
+            </motion.button>
+
+            {/* Dropdown Menu */}
+            <AnimatePresence>
+              {state.isExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute left-full top-0 ml-4 p-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg min-w-[200px] z-50"
+                >
+                  {hiddenItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-md transition-colors ${
+                        pathname === item.href
+                          ? `${item.color} text-white`
+                          : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      <item.icon size={20} />
+                      <span>{item.label}</span>
+                    </Link>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
 
+      {/* Bottom Actions */}
       <div className="mt-auto flex flex-col gap-3 items-center justify-center">
-        {/* Theme Switcher */}
         <ThemeSwitcher />
-        {/* Logout Button */}
         <LogOut />
       </div>
     </nav>
@@ -81,7 +129,7 @@ export default function Navigation({ user }: Props) {
 }
 
 // Reusable Nav Item Component
-function NavItem({
+const NavItem = memo(function NavItem({
   href,
   icon,
   color,
@@ -94,6 +142,24 @@ function NavItem({
   isActive: boolean;
   label: string;
 }) {
+  // Pre-compute conditional classes for better performance
+  const containerClass = useMemo(
+    () =>
+      `relative flex items-center justify-center w-12 h-12 rounded-full 
+     transition-all duration-300 ${
+       isActive
+         ? `${color} shadow-md scale-110`
+         : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
+     }`,
+    [isActive, color]
+  );
+
+  const iconClass = useMemo(
+    () =>
+      isActive ? 'text-white scale-110' : 'text-gray-600 dark:text-gray-300',
+    [isActive]
+  );
+
   return (
     <motion.div
       whileHover={{ scale: 1.1 }}
@@ -101,18 +167,8 @@ function NavItem({
       className="relative group z-50"
     >
       <Link href={href} className={isActive ? 'pointer-events-none' : ''}>
-        <div
-          className={`relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 ${
-            isActive
-              ? `${color} shadow-md scale-110`
-              : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
-          }`}
-        >
-          <div
-            className={`${isActive ? 'text-white scale-110' : 'text-gray-600 dark:text-gray-300'}`}
-          >
-            {icon}
-          </div>
+        <div className={containerClass}>
+          <div className={iconClass}>{icon}</div>
         </div>
 
         {/* Tooltip */}
@@ -122,4 +178,6 @@ function NavItem({
       </Link>
     </motion.div>
   );
-}
+});
+
+NavItem.displayName = 'NavItem';

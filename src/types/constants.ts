@@ -1,4 +1,13 @@
-import { GridIcon, HeartIcon, LucideIcon, Repeat2Icon } from 'lucide-react';
+import {
+  Bell,
+  GridIcon,
+  HeartIcon,
+  Home,
+  LucideIcon,
+  PlusCircle,
+  Repeat2Icon,
+  User,
+} from 'lucide-react';
 
 export const MONTHS = [
   'January',
@@ -46,6 +55,51 @@ export const profileFilters: {
   { label: 'Likes', url: 'liked', icon: HeartIcon },
   { label: 'Reposts', url: 'reposts', icon: Repeat2Icon },
 ] as const;
+
+// NAVIGATION  -----------------------------------------------------------
+
+//Viewport height breakpoints for different navigation states
+export const CUTOFF_LEVELS = {
+  ULTRA_MINIMAL: 500, // Extreme space saving - only most critical
+  MINIMAL: 600, // Very limited space - essential only
+  COMPACT: 650, // Reduced space - core features
+  REDUCED: 700, // Standard compact - most features
+  FULL: Infinity, // Full experience - all features
+} as const;
+
+//  Navigation items with priority levels and metadata
+// Priority determines display order and cutoff behavior
+export const NAVIGATION_CONFIG = {
+  HOME: {
+    priority: 1,
+    href: '/home',
+    icon: Home,
+    label: 'Home',
+    color: 'bg-sky-500',
+    critical: true,
+  },
+  PROFILE: {
+    priority: 2,
+    icon: User,
+    label: 'Profile',
+    color: 'bg-orange-500',
+    critical: true,
+  },
+  ALERTS: {
+    priority: 3,
+    href: '/notifications',
+    icon: Bell,
+    label: 'Alerts',
+    color: 'bg-indigo-500',
+  },
+  CREATE: {
+    priority: 4,
+    href: '/create',
+    icon: PlusCircle,
+    label: 'Create',
+    color: 'bg-rose-500',
+  },
+} as const;
 
 // SERVER -------------------------------------------------------------
 
