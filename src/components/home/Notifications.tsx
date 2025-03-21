@@ -47,7 +47,7 @@ export default function Notifications() {
   ];
 
   // Function to render the appropriate icon based on notification type
-  const renderIcon = (type) => {
+  const renderIcon = (type: string) => {
     switch (type) {
       case 'like':
         return <Heart className="text-[var(--color-magenta-500)]" size={16} />;

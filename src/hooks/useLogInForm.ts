@@ -27,6 +27,7 @@ export const useLogInForm = () => {
     setIsSubmitting(true);
 
     const result = await logIn(formData);
+
     if (result.success) {
       router.replace('/home');
     } else {

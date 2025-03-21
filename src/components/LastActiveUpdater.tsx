@@ -13,7 +13,6 @@ export default function LastActiveUpdater({ lastActive }: Props) {
   useEffect(() => {
     const lastActiveDate = new Date(lastActive);
     const minutesDifference = differenceInMinutes(new Date(), lastActiveDate);
-    console.log(minutesDifference);
     if (minutesDifference >= ACTIVITY_THRESHOLDS.UPDATE_LAST_ACTIVE_MINUTES) {
       updateLastActive();
     }

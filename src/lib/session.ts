@@ -24,7 +24,7 @@ export async function encrypt(payload: SessionPayload) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime('7d')
+    .setExpirationTime('1h')
     .sign(encodedKey);
 }
 
@@ -76,7 +76,7 @@ export async function getUser() {
   const user = await getSession();
 
   if (!user.success || !user.data) {
-    redirect('/');
+    return redirect('/');
   }
 
   return user.data;

@@ -18,7 +18,7 @@ export default function Modal({ title, close, children, isOpen }: Props) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-[var(--color-dark-500)]/40 backdrop-blur-md"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[var(--color-dark-500)]/40 backdrop-blur-md"
           onClick={close}
         >
           <motion.div
