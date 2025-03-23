@@ -1,8 +1,8 @@
 import PostContainer from '../post/PostContainer';
-import { PostWithProfileAndCounts } from '@/types/post';
+import { PostWithCounts } from '@/types/post';
 
 type Props = {
-  posts: PostWithProfileAndCounts[];
+  posts: PostWithCounts[];
 };
 
 export default async function Feed({ posts }: Props) {
@@ -12,7 +12,7 @@ export default async function Feed({ posts }: Props) {
         <p className="text-[var(--color-dark-500)]/60 dark:text-white/60">
           No posts yet
         </p>
-        <button className="primary-button">Create a post</button>
+        <button className="primary-button mx-auto mt-3">Create a post</button>
       </div>
     );
   }
