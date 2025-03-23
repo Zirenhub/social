@@ -72,6 +72,33 @@ export const FullProfileContent = BasicProfileContent.merge(
   AdditinalProfileInfoContent
 );
 
+export const profileQuery = (userProfileId: string) => ({
+  include: {
+    _count: {
+      select: {
+        posts: true,
+        followers: true,
+        following: true,
+      },
+    },
+    followers: {
+      where: {
+        followerId: userProfileId,
+      },
+      take: 1,
+    },
+    following: {
+      where: {
+        followingId: userProfileId,
+      },
+      take: 1,
+    },
+  },
+  omit: {
+    lastActive: true,
+  },
+});
+
 export type GetProfileType = Prisma.ProfileGetPayload<{
   include: {
     _count: {
