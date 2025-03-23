@@ -3,6 +3,7 @@ import successResponse, { errorResponse } from '../response';
 import { unstable_cache } from 'next/cache';
 import { CACHE_TAGS } from '@/types/constants';
 import { postQuery } from '@/types/post';
+import { profileQuery } from '@/types/profile';
 import { getUser } from '@/lib/session';
 
 // export const getPostsCount = (profileId: string, since?: Date) => {
@@ -82,28 +83,7 @@ export const getProfile = async (profileId: string) => {
           where: {
             id: profileId,
           },
-          include: {
-            _count: {
-              select: {
-                posts: true,
-                followers: true,
-                following: true,
-              },
-            },
-            followers: {
-              where: {
-                followerId: user.profile.id,
-              },
-              take: 1,
-            },
-            following: {
-              where: {
-                followingId: user.profile.id,
-              },
-              take: 1,
-            },
-          },
-          omit: { lastActive: true },
+          ...profileQuery(user.profile.id),
         });
 
         return successResponse(profile);
@@ -125,7 +105,7 @@ export const getProfilePosts = (profileId: string) => {
   return unstable_cache(
     async () => {
       try {
-        const posts = await prisma.post.findMany(postQuery(profileId));
+        const posts = await prisma.post.findMany(postQuery({ profileId }));
         return successResponse(posts);
       } catch (error) {
         return errorResponse(error, 'Failed getting profile posts.');
