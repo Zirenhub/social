@@ -1,16 +1,23 @@
+// useNavigationState.ts
 import { SessionUser } from '@/types/api';
 import { CUTOFF_LEVELS, NAVIGATION_CONFIG } from '@/types/constants';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { useDebounce } from 'use-debounce';
 
 export default function useNavigationState(user: SessionUser) {
+  const isMounted = useRef(true);
   const [state, setState] = useState({
     isExpanded: false,
     activeLevel: 'FULL' as keyof typeof CUTOFF_LEVELS,
-    isMounted: false,
   });
 
-  // Memoize nav items to prevent unnecessary rebuilds
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  // Memoized nav items
   const navItems = useMemo(
     () =>
       [
@@ -22,12 +29,13 @@ export default function useNavigationState(user: SessionUser) {
     [user.profile.id]
   );
 
-  // Debounced resize handler using use-debounce
-  const [handleResize] = useDebounce(() => {
+  // Stable resize handler
+  const resizeHandler = useCallback(() => {
+    if (!isMounted.current) return;
+
     const height = window.innerHeight;
     let newLevel: keyof typeof CUTOFF_LEVELS = 'FULL';
 
-    // Determine appropriate level based on viewport height
     switch (true) {
       case height < CUTOFF_LEVELS.ULTRA_MINIMAL:
         newLevel = 'ULTRA_MINIMAL';
@@ -44,30 +52,53 @@ export default function useNavigationState(user: SessionUser) {
     }
 
     setState((prev) => ({ ...prev, activeLevel: newLevel }));
-  }, 150); // 150ms debounce time for optimal performance
+  }, []);
 
-  // Memoized visible/hidden items calculation with stricter priority rules
+  // Debounced resize with cleanup
+  const [debouncedResize, { cancel }] = useDebounce(resizeHandler, 150);
+  useEffect(() => () => cancel(), [cancel]);
+
+  // Memoized items calculation
   const { visibleItems, hiddenItems } = useMemo(() => {
     const maxPriority = {
-      ULTRA_MINIMAL: 1, // Only Home
-      MINIMAL: 2, // Home + Profile
-      COMPACT: 3, // Home + Profile + Alerts
-      REDUCED: 3, // Changed from 4 to 3 to ensure Create is always in dropdown when not FULL
+      ULTRA_MINIMAL: 1,
+      MINIMAL: 2,
+      COMPACT: 3,
+      REDUCED: 3,
       FULL: Infinity,
     }[state.activeLevel];
 
-    // Filter items based on priority and ensure CREATE is hidden unless FULL
     const visible = navItems.filter(
       (item) =>
         item.priority <= maxPriority &&
         (state.activeLevel === 'FULL' || item.label !== 'Create')
     );
 
-    // Everything else goes to hidden items
-    const hidden = navItems.filter((item) => !visible.includes(item));
-
-    return { visibleItems: visible, hiddenItems: hidden };
+    return {
+      visibleItems: visible,
+      hiddenItems: navItems.filter((item) => !visible.includes(item)),
+    };
   }, [navItems, state.activeLevel]);
 
-  return { state, setState, visibleItems, hiddenItems, handleResize };
+  // Safe state updates
+  const toggleExpanded = useCallback(() => {
+    isMounted.current &&
+      setState((prev) => ({
+        ...prev,
+        isExpanded: !prev.isExpanded,
+      }));
+  }, []);
+
+  const toggleIsMounted = () => {
+    isMounted.current = true;
+  };
+
+  return {
+    state,
+    visibleItems,
+    hiddenItems,
+    handleResize: debouncedResize,
+    toggleExpanded,
+    toggleIsMounted,
+  };
 }

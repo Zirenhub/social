@@ -1,6 +1,6 @@
 'use client';
 import { usePathname } from 'next/navigation';
-import React, { useEffect, useMemo, useCallback, memo } from 'react';
+import React, { useEffect } from 'react';
 import { MoreVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -14,15 +14,19 @@ type Props = {
 };
 
 export default function Navigation({ user }: Props) {
-  const { state, setState, visibleItems, hiddenItems, handleResize } =
-    useNavigationState(user);
-
+  const {
+    state,
+    toggleExpanded,
+    visibleItems,
+    hiddenItems,
+    handleResize,
+    toggleIsMounted,
+  } = useNavigationState(user);
   const pathname = usePathname();
 
   // Setup ResizeObserver for better performance than window events
   useEffect(() => {
-    setState((prev) => ({ ...prev, isMounted: true }));
-
+    toggleIsMounted(); // in case navigation gets unmounted, remount
     const resizeObserver = new ResizeObserver(() => {
       handleResize();
     });
@@ -30,11 +34,6 @@ export default function Navigation({ user }: Props) {
     resizeObserver.observe(document.documentElement);
     return () => resizeObserver.disconnect();
   }, [handleResize]);
-
-  // Memoized callback for dropdown toggle
-  const toggleExpanded = useCallback(() => {
-    setState((prev) => ({ ...prev, isExpanded: !prev.isExpanded }));
-  }, [setState]);
 
   return (
     <nav
@@ -62,14 +61,41 @@ export default function Navigation({ user }: Props) {
       {/* Main Navigation Items */}
       <div className="flex flex-col gap-6">
         {visibleItems.map((item) => (
-          <NavItem
+          <motion.div
             key={item.href}
-            href={item.href}
-            icon={<item.icon size={24} />}
-            color={item.color}
-            isActive={pathname === item.href}
-            label={item.label}
-          />
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="relative group z-50"
+          >
+            <Link
+              href={item.href}
+              className={pathname === item.href ? 'pointer-events-none' : ''}
+            >
+              <div
+                className={`relative flex items-center justify-center w-12 h-12 rounded-full 
+     transition-all duration-300 ${
+       pathname === item.href
+         ? `${item.color} shadow-md scale-110`
+         : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
+     }`}
+              >
+                <div
+                  className={
+                    pathname === item.href
+                      ? 'text-white scale-110'
+                      : 'text-gray-600 dark:text-gray-300'
+                  }
+                >
+                  {<item.icon size={24} />}
+                </div>
+              </div>
+
+              {/* Tooltip */}
+              <div className="absolute left-full ml-4 px-3 py-1 dark:bg-gray-800 bg-white text-gray-700 dark:text-gray-300 text-sm rounded-md shadow-md opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 whitespace-nowrap z-50">
+                {item.label}
+              </div>
+            </Link>
+          </motion.div>
         ))}
 
         {/* More Button and Dropdown */}
@@ -127,57 +153,3 @@ export default function Navigation({ user }: Props) {
     </nav>
   );
 }
-
-// Reusable Nav Item Component
-const NavItem = memo(function NavItem({
-  href,
-  icon,
-  color,
-  isActive,
-  label,
-}: {
-  href: string;
-  icon: React.JSX.Element;
-  color: string;
-  isActive: boolean;
-  label: string;
-}) {
-  // Pre-compute conditional classes for better performance
-  const containerClass = useMemo(
-    () =>
-      `relative flex items-center justify-center w-12 h-12 rounded-full 
-     transition-all duration-300 ${
-       isActive
-         ? `${color} shadow-md scale-110`
-         : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
-     }`,
-    [isActive, color]
-  );
-
-  const iconClass = useMemo(
-    () =>
-      isActive ? 'text-white scale-110' : 'text-gray-600 dark:text-gray-300',
-    [isActive]
-  );
-
-  return (
-    <motion.div
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
-      className="relative group z-50"
-    >
-      <Link href={href} className={isActive ? 'pointer-events-none' : ''}>
-        <div className={containerClass}>
-          <div className={iconClass}>{icon}</div>
-        </div>
-
-        {/* Tooltip */}
-        <div className="absolute left-full ml-4 px-3 py-1 dark:bg-gray-800 bg-white text-gray-700 dark:text-gray-300 text-sm rounded-md shadow-md opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 whitespace-nowrap z-50">
-          {label}
-        </div>
-      </Link>
-    </motion.div>
-  );
-});
-
-NavItem.displayName = 'NavItem';
