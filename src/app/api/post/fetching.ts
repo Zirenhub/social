@@ -12,7 +12,7 @@ export const getHomePosts = ({ filter }: getPostsProps) => {
   return unstable_cache(
     async () => {
       try {
-        const posts = await prisma.post.findMany(postQuery());
+        const posts = await prisma.post.findMany(postQuery({}));
         return successResponse(posts);
       } catch (error) {
         return errorResponse(error, 'Something went wrong fetching posts.');
