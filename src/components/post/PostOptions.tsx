@@ -1,13 +1,13 @@
 'use client';
 import { deletePost } from '@/app/api/post/actions';
-import { PostWithProfileAndCounts } from '@/types/post';
+import { PostWithCounts } from '@/types/post';
 import { EllipsisVertical, Trash, UserPlus } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import Modal from '../Modal';
 
 type Props = {
-  post: PostWithProfileAndCounts;
+  post: PostWithCounts;
   isOwner: boolean;
 };
 
