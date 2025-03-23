@@ -22,13 +22,18 @@ import ProfileStats from '@/components/profile/ProfileStats';
 import Follow from '@/components/profile/profile-interactions/Follow';
 import Message from '@/components/profile/profile-interactions/Message';
 import Filter from '@/components/filter/Filter';
-import { profileFilters } from '@/types/constants';
+import { PROFILE_PAGE_POSTS_FILTERS, profileFilters } from '@/types/constants';
 import Search from '@/components/sidebar/Search';
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ filter?: string; query?: string }>;
+};
 
-export default async function Profile({ params }: Props) {
+export default async function Profile({ params, searchParams }: Props) {
   const { slug } = await params;
+  const { filter, query } = await searchParams;
+
   const profileResult = await getProfile(slug);
 
   if (!profileResult.success || !profileResult.data) {
@@ -48,6 +53,15 @@ export default async function Profile({ params }: Props) {
   const currentUser = await getUser();
   const isCurrentUser = currentUser.profile.id === result.id;
   const { _count } = profileResult.data;
+
+  const getCurrentFilter = () => {
+    const matchingFilter = PROFILE_PAGE_POSTS_FILTERS.find((x) => x === filter);
+    if (matchingFilter) {
+      return matchingFilter;
+    } else {
+      return 'posts';
+    }
+  };
 
   return (
     <div className="mx-14 mt-6">
@@ -163,7 +177,10 @@ export default async function Profile({ params }: Props) {
             </div>
 
             {/* Profile Filters */}
-            <Filter currentFilter="posts" filters={profileFilters} />
+            <Filter
+              currentFilter={getCurrentFilter()}
+              filters={profileFilters}
+            />
 
             {/* Posts */}
             {result.posts === null ? (
@@ -175,7 +192,7 @@ export default async function Profile({ params }: Props) {
 
           {/* Right side - Additional info */}
           <aside className="md:w-1/3 space-y-6 sticky top-4 self-start">
-            <Search />
+            <Search query={query} />
             {/* Activity summary */}
             <ActivitySummary lastActive={result.lastActive} />
             {/* Suggested connections */}
