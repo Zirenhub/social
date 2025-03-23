@@ -4,11 +4,11 @@ import {
   CalendarIcon,
   User2Icon,
 } from 'lucide-react';
-import Profile from '@/types/profile';
 import { formatJoinedDate } from '@/helpers/formatDate';
+import { GetProfileType } from '@/types/profile';
 
 type Props = {
-  profile: Profile;
+  profile: GetProfileType;
 };
 
 export default function ProfileHover({ profile }: Props) {
@@ -19,7 +19,7 @@ export default function ProfileHover({ profile }: Props) {
 
       {/* Profile Content */}
       <div className="flex items-center mb-3">
-        <div className="w-12 h-12 p-1 rounded-full mr-3 border-2 border-gray-400">
+        <div className="w-12 h-12 p-1 rounded-full mr-2 border-2 border-gray-400">
           <User2Icon size={'full'} color="gray" />
         </div>
         <div>
@@ -40,7 +40,7 @@ export default function ProfileHover({ profile }: Props) {
         </div>
         <div className="flex items-center">
           <MapPinIcon size={16} className="mr-2 text-gray-500" />
-          <span>San Francisco, CA</span>
+          <span>{profile.location || 'Kuklen'}</span>
         </div>
         <div className="flex items-center">
           <CalendarIcon size={16} className="mr-2 text-gray-500" />
@@ -49,13 +49,13 @@ export default function ProfileHover({ profile }: Props) {
         <div className="flex justify-between mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
           <div>
             <span className="font-['bold'] text-gray-800 dark:text-gray-100">
-              142
+              {profile._count.posts}
             </span>
             <span className="text-gray-500 dark:text-gray-400 ml-1">Posts</span>
           </div>
           <div>
             <span className="font-['bold'] text-gray-800 dark:text-gray-100">
-              3.2k
+              {profile._count.followers}
             </span>
             <span className="text-gray-500 dark:text-gray-400 ml-1">
               Followers
