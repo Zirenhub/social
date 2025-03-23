@@ -15,21 +15,22 @@ export const PostContent = z.object({
 
 type PostContentZ = z.infer<typeof PostContent>;
 
-type PostWithProfileAndCounts = Prisma.PostGetPayload<{
+type PostWithCounts = Prisma.PostGetPayload<{
   include: {
-    profile: true;
+    profile: { select: { id: true } };
     _count: { select: { likes: true; comments: true } };
   };
   orderBy: { createdAt: typeof Prisma.SortOrder.desc };
 }>;
 
-export const postQuery = (profileId?: string) => ({
+// instead of taking all of profile take only needed fields
+export const postQuery = ({ profileId }: { profileId?: string }) => ({
   where: profileId ? { profileId } : {},
   include: {
-    profile: true,
+    profile: { select: { id: true } },
     _count: { select: { likes: true, comments: true } },
   },
   orderBy: { createdAt: Prisma.SortOrder.desc },
 });
 
-export type { PostContentZ, Post, PostWithProfileAndCounts };
+export type { PostContentZ, Post, PostWithCounts };
