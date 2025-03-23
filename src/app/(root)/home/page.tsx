@@ -16,17 +16,15 @@ export const metadata: Metadata = {
   description: 'View your personalized feed',
 };
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ filter: string | undefined }>;
-}) {
-  const currentFilter = (await searchParams).filter;
+type Props = {
+  searchParams: Promise<{ filter?: string; query?: string }>;
+};
+
+export default async function Home({ searchParams }: Props) {
+  const { filter, query } = await searchParams;
 
   const getCurrentFilter = () => {
-    const matchingFilter = HOME_PAGE_POSTS_FILTERS.find(
-      (filter) => filter === currentFilter
-    );
+    const matchingFilter = HOME_PAGE_POSTS_FILTERS.find((x) => x === filter);
     if (matchingFilter) {
       return matchingFilter;
     } else {
@@ -73,7 +71,7 @@ export default async function Home({
       {/* Right Sidebar */}
       <aside className="hidden 2xl:flex justify-end mt-4 sticky top-4 flex-1">
         <div className="w-76">
-          <Sidebar />
+          <Sidebar query={query} />
         </div>
       </aside>
     </div>

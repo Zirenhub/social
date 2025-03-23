@@ -1,7 +1,11 @@
 import MightKnow from '../sidebar/MightKnow';
 import Search from '../sidebar/Search';
 
-export default function Sidebar() {
+type Props = {
+  query?: string;
+};
+
+export default function Sidebar({ query }: Props) {
   // Sample trending topics
   const trendingTopics = [
     { topic: 'Technology', posts: '1.2K' },
@@ -14,7 +18,7 @@ export default function Sidebar() {
   return (
     <div className="overflow-auto flex flex-col gap-3 no-scrollbar">
       {/* Search Box */}
-      <Search />
+      <Search query={query} />
 
       {/* Trending Topics */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-200 dark:border-gray-700">
