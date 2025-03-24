@@ -30,7 +30,8 @@ export default async function PostContainer({ post }: Props) {
         />
         <PostOptions
           post={post}
-          isOwner={profileResult.data.id === user.profile.id}
+          profile={profileResult.data}
+          isOwner={user.profile.id === profileResult.data.id}
         />
       </div>
       <p className="text-gray-800 dark:text-gray-200 mb-4">{post.content}</p>

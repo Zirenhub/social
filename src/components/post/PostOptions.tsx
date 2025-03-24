@@ -5,13 +5,16 @@ import { EllipsisVertical, Trash, UserPlus } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import Modal from '../Modal';
+import Follow from '../profile/profile-interactions/Follow';
+import { GetProfileType } from '@/types/profile';
 
 type Props = {
   post: PostWithCounts;
+  profile: GetProfileType;
   isOwner: boolean;
 };
 
-export default function PostOptions({ post, isOwner }: Props) {
+export default function PostOptions({ post, profile, isOwner }: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [showDeletePostModal, setShowDeletePostModal] =
     useState<boolean>(false);
@@ -102,18 +105,13 @@ export default function PostOptions({ post, isOwner }: Props) {
                 Delete Post
               </button>
             ) : (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  // Add friend logic here
-                  toast.info('Friend request functionality would go here');
+              <Follow
+                sideEffect={() => {
                   setIsOpen(false);
                 }}
-                className="flex items-center w-full px-4 py-2 text-sm text-left transition-colors text-[var(--color-dark-500)]/80 dark:text-white/80 hover:bg-[var(--color-cyan-500)]/10 hover:text-[var(--color-cyan-500)]"
-              >
-                <UserPlus size={16} className="mr-2" />
-                Add friend
-              </button>
+                profile={profile}
+                className="cursor-pointer flex items-center w-full px-4 py-2 text-sm text-left transition-colors text-[var(--color-dark-500)]/80 dark:text-white/80 hover:bg-[var(--color-magenta-500)]/10 hover:text-[var(--color-magenta-500)]"
+              />
             )}
           </div>
         )}
