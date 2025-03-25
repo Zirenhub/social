@@ -3,16 +3,19 @@ import { PostWithCounts } from '@/types/post';
 
 type Props = {
   posts: PostWithCounts[];
+  showCreatePost?: boolean;
 };
 
-export default async function Feed({ posts }: Props) {
+export default async function Feed({ posts, showCreatePost = true }: Props) {
   if (posts.length === 0) {
     return (
       <div className="p-12 text-center bg-white rounded-xl shadow-md dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <p className="text-[var(--color-dark-500)]/60 dark:text-white/60">
-          No posts yet
+          So empty here...
         </p>
-        <button className="primary-button mx-auto mt-3">Create a post</button>
+        {showCreatePost && (
+          <button className="primary-button mx-auto mt-3">Create a post</button>
+        )}
       </div>
     );
   }
