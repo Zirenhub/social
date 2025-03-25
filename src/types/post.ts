@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Post, Prisma } from '@prisma/client';
+import { HomePagePostsFilter } from './constants';
 
 export const MAX_POST_CHARS = 256;
 
@@ -15,22 +16,32 @@ export const PostContent = z.object({
 
 type PostContentZ = z.infer<typeof PostContent>;
 
-type PostWithCounts = Prisma.PostGetPayload<{
+const postWithCountsArgs = {
   include: {
-    profile: { select: { id: true } };
-    _count: { select: { likes: true; comments: true } };
-  };
-  orderBy: { createdAt: typeof Prisma.SortOrder.desc };
-}>;
-
-// instead of taking all of profile take only needed fields
-export const postQuery = ({ profileId }: { profileId?: string }) => ({
-  where: profileId ? { profileId } : {},
-  include: {
-    profile: { select: { id: true } },
-    _count: { select: { likes: true, comments: true } },
+    profile: { select: { id: true } } as const,
+    _count: { select: { likes: true, comments: true } } as const,
   },
-  orderBy: { createdAt: Prisma.SortOrder.desc },
-});
+  orderBy: { createdAt: Prisma.SortOrder.desc } as const,
+} as const;
+
+const validatedArgs =
+  Prisma.validator<Prisma.PostFindManyArgs>()(postWithCountsArgs);
+type PostWithCounts = Prisma.PostGetPayload<typeof validatedArgs>;
+
+type postQueryProps = {
+  profileId?: string;
+};
+
+export const postQuery = ({
+  profileId,
+}: postQueryProps): typeof validatedArgs => {
+  const query = { ...validatedArgs };
+
+  if (profileId) {
+    (query as Prisma.PostFindManyArgs).where = { profileId };
+  }
+
+  return query;
+};
 
 export type { PostContentZ, Post, PostWithCounts };
