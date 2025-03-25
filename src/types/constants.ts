@@ -31,10 +31,10 @@ export const HOME_PAGE_POSTS_FILTERS = [
   'following',
   'trending',
 ] as const;
-type HomePagePostsFilter = (typeof HOME_PAGE_POSTS_FILTERS)[number];
+export type HomePagePostsFilter = (typeof HOME_PAGE_POSTS_FILTERS)[number];
 export const homeFilters: { label: string; url: HomePagePostsFilter }[] = [
   { label: 'For You', url: 'forYou' },
-  { label: 'Friends', url: 'following' },
+  { label: 'Following', url: 'following' },
   { label: 'Trending', url: 'trending' },
 ] as const;
 
@@ -109,11 +109,8 @@ export const ACTIVITY_THRESHOLDS = {
 } as const;
 
 export const CACHE_TAGS = {
-  // Main resource types
-  POSTS: 'posts',
-  COMMENTS: 'comments',
-
   // Specific resources (for targeted invalidation)
+  POSTS: (filter: HomePagePostsFilter) => `home:${filter}`,
   POST: (id: string) => `post:${id}`,
   PROFILE: (id: string) => `profile:${id}`,
   PROFILE_POSTS: (id: string) => `profile:${id}:posts`,
