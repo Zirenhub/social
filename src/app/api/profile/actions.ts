@@ -51,13 +51,14 @@ export async function followProfile(profileId: string) {
 
     revalidateTag(CACHE_TAGS.PROFILE(profileId)); // revalidate since followers count has changed
     revalidateTag(CACHE_TAGS.PROFILE(user.profile.id)); // revalidate since following count has changed
+    revalidateTag(CACHE_TAGS.POSTS('following')); // revalidate since we wanna show posts from the newly followed profile
 
     return successResponse(null);
   } catch (error) {
     return errorResponse(error, 'Something went wrong following profile.');
   }
 }
-
+// CAHNGE CACHE POSTS TO FOLLOWING FILTER!!
 export async function unfollowProfile(profileId: string) {
   try {
     const user = await getUser();
@@ -84,6 +85,7 @@ export async function unfollowProfile(profileId: string) {
 
     revalidateTag(CACHE_TAGS.PROFILE(profileId)); // revalidate since followers count has changed
     revalidateTag(CACHE_TAGS.PROFILE(user.profile.id)); // revalidate since following count has changed
+    revalidateTag(CACHE_TAGS.POSTS('following')); // revalidate since we wanna show posts from the newly followed profile
 
     return successResponse(null);
   } catch (error) {
