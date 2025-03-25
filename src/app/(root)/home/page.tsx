@@ -63,7 +63,10 @@ export default async function Home({ searchParams }: Props) {
           {!result.success || !result.data ? (
             <ErrorParagraph message={result.error?.message} />
           ) : (
-            <Feed posts={result.data} />
+            <Feed
+              posts={result.data}
+              showCreatePost={getCurrentFilter() === 'forYou'}
+            />
           )}
         </Suspense>
       </div>
