@@ -1,17 +1,15 @@
 import { getProfile } from '@/app/api/profile/fetching';
-import { getUser } from '@/lib/session';
 import { Settings, User2Icon } from 'lucide-react';
-import ErrorParagraph from '../error/ErrorParagraph';
 import ProfileStats from '../profile/ProfileStats';
+import getSession from '@/lib/getSession';
 
 export default async function ProfileCard() {
-  const user = await getUser();
-  const profileResult = await getProfile(user.profile.id);
+  const session = await getSession();
+  const profileResult = await getProfile({
+    profileId: session.user.profile,
+  });
 
-  if (!profileResult.success || !profileResult.data) {
-    return <ErrorParagraph message={profileResult.error?.message} />;
-  }
-  const { _count } = profileResult.data;
+  const { _count } = profileResult;
 
   const navs = [
     { label: 'Settings', icon: <Settings size={16} color="gray" /> },
@@ -25,10 +23,10 @@ export default async function ProfileCard() {
         </div>
         <div className="mb-1">
           <p className="font-['bold'] text-gray-600 dark:text-gray-100">
-            {profileResult.data.firstName} {profileResult.data.lastName}
+            {profileResult.firstName} {profileResult.lastName}
           </p>
           <p className="text-sm text-gray-400 dark:text-gray-400">
-            @{profileResult.data.username}
+            @{profileResult.username}
           </p>
         </div>
       </div>

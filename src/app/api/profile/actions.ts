@@ -1,25 +1,24 @@
 'use server';
-
 import {
   AdditinalProfileInfoContent,
   AdditinalProfileInfoZ,
 } from '@/types/profile';
 import successResponse, { errorResponse } from '../response';
 import { prisma } from '@/lib/prisma';
-import { getUser } from '@/lib/session';
-import { revalidateTag } from 'next/cache';
-import { CACHE_TAGS } from '@/types/constants';
+// import { revalidateTag } from 'next/cache';
+// import { CACHE_TAGS } from '@/types/constants';
+import getSession from '@/lib/getSession';
 
 export async function updateProfile(updatedData: AdditinalProfileInfoZ) {
   try {
     const parsed = AdditinalProfileInfoContent.parse(updatedData);
-    const user = await getUser();
+    const session = await getSession();
     const updatedProfile = await prisma.profile.update({
-      where: { id: user.profile.id },
+      where: { id: session.user.profile },
       data: parsed,
     });
 
-    revalidateTag(CACHE_TAGS.PROFILE(user.profile.id));
+    // revalidateTag(CACHE_TAGS.PROFILE(user.profile.id));
 
     return successResponse(updatedProfile);
   } catch (error) {
@@ -29,9 +28,9 @@ export async function updateProfile(updatedData: AdditinalProfileInfoZ) {
 
 export async function followProfile(profileId: string) {
   try {
-    const user = await getUser();
-    if (user.profile.id === profileId) {
-      return errorResponse(null, 'You cannot follow yourself.');
+    const session = await getSession();
+    if (session.user.profile === profileId) {
+      throw new Error('You cannot follow yourself.');
     }
 
     const profile = await prisma.profile.findUnique({
@@ -39,31 +38,31 @@ export async function followProfile(profileId: string) {
     });
 
     if (!profile) {
-      return errorResponse(null, 'Profile not found.');
+      throw new Error('Profile not found.');
     }
 
     await prisma.follow.create({
       data: {
-        followerId: user.profile.id,
+        followerId: session.user.profile,
         followingId: profileId,
       },
     });
 
-    revalidateTag(CACHE_TAGS.PROFILE(profileId)); // revalidate since followers count has changed
-    revalidateTag(CACHE_TAGS.PROFILE(user.profile.id)); // revalidate since following count has changed
-    revalidateTag(CACHE_TAGS.POSTS('following')); // revalidate since we wanna show posts from the newly followed profile
+    // revalidateTag(CACHE_TAGS.PROFILE(profileId)); // revalidate since followers count has changed
+    // revalidateTag(CACHE_TAGS.PROFILE(user.profile.id)); // revalidate since following count has changed
+    // revalidateTag(CACHE_TAGS.HOME_POSTS('following')); // revalidate since we wanna show posts from the newly followed profile
 
     return successResponse(null);
   } catch (error) {
     return errorResponse(error, 'Something went wrong following profile.');
   }
 }
-// CAHNGE CACHE POSTS TO FOLLOWING FILTER!!
+
 export async function unfollowProfile(profileId: string) {
   try {
-    const user = await getUser();
-    if (user.profile.id === profileId) {
-      return errorResponse(null, 'You cannot unfollow yourself.');
+    const session = await getSession();
+    if (session.user.profile === profileId) {
+      throw new Error('You cannot unfollow yourself.');
     }
 
     const profile = await prisma.profile.findUnique({
@@ -71,21 +70,21 @@ export async function unfollowProfile(profileId: string) {
     });
 
     if (!profile) {
-      return errorResponse(null, 'Profile not found.');
+      throw new Error('Profile not found.');
     }
 
     await prisma.follow.delete({
       where: {
         followerId_followingId: {
-          followerId: user.profile.id,
+          followerId: session.user.profile,
           followingId: profileId,
         },
       },
     });
 
-    revalidateTag(CACHE_TAGS.PROFILE(profileId)); // revalidate since followers count has changed
-    revalidateTag(CACHE_TAGS.PROFILE(user.profile.id)); // revalidate since following count has changed
-    revalidateTag(CACHE_TAGS.POSTS('following')); // revalidate since we wanna show posts from the newly followed profile
+    // revalidateTag(CACHE_TAGS.PROFILE(profileId)); // revalidate since followers count has changed
+    // revalidateTag(CACHE_TAGS.PROFILE(user.profile.id)); // revalidate since following count has changed
+    // revalidateTag(CACHE_TAGS.HOME_POSTS('following')); // revalidate since we wanna show posts from the newly followed profile
 
     return successResponse(null);
   } catch (error) {

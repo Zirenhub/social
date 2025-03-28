@@ -1,12 +1,10 @@
 'use server';
-
-import { LogInContent, LogInZ, SignUpContent, SignUpZ } from '@/types/auth';
-import bcrypt from 'bcrypt';
+import { auth, signIn, signOut } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import successResponse, { errorResponse } from '../response';
-import { createSession, deleteSession, getUser } from '@/lib/session';
-import { SessionUser } from '@/types/api';
+import { LogInZ, SignUpContent, SignUpZ } from '@/types/auth';
 import { ACTIVITY_THRESHOLDS } from '@/types/constants';
+const bcrypt = require('bcryptjs');
+import successResponse, { errorResponse } from '../response';
 
 let lastUpdateTimestamp = 0;
 
@@ -46,7 +44,12 @@ export async function signUp(formData: SignUpZ) {
       omit: { hashedPassword: true },
     });
 
-    await createSession(newUserWithProfile as SessionUser);
+    // Sign in the user with NextAuth
+    await signIn('credentials', {
+      email: parsed.email,
+      password: parsed.password,
+      redirect: false,
+    });
 
     return successResponse(newUserWithProfile);
   } catch (err) {
@@ -54,39 +57,16 @@ export async function signUp(formData: SignUpZ) {
   }
 }
 
-export async function logIn(formData: LogInZ) {
+export async function login(formData: LogInZ) {
   try {
-    const parsed = LogInContent.parse(formData);
-
-    const user = await prisma.user.findUnique({
-      where: {
-        email: parsed.email,
-      },
-      include: {
-        profile: true,
-      },
+    await signIn('credentials', {
+      email: formData.email,
+      password: formData.password,
+      redirect: false,
     });
-
-    if (!user || !user.profile) {
-      throw new Error('User not found');
-    }
-
-    const passwordMatch = await bcrypt.compare(
-      parsed.password,
-      user.hashedPassword
-    );
-
-    if (!passwordMatch) {
-      throw new Error('Password is incorrect');
-    }
-
-    const { hashedPassword, ...safeUser } = user;
-
-    await createSession(safeUser as SessionUser);
-
-    return successResponse(safeUser);
+    return successResponse(null);
   } catch (err) {
-    return errorResponse(err, 'An error occurred while creating the user.');
+    return errorResponse(err, 'An error occurred while logging the user.');
   }
 }
 
@@ -111,37 +91,38 @@ export async function updateLastActive(
     }
 
     // Get the current user from the session
-    const user = await getUser();
+    const session = await auth();
+    if (!session?.user) {
+      return {
+        success: false,
+        data: null,
+        error: { message: 'User not authenticated' },
+      };
+    }
 
     // Update the profile's lastActive timestamp
     const updatedProfile = await prisma.profile.update({
-      where: { id: user.profile.id },
+      where: { id: session.user.profile },
       data: { lastActive: new Date() },
-      include: { user: true },
     });
-
-    // Remove sensitive data before storing in session
-    const { hashedPassword, ...safeUser } = updatedProfile.user;
-
-    // Update the session with new lastActive time
-    await createSession({ ...safeUser, profile: updatedProfile });
 
     // Update our timestamp tracker
     lastUpdateTimestamp = now;
 
-    return successResponse({ ...safeUser, profile: updatedProfile });
+    return { success: true, data: updatedProfile, error: null };
   } catch (err) {
     console.error('Failed to update last active:', err);
-    return errorResponse(
-      err,
-      'An error occurred while updating last active prop.'
-    );
+    return {
+      success: false,
+      data: null,
+      error: { message: 'An error occurred while updating last active prop.' },
+    };
   }
 }
 
 export async function logOut() {
   try {
-    await deleteSession();
+    await signOut();
     return successResponse(null);
   } catch (err) {
     return errorResponse(err, 'An error occurred while logging out.');

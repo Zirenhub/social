@@ -32,7 +32,7 @@ export default async function Home({ searchParams }: Props) {
     }
   };
 
-  const result = await getHomePosts({ filter: getCurrentFilter() });
+  const posts = await getHomePosts({ filter: getCurrentFilter() });
 
   return (
     <div className="flex items-start text-lg justify-between mx-14 pr-[72px]">
@@ -60,14 +60,10 @@ export default async function Home({ searchParams }: Props) {
             </div>
           }
         >
-          {!result.success || !result.data ? (
-            <ErrorParagraph message={result.error?.message} />
-          ) : (
-            <Feed
-              posts={result.data}
-              showCreatePost={getCurrentFilter() === 'forYou'}
-            />
-          )}
+          <Feed
+            posts={posts}
+            showCreatePost={getCurrentFilter() === 'forYou'}
+          />
         </Suspense>
       </div>
 

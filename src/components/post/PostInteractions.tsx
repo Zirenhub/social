@@ -1,29 +1,52 @@
-import { PostWithProfileAndCounts } from '@/types/post';
-import { HeartIcon, MessageCircleMoreIcon, Share2Icon } from 'lucide-react';
+'use client';
+import { likePost } from '@/app/api/post/actions';
+import { PostWithCounts } from '@/types/post';
+import { HeartIcon, MessageCircleMoreIcon, RepeatIcon } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 type Props = {
-  post: PostWithProfileAndCounts;
+  post: PostWithCounts;
 };
 
 export default function PostInteractions({ post }: Props) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const postIsLiked = post.likes.length > 0;
+
   const interactions = [
     {
       label: 'Like',
-      icon: <HeartIcon size={'full'} />,
+      icon: (
+        <HeartIcon
+          size={21}
+          color={postIsLiked ? 'oklch(0.704 0.191 22.216)' : undefined}
+          fill={postIsLiked ? 'oklch(0.704 0.191 22.216)' : 'transparent'}
+        />
+      ),
       count: post._count.likes,
-      noClick: () => console.log('like'),
+      noClick: async () => {
+        setIsLoading(true);
+        const result = await likePost({ postId: post.id });
+        if (!result.success || !result.data) {
+          toast.error(
+            `Something went wrong,
+            ${result.error?.message || 'unknown'}`
+          );
+        }
+        setIsLoading(false);
+      },
     },
     {
       label: 'Comments',
-      icon: <MessageCircleMoreIcon size={'full'} />,
+      icon: <MessageCircleMoreIcon size={21} />,
       count: post._count.comments,
-      noClick: () => console.log('comment'),
+      noClick: () => toast.success(`Opening comments on post ${post.id}`),
     },
     {
       label: 'Share',
-      icon: <Share2Icon size={'full'} />,
+      icon: <RepeatIcon size={21} />,
       count: 0,
-      noClick: () => console.log('share'),
+      noClick: () => toast.success(`Repost post ${post.id}`),
     },
   ];
 
@@ -32,11 +55,17 @@ export default function PostInteractions({ post }: Props) {
       {interactions.map((interaction) => {
         return (
           <button
+            disabled={isLoading}
             key={interaction.label}
-            className="cursor-pointer flex gap-1 items-center hover:text-[var(--color-cyan-500)] transition-colors h-9 w-9"
+            onClick={interaction.noClick}
+            className="cursor-pointer flex items-center gap-1 hover:text-[var(--color-cyan-500)] transition-colors h-9"
           >
-            {interaction.icon}
-            <span>{interaction.count}</span>
+            <span className="h-[21px] flex items-center">
+              {interaction.icon}
+            </span>
+            <span className="min-w-[1ch] text-center mt-1">
+              {interaction.count}
+            </span>
           </button>
         );
       })}

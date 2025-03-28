@@ -3,7 +3,7 @@
 import { Loader2, SearchIcon, User2Icon } from 'lucide-react';
 import { GetProfileType } from '@/types/profile';
 import { useRouter } from 'next/navigation';
-import ProfileHover from '../profile/ProfileHover';
+// import ProfileHover from '../profile/profile-hover/ProfileHover';
 
 type Props = {
   query: string;
@@ -65,7 +65,7 @@ export default function SearchResults({ query, result }: Props) {
                     <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                       {profile.location || 'Software Engineer'}
                     </p>
-                    <ProfileHover profile={profile} />
+                    {/* <ProfileHover profile={profile} /> */}
                   </div>
                 </div>
               </div>

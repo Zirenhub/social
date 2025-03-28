@@ -13,10 +13,7 @@ export default async function Search({ query }: Props) {
     <>
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-200 dark:border-gray-700 relative">
         <SearchInput />
-        {result?.error && <p>{result.error.message}</p>}
-        {result?.data && query && (
-          <SearchResults query={query} result={result.data} />
-        )}
+        {query && <SearchResults query={query} result={result || []} />}
       </div>
     </>
   );

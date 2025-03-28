@@ -1,4 +1,4 @@
-import { logIn } from '@/app/api/auth/actions';
+import { login } from '@/app/api/auth/actions';
 import { setFormErrors } from '@/helpers/setFormErrors';
 import { LogInZ, LogInContent } from '@/types/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -26,7 +26,7 @@ export const useLogInForm = () => {
     hasErrorsRef.current = false;
     setIsSubmitting(true);
 
-    const result = await logIn(formData);
+    const result = await login(formData);
 
     if (result.success) {
       router.replace('/home');

@@ -1,16 +1,21 @@
 import Navigation from '@/components/nav-bar/Navigation';
 import React from 'react';
-import { getUser } from '@/lib/session';
 import LastActiveUpdater from '@/components/LastActiveUpdater';
 import { differenceInMinutes } from 'date-fns';
 import NewProfileModal from '@/components/NewProfileModal';
+import { GetUser } from '../api/auth/fetching';
+import { redirect } from 'next/navigation';
+import { auth } from '@/auth';
 
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await getUser();
+  const session = await auth();
+  if (!session) redirect('/');
+
+  const user = await GetUser();
   const isUserNew =
     differenceInMinutes(new Date(), new Date(user.profile.createdAt)) <= 5;
 

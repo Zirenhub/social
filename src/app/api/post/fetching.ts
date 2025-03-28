@@ -1,48 +1,47 @@
 import { prisma } from '@/lib/prisma';
-import successResponse, { errorResponse } from '../response';
-import { unstable_cache } from 'next/cache';
-import { CACHE_TAGS, HomePagePostsFilter } from '@/types/constants';
+import { HomePagePostsFilter } from '@/types/constants';
 import { postQuery, PostWithCounts } from '@/types/post';
-import { getUser } from '@/lib/session';
-import { getProfile } from '../profile/fetching';
+import { cache } from 'react';
+import { errorResponse } from '../response';
+import getSession from '@/lib/getSession';
 
-export const getHomePosts = async ({
-  filter,
-}: {
-  filter: HomePagePostsFilter;
-}) => {
-  const user = await getUser();
+export const getHomePosts = cache(
+  async ({ filter }: { filter: HomePagePostsFilter }) => {
+    try {
+      const session = await getSession();
+      let posts: PostWithCounts[] = [];
+      if (filter === 'forYou') {
+        const forYouPosts = await prisma.post.findMany({
+          ...postQuery({ userProfileId: session.user.profile }),
+        });
+        posts = forYouPosts;
+      }
 
-  return unstable_cache(
-    async () => {
-      try {
-        let posts: PostWithCounts[] = [];
-
-        if (filter === 'forYou') {
-          const forYouPosts = await prisma.post.findMany({ ...postQuery({}) });
-          posts = forYouPosts;
-        }
-
-        if (filter === 'following') {
-          const profile = await prisma.profile.findUniqueOrThrow({
-            where: { id: user.profile.id },
-            include: {
-              following: {
-                include: { following: { select: { posts: postQuery({}) } } },
+      if (filter === 'following') {
+        const profile = await prisma.profile.findUniqueOrThrow({
+          where: { id: session.user.profile },
+          include: {
+            following: {
+              include: {
+                following: {
+                  select: {
+                    posts: postQuery({ userProfileId: session.user.profile }),
+                  },
+                },
               },
             },
-          });
+          },
+        });
 
-          for (const follower of profile.following) {
-            posts.push(...follower.following.posts);
-          }
+        for (const following of profile.following) {
+          posts.push(...following.following.posts);
         }
-        return successResponse(posts);
-      } catch (error) {
-        return errorResponse(error, 'Something went wrong fetching posts.');
       }
-    },
-    [CACHE_TAGS.POSTS(filter)],
-    { tags: [CACHE_TAGS.POSTS(filter)] }
-  )();
-};
+
+      return posts;
+    } catch (error) {
+      const err = errorResponse(error, 'Failed getting home page posts.');
+      throw new Error(err.error?.message);
+    }
+  }
+);

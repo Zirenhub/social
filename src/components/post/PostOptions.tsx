@@ -1,20 +1,18 @@
 'use client';
 import { deletePost } from '@/app/api/post/actions';
 import { PostWithCounts } from '@/types/post';
-import { EllipsisVertical, Trash, UserPlus } from 'lucide-react';
+import { EllipsisVertical, Trash } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import Modal from '../Modal';
 import Follow from '../profile/profile-interactions/Follow';
-import { GetProfileType } from '@/types/profile';
 
 type Props = {
   post: PostWithCounts;
-  profile: GetProfileType;
   isOwner: boolean;
 };
 
-export default function PostOptions({ post, profile, isOwner }: Props) {
+export default function PostOptions({ post, isOwner }: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [showDeletePostModal, setShowDeletePostModal] =
     useState<boolean>(false);
@@ -104,15 +102,15 @@ export default function PostOptions({ post, profile, isOwner }: Props) {
                 <Trash size={16} className="mr-2" />
                 Delete Post
               </button>
-            ) : (
-              <Follow
-                sideEffect={() => {
-                  setIsOpen(false);
-                }}
-                profile={profile}
-                className="cursor-pointer flex items-center w-full px-4 py-2 text-sm text-left transition-colors text-[var(--color-dark-500)]/80 dark:text-white/80 hover:bg-[var(--color-magenta-500)]/10 hover:text-[var(--color-magenta-500)]"
-              />
-            )}
+            ) : null
+            // <Follow
+            //   sideEffect={() => {
+            //     setIsOpen(false);
+            //   }}
+            //   profile={profile}
+            //   className="cursor-pointer flex items-center w-full px-4 py-2 text-sm text-left transition-colors text-[var(--color-dark-500)]/80 dark:text-white/80 hover:bg-[var(--color-magenta-500)]/10 hover:text-[var(--color-magenta-500)]"
+            // />
+            }
           </div>
         )}
       </div>

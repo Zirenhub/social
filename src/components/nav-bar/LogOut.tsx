@@ -4,14 +4,16 @@ import LoaderPlaceholder from '../loader/LoaderPlaceholder';
 import { motion } from 'framer-motion';
 import { LogOut as LogOutIcon } from 'lucide-react';
 import { logOut as logOutAction } from '@/app/api/auth/actions';
+import { useRouter } from 'next/navigation';
 
 export default function LogOut() {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   function handleLogOut() {
     startTransition(async () => {
       await logOutAction();
-      // router.replace('/'); this gets handled inside root layout
+      router.replace('/');
     });
   }
 

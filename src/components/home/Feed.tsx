@@ -6,7 +6,7 @@ type Props = {
   showCreatePost?: boolean;
 };
 
-export default async function Feed({ posts, showCreatePost = true }: Props) {
+export default function Feed({ posts, showCreatePost = true }: Props) {
   if (posts.length === 0) {
     return (
       <div className="p-12 text-center bg-white rounded-xl shadow-md dark:bg-gray-800 border border-gray-200 dark:border-gray-700">

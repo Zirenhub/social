@@ -1,9 +1,10 @@
-import { prisma } from '@/lib/prisma';
-import successResponse, { errorResponse } from '../response';
+import prisma from '@/lib/prisma';
+import { errorResponse } from '../response';
 import { getProfile } from '../profile/fetching';
 import { GetProfileType } from '@/types/profile';
+import { cache } from 'react';
 
-export async function getSearchProfiles(query: string) {
+export const getSearchProfiles = cache(async (query: string) => {
   try {
     // Format query for full-text search
     const formattedQuery = query
@@ -35,15 +36,18 @@ export async function getSearchProfiles(query: string) {
     const profiles: GetProfileType[] = [];
 
     for (const { id } of results) {
-      const { success, data, error } = await getProfile(id);
-      if (!success || !data) {
-        throw new Error(error?.message);
-      }
-      profiles.push(data);
+      const profile = await getProfile({
+        profileId: id,
+      });
+      profiles.push(profile);
     }
 
-    return successResponse(profiles);
+    return profiles;
   } catch (error) {
-    return errorResponse(error, 'Something went wrong getting serach results.');
+    const err = errorResponse(
+      error,
+      'Something went wrong getting serach results.'
+    );
+    throw new Error(err.error?.message);
   }
-}
+});

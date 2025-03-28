@@ -9,28 +9,30 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "2.7.2",
     "@hookform/resolvers": "^4.1.3",
-    "@prisma/client": "^6.4.1",
+    "@prisma/client": "^6.5.0",
     "autoprefixer": "^10.4.20",
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.2",
     "date-fns": "^4.1.0",
     "jose": "^6.0.8",
     "lucide-react": "^0.477.0",
     "motion": "^12.4.10",
     "next": "15.2.0",
+    "next-auth": "^5.0.0-beta.25",
     "next-themes": "^0.4.4",
     "postcss": "^8.5.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
     "react-toastify": "^11.0.5",
+    "server-only": "^0.0.1",
     "use-debounce": "^10.0.4",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
-    "@types/bcrypt": "^5.0.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -38,7 +40,7 @@
     "eslint-config-next": "15.2.0",
     "eslint-config-prettier": "^10.0.2",
     "prettier": "^3.5.3",
-    "prisma": "^6.4.1",
+    "prisma": "^6.5.0",
     "tailwindcss": "^4.0.9",
     "typescript": "^5"
   }

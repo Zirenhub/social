@@ -109,8 +109,10 @@ export const ACTIVITY_THRESHOLDS = {
 } as const;
 
 export const CACHE_TAGS = {
+  POSTS: 'home:posts',
+
   // Specific resources (for targeted invalidation)
-  POSTS: (filter: HomePagePostsFilter) => `home:${filter}`,
+  HOME_POSTS: (filter: HomePagePostsFilter) => `home:${filter}`,
   POST: (id: string) => `post:${id}`,
   PROFILE: (id: string) => `profile:${id}`,
   PROFILE_POSTS: (id: string) => `profile:${id}:posts`,

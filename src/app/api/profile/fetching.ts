@@ -1,10 +1,9 @@
 import { prisma } from '@/lib/prisma';
-import successResponse, { errorResponse } from '../response';
-import { unstable_cache } from 'next/cache';
-import { CACHE_TAGS } from '@/types/constants';
+import { errorResponse } from '../response';
 import { postQuery } from '@/types/post';
 import { profileQuery } from '@/types/profile';
-import { getUser } from '@/lib/session';
+import { cache } from 'react';
+import getSession from '@/lib/getSession';
 
 // export const getPostsCount = (profileId: string, since?: Date) => {
 //   return unstable_cache(
@@ -73,55 +72,41 @@ import { getUser } from '@/lib/session';
 //   )();
 // };
 
-export const getProfile = async (profileId: string) => {
-  const user = await getUser();
+export const getProfile = cache(
+  async ({ profileId }: { profileId: string }) => {
+    const session = await getSession();
 
-  return unstable_cache(
-    async () => {
-      try {
-        const profile = await prisma.profile.findUniqueOrThrow({
-          where: {
-            id: profileId,
-          },
-          ...profileQuery(user.profile.id),
-        });
+    try {
+      const profile = await prisma.profile.findUniqueOrThrow({
+        where: {
+          id: profileId,
+        },
+        ...profileQuery(session.user.profile),
+      });
 
-        return successResponse(profile);
-      } catch (error) {
-        return errorResponse(error, 'Failed getting profile.');
-      }
-    },
-    // Use string array for cache key
-    [CACHE_TAGS.PROFILE(profileId)],
-    {
-      // Use string array for tags
-      tags: [CACHE_TAGS.PROFILE(profileId)],
-      revalidate: 60,
+      return profile;
+    } catch (error) {
+      const err = errorResponse(error, 'Failed getting profile.');
+      throw new Error(err.error?.message);
     }
-  )();
-};
+  }
+);
 
-export const getProfilePosts = (profileId: string) => {
-  return unstable_cache(
-    async () => {
-      try {
-        const posts = await prisma.post.findMany(postQuery({ profileId }));
-        return successResponse(posts);
-      } catch (error) {
-        return errorResponse(error, 'Failed getting profile posts.');
-      }
-    },
-    // Use string array for cache key
-    [CACHE_TAGS.PROFILE_POSTS(profileId)],
-    {
-      // Use string array for tags
-      tags: [
-        CACHE_TAGS.PROFILE_POSTS(profileId),
-        CACHE_TAGS.PROFILE(profileId),
-      ],
+export const getProfilePosts = cache(
+  async ({ profileId }: { profileId: string }) => {
+    const session = await getSession();
+
+    try {
+      const posts = await prisma.post.findMany(
+        postQuery({ profileId, userProfileId: session.user.profile })
+      );
+      return posts;
+    } catch (error) {
+      const err = errorResponse(error, 'Failed getting profile posts.');
+      throw new Error(err.error?.message);
     }
-  )();
-};
+  }
+);
 
 // Get fresh lastActive separately
 export const getProfileLastActive = async (profileId: string) => {

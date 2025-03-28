@@ -1,5 +1,6 @@
 import { ApiResponse } from '@/types/api';
 import { Prisma } from '@prisma/client';
+import { AuthError } from 'next-auth';
 import { ZodError } from 'zod';
 
 export default function successResponse<T>(data: T): ApiResponse<T> {
@@ -21,26 +22,42 @@ export function errorResponse(
     error: { message: defaultMessage },
   };
 
+  if (error instanceof AuthError) {
+    switch (error.type) {
+      // fix case "CredentialsSignin" not taking this path
+      case 'CredentialsSignin':
+        response.error.message = 'Invalid email or password.';
+      default:
+        response.error.message = 'Something went wrong. Please try again.';
+    }
+    return response;
+  }
+
+  // Handle standard Error objects
+  if (error instanceof Error) {
+    response.error.message = error.message;
+  }
   // Check for DateTime validation errors specifically
   if (error instanceof Error) {
-    const errorMessage = error.message;
-    if (errorMessage.includes('Expected ISO-8601 DateTime')) {
+    if (error.message.includes('Expected ISO-8601 DateTime')) {
       response.error.message =
         'Invalid date format provided. Please use a valid date.';
-      return response;
     }
+    return response;
   }
 
   if (error instanceof Prisma.PrismaClientValidationError) {
     response.error.message = 'Invalid data provided.';
+    return response;
   }
 
   // Handle Prisma errors
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     response.error.message = getPrismaErrorMessage(error);
+    return response;
   }
   // Handle Zod validation errors
-  else if (error instanceof ZodError) {
+  if (error instanceof ZodError) {
     const { fieldErrors } = error.flatten();
 
     // Create a user-friendly message
@@ -57,10 +74,7 @@ export function errorResponse(
         }
       }
     }
-  }
-  // Handle standard Error objects
-  else if (error instanceof Error) {
-    response.error.message = error.message;
+    return response;
   }
 
   return response;

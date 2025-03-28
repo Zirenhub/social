@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { Post, Prisma } from '@prisma/client';
-import { HomePagePostsFilter } from './constants';
 
 export const MAX_POST_CHARS = 256;
 
@@ -16,26 +15,39 @@ export const PostContent = z.object({
 
 type PostContentZ = z.infer<typeof PostContent>;
 
-const postWithCountsArgs = {
-  include: {
-    profile: { select: { id: true } } as const,
-    _count: { select: { likes: true, comments: true } } as const,
-  },
-  orderBy: { createdAt: Prisma.SortOrder.desc } as const,
-} as const;
+const postWithCountsArgs = (userProfileId: string) =>
+  ({
+    include: {
+      profile: {
+        select: { id: true, firstName: true, lastName: true },
+      } as const,
+      _count: { select: { likes: true, comments: true } } as const,
+      likes: {
+        where: {
+          profileId: userProfileId,
+        },
+        take: 1,
+      },
+    },
+    orderBy: { createdAt: Prisma.SortOrder.desc } as const,
+  }) as const;
 
-const validatedArgs =
-  Prisma.validator<Prisma.PostFindManyArgs>()(postWithCountsArgs);
-type PostWithCounts = Prisma.PostGetPayload<typeof validatedArgs>;
+const validatedArgs = (userProfileId: string) =>
+  Prisma.validator<Prisma.PostFindManyArgs>()(
+    postWithCountsArgs(userProfileId)
+  );
+type PostWithCounts = Prisma.PostGetPayload<ReturnType<typeof validatedArgs>>;
 
 type postQueryProps = {
   profileId?: string;
+  userProfileId: string;
 };
 
 export const postQuery = ({
   profileId,
-}: postQueryProps): typeof validatedArgs => {
-  const query = { ...validatedArgs };
+  userProfileId,
+}: postQueryProps): ReturnType<typeof validatedArgs> => {
+  const query = { ...validatedArgs(userProfileId) };
 
   if (profileId) {
     (query as Prisma.PostFindManyArgs).where = { profileId };

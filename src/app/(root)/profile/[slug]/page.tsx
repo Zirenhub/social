@@ -16,14 +16,13 @@ import {
   getProfilePosts,
 } from '@/app/api/profile/fetching';
 import { formatJoinedDate } from '@/helpers/formatDate';
-import { getUser } from '@/lib/session';
-import ErrorParagraph from '@/components/error/ErrorParagraph';
 import ProfileStats from '@/components/profile/ProfileStats';
 import Follow from '@/components/profile/profile-interactions/Follow';
 import Message from '@/components/profile/profile-interactions/Message';
 import Filter from '@/components/filter/Filter';
 import { PROFILE_PAGE_POSTS_FILTERS, profileFilters } from '@/types/constants';
 import Search from '@/components/sidebar/Search';
+import { GetUser } from '@/app/api/auth/fetching';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -33,26 +32,22 @@ type Props = {
 export default async function Profile({ params, searchParams }: Props) {
   const { slug } = await params;
   const { filter, query } = await searchParams;
+  const currentUser = await GetUser();
 
-  const profileResult = await getProfile(slug);
-
-  if (!profileResult.success || !profileResult.data) {
-    return <ErrorParagraph message={profileResult.error?.message} />;
-  }
-
-  const profilePosts = await getProfilePosts(slug);
-  // maybe check if lastActive threshold has passed, if yes, fetch and if not, use the cached value
+  const profileResult = await getProfile({
+    profileId: slug,
+  });
+  const profilePosts = await getProfilePosts({ profileId: slug });
   const profileLastActive = await getProfileLastActive(slug);
 
   const result = {
-    ...profileResult.data,
-    posts: profilePosts.data,
+    ...profileResult,
+    posts: profilePosts,
     lastActive: profileLastActive,
   };
 
-  const currentUser = await getUser();
   const isCurrentUser = currentUser.profile.id === result.id;
-  const { _count } = profileResult.data;
+  const { _count } = profileResult;
 
   const getCurrentFilter = () => {
     const matchingFilter = PROFILE_PAGE_POSTS_FILTERS.find((x) => x === filter);
@@ -167,7 +162,7 @@ export default async function Profile({ params, searchParams }: Props) {
                   {!isCurrentUser && (
                     <div className="flex gap-4">
                       {/* <!-- Follow Button --> */}
-                      <Follow profile={profileResult.data} />
+                      <Follow profile={profileResult} />
                       {/* <!-- Message Button --> */}
                       <Message />
                     </div>
@@ -183,11 +178,7 @@ export default async function Profile({ params, searchParams }: Props) {
             />
 
             {/* Posts */}
-            {result.posts === null ? (
-              <ErrorParagraph message={profilePosts.error?.message} />
-            ) : (
-              <Feed posts={result.posts} />
-            )}
+            <Feed posts={result.posts} />
           </div>
 
           {/* Right side - Additional info */}
