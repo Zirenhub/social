@@ -1,10 +1,10 @@
 // useNavigationState.ts
-import { SessionUser } from '@/types/api';
+import { GetUserType } from '@/types/auth';
 import { CUTOFF_LEVELS, NAVIGATION_CONFIG } from '@/types/constants';
 import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { useDebounce } from 'use-debounce';
 
-export default function useNavigationState(user: SessionUser) {
+export default function useNavigationState(user: GetUserType) {
   const isMounted = useRef(true);
   const [state, setState] = useState({
     isExpanded: false,
