@@ -13,7 +13,7 @@ type Props = {
 
 export default function ProfileHover({ profile }: Props) {
   return (
-    <div className="absolute z-10 top-15 left-0 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 p-4">
+    <div className="absolute z-10 top-15 left-0 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 p-4 pointer-events-none">
       {/* Popup Arrow */}
       <div className="absolute -top-2 left-6 w-4 h-4 bg-white dark:bg-gray-800 transform rotate-45 border-t border-l border-gray-200 dark:border-gray-700"></div>
 

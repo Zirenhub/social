@@ -1,44 +1,51 @@
-import Link from 'next/link';
-import {
-  Calendar,
-  MapPin,
-  Edit,
-  Settings,
-  Share2,
-  User2Icon,
-} from 'lucide-react';
-import MightKnow from '@/components/sidebar/MightKnow';
+import MightKnow from '@/components/ui/MightKnow';
 import ActivitySummary from '@/components/profile/ActivitySummary';
-import Feed from '@/components/home/Feed';
+import Feed from '@/components/post/Feed';
 import {
   getProfile,
   getProfileLastActive,
   getProfilePosts,
 } from '@/app/api/profile/fetching';
-import { formatJoinedDate } from '@/helpers/formatDate';
 import ProfileStats from '@/components/profile/ProfileStats';
 import Follow from '@/components/profile/profile-interactions/Follow';
 import Message from '@/components/profile/profile-interactions/Message';
-import Filter from '@/components/filter/Filter';
+import Filter from '@/components/ui/Filter';
 import { PROFILE_PAGE_POSTS_FILTERS, profileFilters } from '@/types/constants';
-import Search from '@/components/sidebar/Search';
+import Search from '@/components/ui/search/Search';
 import { GetUser } from '@/app/api/auth/fetching';
+import getSession from '@/lib/getSession';
+import ProfileHeader from '@/components/profile/ProfileHeader';
+import ProfilePictureSection from '@/components/profile/ProfileAvatar';
+import ProfileInfoSection from '@/components/profile/ProfileInfo';
 
 type Props = {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ filter?: string; query?: string }>;
 };
 
+const getCurrentFilter = (filter: string | undefined) => {
+  const matchingFilter = PROFILE_PAGE_POSTS_FILTERS.find((x) => x === filter);
+  return matchingFilter || 'post';
+};
+
 export default async function Profile({ params, searchParams }: Props) {
   const { slug } = await params;
   const { filter, query } = await searchParams;
-  const currentUser = await GetUser();
 
-  const profileResult = await getProfile({
-    profileId: slug,
-  });
-  const profilePosts = await getProfilePosts({ profileId: slug });
-  const profileLastActive = await getProfileLastActive(slug);
+  const session = await getSession();
+  const currentUser = await GetUser(session.user.id);
+
+  const [profileResult, profilePosts, profileLastActive] = await Promise.all([
+    getProfile({
+      profileId: slug,
+      userProfileId: currentUser.profile.id,
+    }),
+    getProfilePosts({
+      profileId: slug,
+      userProfileId: currentUser.profile.id,
+    }),
+    getProfileLastActive(slug),
+  ]);
 
   const result = {
     ...profileResult,
@@ -47,146 +54,46 @@ export default async function Profile({ params, searchParams }: Props) {
   };
 
   const isCurrentUser = currentUser.profile.id === result.id;
-  const { _count } = profileResult;
-
-  const getCurrentFilter = () => {
-    const matchingFilter = PROFILE_PAGE_POSTS_FILTERS.find((x) => x === filter);
-    if (matchingFilter) {
-      return matchingFilter;
-    } else {
-      return 'posts';
-    }
-  };
+  const currentFilter = getCurrentFilter(filter);
 
   return (
     <div className="mx-14 mt-6">
-      {/* Header with improved cover photo */}
-      <div className="relative h-72 rounded-2xl overflow-hidden shadow-lg">
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-blue-500)] via-[var(--color-purple-500)] to-[var(--color-cyan-500)]" />
+      <ProfileHeader isCurrentUser={isCurrentUser} />
 
-        {/* Overlay gradient for better text visibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-
-        {/* Settings and share buttons */}
-        <div className="absolute top-4 right-4 z-10 flex gap-3">
-          <Link
-            href="/profile/share"
-            className="flex items-center justify-center w-10 h-10 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full transition-all duration-200 hover:scale-105"
-          >
-            <Share2 size={18} className="text-white" />
-          </Link>
-          {isCurrentUser && (
-            <Link
-              href="/settings"
-              className="flex items-center justify-center w-10 h-10 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full transition-all duration-200 hover:scale-105"
-            >
-              <Settings size={18} className="text-white" />
-            </Link>
-          )}
-        </div>
-      </div>
-
-      {/* Profile container */}
       <div className="max-w-5xl mx-auto -mt-24">
         <div className="flex gap-6">
-          {/* Left side - Profile info */}
           <div className="md:w-2/3">
             <div className="relative mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
-              {/* Profile picture */}
-              <div className="h-4 mb-28 flex items-start w-full">
-                <div className="absolute left-8 -top-6 ring-white dark:ring-[var(--color-dark-500)] rounded-full shadow-xl bg-white p-4">
-                  <User2Icon size={120} className="object-cover" color="gray" />
-                </div>
-                {/* Edit profile button */}
-                {isCurrentUser && (
-                  <div className="ml-auto">
-                    <Link
-                      href="/profile/edit"
-                      className="flex px-3 py-2 m-3 items-center gap-2 text-sm font-medium transition-all duration-200 rounded-lg bg-[var(--color-cyan-500)]/10 text-[var(--color-cyan-500)] hover:bg-[var(--color-cyan-500)] hover:text-white"
-                    >
-                      <Edit size={16} />
-                      Edit Profile
-                    </Link>
+              <ProfilePictureSection isCurrentUser={isCurrentUser} />
+              <ProfileInfoSection
+                profile={profileResult}
+                isCurrentUser={isCurrentUser}
+              />
+
+              <div className="flex justify-between top-seperator mt-3 pt-3 px-8 mb-3">
+                <ProfileStats
+                  postsCount={result._count.posts}
+                  followersCount={result._count.followers}
+                  followingCount={result._count.following}
+                />
+
+                {!isCurrentUser && (
+                  <div className="flex gap-4">
+                    <Follow profile={profileResult} />
+                    <Message />
                   </div>
                 )}
               </div>
-
-              {/* Profile content */}
-              <div className="pb-8 px-8">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-[var(--color-cyan-500)] to-[var(--color-blue-500)] bg-clip-text text-transparent pb-1">
-                  {`${result.firstName} ${result.lastName}`}
-                </h1>
-
-                <p className="text-[var(--color-dark-500)]/60 dark:text-white/60">
-                  @{result.username}
-                </p>
-
-                <p className="mt-4 text-[var(--color-dark-500)]/80 dark:text-white/80">
-                  {result.bio ||
-                    (isCurrentUser ? (
-                      'No bio yet. Click on Edit Profile to add your bio.'
-                    ) : (
-                      <span className="text-[var(--color-dark-500)]/30 dark:text-white/80">
-                        This user has no bio.
-                      </span>
-                    ))}
-                </p>
-
-                <div className="flex flex-wrap gap-4 mt-6">
-                  {result.location && (
-                    <div className="flex items-center gap-1 text-sm text-[var(--color-dark-500)]/60 dark:text-white/60">
-                      <MapPin
-                        size={16}
-                        className="text-[var(--color-cyan-500)]"
-                      />
-                      {result.location}
-                    </div>
-                  )}
-
-                  <div className="flex items-center gap-1 text-sm text-[var(--color-dark-500)]/60 dark:text-white/60">
-                    <Calendar
-                      size={16}
-                      className="text-[var(--color-cyan-500)]"
-                    />
-                    Joined {formatJoinedDate(result.createdAt)}
-                  </div>
-                </div>
-
-                <div className="flex justify-between top-seperator mt-3 pt-3">
-                  <ProfileStats
-                    postsCount={_count.posts}
-                    followersCount={_count.followers}
-                    followingCount={_count.following}
-                  />
-
-                  {!isCurrentUser && (
-                    <div className="flex gap-4">
-                      {/* <!-- Follow Button --> */}
-                      <Follow profile={profileResult} />
-                      {/* <!-- Message Button --> */}
-                      <Message />
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
 
-            {/* Profile Filters */}
-            <Filter
-              currentFilter={getCurrentFilter()}
-              filters={profileFilters}
-            />
+            <Filter currentFilter={currentFilter} filters={profileFilters} />
 
-            {/* Posts */}
             <Feed posts={result.posts} />
           </div>
 
-          {/* Right side - Additional info */}
           <aside className="md:w-1/3 space-y-6 sticky top-4 self-start">
             <Search query={query} />
-            {/* Activity summary */}
             <ActivitySummary lastActive={result.lastActive} />
-            {/* Suggested connections */}
             <MightKnow />
           </aside>
         </div>

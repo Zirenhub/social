@@ -1,32 +1,33 @@
 'use client';
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { User2Icon } from 'lucide-react';
 import { useDebouncedCallback } from 'use-debounce';
+import { GetProfileType } from '@/types/profile';
+import { Suspense, useState } from 'react';
+import dynamic from 'next/dynamic';
+
+const ProfileHover = dynamic(() => import('./ProfileHover'));
 
 type Props = {
-  profile: {
-    firstName: string;
-    lastName: string;
-    id: string;
-  };
+  profile: GetProfileType;
   createdAt: string;
 };
 
 export default function PostHeader({ profile, createdAt }: Props) {
+  const [hover, setHover] = useState<boolean>(false);
+
   const router = useRouter();
-  const [isHovered, setIsHovered] = useState(false);
 
   const handleNavigateToProfile = () => {
     router.push(`/profile/${profile.id}`);
   };
 
   const handleMouseEnter = useDebouncedCallback(() => {
-    setIsHovered(true);
+    setHover(true);
   }, 300);
 
   const handleMouseLeave = useDebouncedCallback(() => {
-    setIsHovered(false);
+    setHover(false);
   }, 300);
 
   return (
@@ -41,8 +42,9 @@ export default function PostHeader({ profile, createdAt }: Props) {
           <User2Icon size={'full'} color="gray" />
         </div>
 
-        {/* {isHovered && (
+        {hover && (
           <Suspense
+            key={profile.id}
             fallback={
               <div className="absolute left-0 top-12 z-10 w-64 rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-800">
                 <div className="flex items-center justify-center py-4">
@@ -51,9 +53,9 @@ export default function PostHeader({ profile, createdAt }: Props) {
               </div>
             }
           >
-            <ProfileHoverCard profile={hoverProfile} />
+            <ProfileHover profile={profile} />
           </Suspense>
-        )} */}
+        )}
 
         <div>
           <h3 className="font-['bold'] text-gray-800 dark:text-gray-100">
