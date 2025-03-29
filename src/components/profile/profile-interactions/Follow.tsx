@@ -1,85 +1,67 @@
 'use client';
-import { followProfile, unfollowProfile } from '@/app/api/profile/actions';
-import { GetProfileType } from '@/types/profile';
 import { UserRoundMinusIcon, UserRoundPlusIcon } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'react-toastify';
+import { useFollow } from '@/hooks/profile/useFollow';
+import { GetProfileType } from '@/types/profile';
+import { DropdownMenuItem } from '@/components/ui/DropdownMenu';
 
 type Props = {
   profile: GetProfileType;
   sideEffect?: () => void;
-  className?: string;
+  asDropdownItem?: boolean;
 };
 
-export default function Follow({ sideEffect, profile, className }: Props) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isFollowing, setIsFollowing] = useState(profile.followers.length > 0);
-  const isFollowingMe = profile.following.length > 0;
+export default function Follow({ sideEffect, profile, asDropdownItem }: Props) {
+  const { isLoading, isFollowing, buttonText, handleFollowAction } =
+    useFollow(profile);
 
-  const handleFollowAction = async () => {
-    try {
-      setIsLoading(true);
+  const { default: buttonTextDefault, hover } = buttonText;
 
-      if (isFollowing) {
-        await unfollowProfile(profile.id);
-        toast.success(`Unfollowed @${profile.username}`);
-        setIsFollowing(false);
-      } else {
-        await followProfile(profile.id);
-        toast.success(
-          isFollowingMe
-            ? `Followed back @${profile.username}`
-            : `Followed @${profile.username}`
-        );
-        setIsFollowing(true);
-      }
-    } catch (error) {
-      toast.error('Action failed. Please try again.');
-    } finally {
-      if (sideEffect) {
-        sideEffect();
-      }
-      setIsLoading(false);
+  const onFollowAction = () => {
+    handleFollowAction();
+    if (sideEffect) {
+      sideEffect();
     }
   };
 
-  // Determine button text based on current state
-  const getButtonText = () => {
-    if (isFollowing) {
-      return { default: 'Following', hover: 'Unfollow' };
-    } else if (isFollowingMe) {
-      return { default: 'Follow back', hover: 'Follow back' };
-    } else {
-      return { default: 'Follow', hover: 'Follow' };
-    }
-  };
-
-  const buttonText = getButtonText();
-
-  const getClassName = () => {
-    if (className) {
-      return className;
-    }
-
-    return 'primary-button';
-  };
+  if (asDropdownItem) {
+    return (
+      <DropdownMenuItem
+        className={`${isFollowing ? 'group' : ''}`}
+        disabled={isLoading}
+        onClick={onFollowAction}
+      >
+        {isFollowing ? (
+          <>
+            <span className="hidden group-hover:flex items-center">
+              <UserRoundMinusIcon size={16} className="mr-2" /> {hover}
+            </span>
+            <span className="group-hover:hidden">{buttonTextDefault}</span>
+          </>
+        ) : (
+          <div className="flex items-center">
+            <UserRoundPlusIcon size={16} className="mr-2" /> {buttonTextDefault}
+          </div>
+        )}
+      </DropdownMenuItem>
+    );
+  }
 
   return (
     <button
-      className={`${isFollowing ? `${getClassName()} group` : getClassName()}`}
+      className={`primary-button ${isFollowing ? 'group' : ''}`}
       disabled={isLoading}
-      onClick={handleFollowAction}
+      onClick={onFollowAction}
     >
       {isFollowing ? (
         <>
           <span className="hidden group-hover:flex items-center">
-            <UserRoundMinusIcon size={16} className="mr-2" /> {buttonText.hover}
+            <UserRoundMinusIcon size={16} className="mr-2" /> {hover}
           </span>
-          <span className="group-hover:hidden">{buttonText.default}</span>
+          <span className="group-hover:hidden">{buttonTextDefault}</span>
         </>
       ) : (
         <div className="flex items-center">
-          <UserRoundPlusIcon size={16} className="mr-2" /> {buttonText.default}
+          <UserRoundPlusIcon size={16} className="mr-2" /> {buttonTextDefault}
         </div>
       )}
     </button>
