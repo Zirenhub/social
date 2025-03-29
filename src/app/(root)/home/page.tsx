@@ -1,15 +1,15 @@
 import { getHomePosts } from '@/app/api/post/fetching';
-import ErrorParagraph from '@/components/error/ErrorParagraph';
-import Filter from '@/components/filter/Filter';
-import Feed from '@/components/home/Feed';
+import Filter from '@/components/ui/Filter';
+import Feed from '@/components/post/Feed';
 import Notifications from '@/components/home/Notifications';
 import ProfileCard from '@/components/home/ProfileCard';
 import Sidebar from '@/components/home/Sidebar';
-import LoaderPlaceholder from '@/components/loader/LoaderPlaceholder';
-import CreatePost from '@/components/post/CreatePost';
+import LoaderPlaceholder from '@/components/ui/LoaderPlaceholder';
+import CreatePost from '@/components/ui/CreatePost';
 import { HOME_PAGE_POSTS_FILTERS, homeFilters } from '@/types/constants';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
+import getSession from '@/lib/getSession';
 
 export const metadata: Metadata = {
   title: 'Home Feed',
@@ -31,8 +31,11 @@ export default async function Home({ searchParams }: Props) {
       return 'forYou';
     }
   };
-
-  const posts = await getHomePosts({ filter: getCurrentFilter() });
+  const session = await getSession();
+  const { posts } = await getHomePosts({
+    filter: getCurrentFilter(),
+    userProfileId: session.user.profile,
+  });
 
   return (
     <div className="flex items-start text-lg justify-between mx-14 pr-[72px]">
