@@ -5,9 +5,9 @@ import {
 } from '@/types/profile';
 import successResponse, { errorResponse } from '../response';
 import { prisma } from '@/lib/prisma';
-// import { revalidateTag } from 'next/cache';
-// import { CACHE_TAGS } from '@/types/constants';
 import getSession from '@/lib/getSession';
+import { revalidatePath, revalidateTag } from 'next/cache';
+import { CACHE_TAGS } from '@/types/constants';
 
 export async function updateProfile(updatedData: AdditinalProfileInfoZ) {
   try {
@@ -18,7 +18,7 @@ export async function updateProfile(updatedData: AdditinalProfileInfoZ) {
       data: parsed,
     });
 
-    // revalidateTag(CACHE_TAGS.PROFILE(user.profile.id));
+    revalidateTag(CACHE_TAGS.PROFILE(session.user.profile));
 
     return successResponse(updatedProfile);
   } catch (error) {
@@ -41,18 +41,18 @@ export async function followProfile(profileId: string) {
       throw new Error('Profile not found.');
     }
 
-    await prisma.follow.create({
+    const result = await prisma.follow.create({
       data: {
         followerId: session.user.profile,
         followingId: profileId,
       },
     });
 
-    // revalidateTag(CACHE_TAGS.PROFILE(profileId)); // revalidate since followers count has changed
-    // revalidateTag(CACHE_TAGS.PROFILE(user.profile.id)); // revalidate since following count has changed
-    // revalidateTag(CACHE_TAGS.HOME_POSTS('following')); // revalidate since we wanna show posts from the newly followed profile
+    revalidateTag(CACHE_TAGS.PROFILE(profileId)); // revalidate since followers count has changed
+    revalidateTag(CACHE_TAGS.PROFILE(session.user.profile)); // revalidate since following count has changed
+    revalidateTag(CACHE_TAGS.HOME_POSTS('following')); // revalidate since we wanna show posts from the newly followed profile
 
-    return successResponse(null);
+    return successResponse(result);
   } catch (error) {
     return errorResponse(error, 'Something went wrong following profile.');
   }
@@ -82,9 +82,10 @@ export async function unfollowProfile(profileId: string) {
       },
     });
 
-    // revalidateTag(CACHE_TAGS.PROFILE(profileId)); // revalidate since followers count has changed
-    // revalidateTag(CACHE_TAGS.PROFILE(user.profile.id)); // revalidate since following count has changed
-    // revalidateTag(CACHE_TAGS.HOME_POSTS('following')); // revalidate since we wanna show posts from the newly followed profile
+    revalidatePath(`/profile/${profileId}`);
+    revalidateTag(CACHE_TAGS.PROFILE(profileId)); // revalidate since followers count has changed
+    revalidateTag(CACHE_TAGS.PROFILE(session.user.profile)); // revalidate since following count has changed
+    revalidateTag(CACHE_TAGS.HOME_POSTS('following')); // revalidate since we wanna show posts from the newly followed profile
 
     return successResponse(null);
   } catch (error) {

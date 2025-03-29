@@ -3,8 +3,8 @@ import { prisma } from '@/lib/prisma';
 import successResponse, { errorResponse } from '../response';
 import { PostContent } from '@/types/post';
 import getSession from '@/lib/getSession';
-// import { revalidateTag } from 'next/cache';
-// import { CACHE_TAGS } from '@/types/constants';
+import { revalidateTag } from 'next/cache';
+import { CACHE_TAGS } from '@/types/constants';
 
 // update last active on actions
 
@@ -16,8 +16,8 @@ export async function createPost({ content }: { content: string }) {
       data: { content: parsed.content, profileId: session.user.profile },
     });
 
-    // revalidateTag(CACHE_TAGS.POSTS); // revalidate home page since new post will alawys show there
-    // revalidateTag(CACHE_TAGS.PROFILE(user.profile.id)); // revalidate profile page since new post will show there (this will also revalidate the count)
+    revalidateTag(CACHE_TAGS.POSTS); // revalidate home page since new post will alawys show there
+    revalidateTag(CACHE_TAGS.PROFILE(session.user.profile)); // revalidate profile page since new post will show there (this will also revalidate the count)
 
     return successResponse(post);
   } catch (error) {
@@ -36,8 +36,8 @@ export async function deletePost({ postId }: { postId: string }) {
 
     const deletedPost = await prisma.post.delete({ where: { id: postId } });
 
-    // revalidateTag(CACHE_TAGS.POSTS);
-    // revalidateTag(CACHE_TAGS.PROFILE(user.profile.id)); // revalidate profile page since post will be removed (this will also revalidate the count)
+    revalidateTag(CACHE_TAGS.POSTS);
+    revalidateTag(CACHE_TAGS.PROFILE(session.user.profile)); // revalidate profile page since post will be removed (this will also revalidate the count)
 
     return successResponse(deletedPost);
   } catch (error) {
@@ -80,7 +80,7 @@ export async function likePost({ postId }: { postId: string }) {
       });
     });
 
-    // revalidateTag(CACHE_TAGS.POSTS);
+    revalidateTag(CACHE_TAGS.POSTS);
 
     return successResponse(result);
   } catch (error) {
