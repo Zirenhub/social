@@ -2,10 +2,11 @@ import prisma from '@/lib/prisma';
 import { errorResponse } from '../response';
 import { getProfile } from '../profile/fetching';
 import { GetProfileType } from '@/types/profile';
-import { cache } from 'react';
+import getSession from '@/lib/getSession';
 
-export const getSearchProfiles = cache(async (query: string) => {
+export const getSearchProfiles = async (query: string) => {
   try {
+    const session = await getSession();
     // Format query for full-text search
     const formattedQuery = query
       .split(' ')
@@ -38,6 +39,7 @@ export const getSearchProfiles = cache(async (query: string) => {
     for (const { id } of results) {
       const profile = await getProfile({
         profileId: id,
+        userProfileId: session.user.profile,
       });
       profiles.push(profile);
     }
@@ -50,4 +52,4 @@ export const getSearchProfiles = cache(async (query: string) => {
     );
     throw new Error(err.error?.message);
   }
-});
+};

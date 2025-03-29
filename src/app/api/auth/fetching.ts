@@ -1,16 +1,17 @@
 'use server';
-import { cache } from 'react';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/auth';
+import { errorResponse } from '../response';
+import { GetUserType } from '@/types/auth';
+import { unstable_cacheTag as cacheTag } from 'next/cache';
+import { CACHE_TAGS } from '@/types/constants';
 
-export const GetUser = cache(async () => {
-  const session = await auth();
-  const id = session?.user?.id;
-
+export const GetUser = async (userId: string): Promise<GetUserType> => {
+  'use cache';
+  cacheTag(CACHE_TAGS.USER(userId));
   try {
     const user = await prisma.user.findFirst({
       where: {
-        id,
+        id: userId,
       },
       include: { profile: true },
     });
@@ -20,7 +21,8 @@ export const GetUser = cache(async () => {
     const { hashedPassword, profile, ...safeUser } = user;
 
     return { ...safeUser, profile };
-  } catch (err) {
-    throw err;
+  } catch (error) {
+    const err = errorResponse(error, 'Something went wrong getting user');
+    throw new Error(err.error?.message);
   }
-});
+};
