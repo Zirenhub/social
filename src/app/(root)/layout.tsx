@@ -15,7 +15,7 @@ export default async function AppLayout({
   const session = await auth();
   if (!session) redirect('/');
 
-  const user = await GetUser();
+  const user = await GetUser(session.user.id);
   const isUserNew =
     differenceInMinutes(new Date(), new Date(user.profile.createdAt)) <= 5;
 
