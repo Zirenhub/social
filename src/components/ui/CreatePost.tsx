@@ -1,9 +1,9 @@
 'use client';
-import { useCreatePost } from '@/hooks/useCreatePost';
+import { useCreatePost } from '@/hooks/post/useCreatePost';
 import { MAX_POST_CHARS } from '@/types/post';
-import LoaderPlaceholder from '../loader/LoaderPlaceholder';
+import LoaderPlaceholder from './LoaderPlaceholder';
 import { ArrowRight } from 'lucide-react';
-import Textarea from '../textarea/Textarea';
+import Textarea from './Textarea';
 
 export default function CreatePost() {
   const { submit, formErrors, register, isSubmitting, charCount } =
