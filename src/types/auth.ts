@@ -1,6 +1,7 @@
 import { getMaxCharError, getMinCharError } from '@/helpers/charLenghtError';
 import { z } from 'zod';
 import { BasicProfileContent } from './profile';
+import { Profile } from '@prisma/client';
 
 export const UserContent = z.object({
   email: z
@@ -43,7 +44,9 @@ export const LogInContent = z.object({
     .max(18, getMaxCharError('Password', 18)),
 });
 
+type GetUserType = { email: string; id: string; profile: Profile };
+
 type SignUpZ = z.infer<typeof SignUpContent>;
 type LogInZ = z.infer<typeof LogInContent>;
 
-export type { SignUpZ, LogInZ };
+export type { SignUpZ, LogInZ, GetUserType };
