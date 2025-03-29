@@ -18,9 +18,6 @@ type PostContentZ = z.infer<typeof PostContent>;
 const postWithCountsArgs = (userProfileId: string) =>
   ({
     include: {
-      profile: {
-        select: { id: true, firstName: true, lastName: true },
-      } as const,
       _count: { select: { likes: true, comments: true } } as const,
       likes: {
         where: {
