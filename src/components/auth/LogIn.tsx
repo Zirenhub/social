@@ -1,7 +1,7 @@
 import showFormErrors from '@/helpers/showFormErrors';
-import { useLogInForm } from '@/hooks/useLogInForm';
+import { useLogInForm } from '@/hooks/auth/useLogInForm';
 import { useEffect } from 'react';
-import LoaderPlaceholder from '../loader/LoaderPlaceholder';
+import LoaderPlaceholder from '../ui/LoaderPlaceholder';
 
 interface LogInProps {
   setLoading: (loading: boolean) => void;

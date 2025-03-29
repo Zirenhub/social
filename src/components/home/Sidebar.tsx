@@ -1,5 +1,5 @@
-import MightKnow from '../sidebar/MightKnow';
-import Search from '../sidebar/Search';
+import MightKnow from '../ui/MightKnow';
+import Search from '../ui/search/Search';
 
 type Props = {
   query?: string;

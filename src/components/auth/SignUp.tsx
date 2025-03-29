@@ -1,8 +1,8 @@
 import showFormErrors from '@/helpers/showFormErrors';
-import { useSignUpForm } from '@/hooks/useSignUpForm';
+import { useSignUpForm } from '@/hooks/auth/useSignUpForm';
 import { MONTHS } from '@/types/constants';
 import { useEffect } from 'react';
-import LoaderPlaceholder from '../loader/LoaderPlaceholder';
+import LoaderPlaceholder from '../ui/LoaderPlaceholder';
 
 interface SignUpProps {
   setLoading: (loading: boolean) => void;

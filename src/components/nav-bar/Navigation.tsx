@@ -6,11 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import ThemeSwitcher from './ThemeSwitcher';
 import LogOut from './LogOut';
-import { SessionUser } from '@/types/api';
 import useNavigationState from '@/hooks/useNavigationState';
+import { GetUserType } from '@/types/auth';
 
 type Props = {
-  user: SessionUser;
+  user: GetUserType;
 };
 
 export default function Navigation({ user }: Props) {

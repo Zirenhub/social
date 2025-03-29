@@ -1,15 +1,15 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Modal from './Modal';
-import { SessionUser } from '@/types/api';
+import Modal from './ui/Modal';
 import { UserCircle2Icon, Upload, X } from 'lucide-react';
-import { useAdditionalProfileInfoForm } from '@/hooks/useAdditionalProfileInfoForm';
+import { useAdditionalProfileInfoForm } from '@/hooks/profile/useAdditionalProfileInfoForm';
 import showFormErrors from '@/helpers/showFormErrors';
 import { ImageFileSchema, MAX_BIO_CHARS } from '@/types/profile';
-import Textarea from './textarea/Textarea';
+import Textarea from './ui/Textarea';
+import { GetUserType } from '@/types/auth';
 
 type Props = {
-  user: SessionUser;
+  user: GetUserType;
 };
 
 export default function NewProfileModal({ user }: Props) {

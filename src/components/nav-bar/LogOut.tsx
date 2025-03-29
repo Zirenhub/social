@@ -1,6 +1,6 @@
 'use client';
 import { useTransition } from 'react';
-import LoaderPlaceholder from '../loader/LoaderPlaceholder';
+import LoaderPlaceholder from '../ui/LoaderPlaceholder';
 import { motion } from 'framer-motion';
 import { LogOut as LogOutIcon } from 'lucide-react';
 import { logOut as logOutAction } from '@/app/api/auth/actions';

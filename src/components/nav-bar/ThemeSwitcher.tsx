@@ -2,7 +2,7 @@ import { useTheme } from 'next-themes';
 import { Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import LoaderPlaceholder from '../loader/LoaderPlaceholder';
+import LoaderPlaceholder from '../ui/LoaderPlaceholder';
 
 export default function ThemeSwitcher() {
   const [isMounted, setIsMounted] = useState(false);
