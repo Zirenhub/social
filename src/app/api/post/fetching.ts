@@ -25,6 +25,7 @@ export const getHomePosts = async ({
   hasMore: boolean;
 }> => {
   'use cache';
+  cacheTag(CACHE_TAGS.POSTS);
   cacheTag(CACHE_TAGS.HOME_POSTS(filter));
   try {
     // Validate pagination parameters

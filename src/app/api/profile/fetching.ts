@@ -103,6 +103,7 @@ export const getProfilePosts = async ({
   userProfileId,
 }: getProfileProps) => {
   'use cache';
+  cacheTag(CACHE_TAGS.POSTS);
   cacheTag(CACHE_TAGS.PROFILE_POSTS(profileId));
   try {
     const posts = await prisma.post.findMany(
