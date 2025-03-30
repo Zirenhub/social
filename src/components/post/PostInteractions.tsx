@@ -57,7 +57,11 @@ export default function PostInteractions({ post }: Props) {
             className="cursor-pointer flex items-center gap-1 hover:text-[var(--color-cyan-500)] transition-colors h-9"
           >
             <span className="h-[21px] flex items-center">
-              {interaction.isPending ? <LoaderPlaceholder /> : interaction.icon}
+              {interaction.isPending ? (
+                <LoaderPlaceholder color="red" />
+              ) : (
+                interaction.icon
+              )}
             </span>
             <span className="min-w-[1ch] text-center mt-1">
               {interaction.count}
