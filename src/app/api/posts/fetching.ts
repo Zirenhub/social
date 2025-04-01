@@ -1,11 +1,10 @@
 import { prisma } from '@/lib/prisma';
-import { CACHE_TAGS, HomePagePostsFilter } from '@/types/constants';
-import { postQuery, PostWithCounts } from '@/types/post';
+import { CACHE_TAGS, HomePagePostsFilter, PER_PAGE } from '@/types/constants';
+import { PaginatedPosts, postQuery } from '@/types/post';
 import { errorResponse } from '../response';
 import { unstable_cacheTag as cacheTag } from 'next/cache';
 
 // Constants for pagination
-const DEFAULT_POSTS_PER_PAGE = 8;
 const MAX_POSTS_PER_PAGE = 50;
 
 type GetHomePostsOptions = {
@@ -19,14 +18,10 @@ export const getHomePosts = async ({
   filter,
   userProfileId,
   page = 1,
-  perPage = DEFAULT_POSTS_PER_PAGE,
-}: GetHomePostsOptions): Promise<{
-  posts: PostWithCounts[];
-  hasMore: boolean;
-}> => {
+  perPage = PER_PAGE,
+}: GetHomePostsOptions): Promise<PaginatedPosts> => {
   'use cache';
-  cacheTag(CACHE_TAGS.POSTS);
-  cacheTag(CACHE_TAGS.HOME_POSTS(filter));
+  cacheTag(CACHE_TAGS.POSTS, CACHE_TAGS.HOME_POSTS(filter));
   try {
     // Validate pagination parameters
     const validatedPerPage = Math.min(Math.max(1, perPage), MAX_POSTS_PER_PAGE);
@@ -46,7 +41,7 @@ export const getHomePosts = async ({
     throw new Error('Invalid filter type');
   } catch (error) {
     const err = errorResponse(error, 'Failed getting home page posts.');
-    throw new Error(err.error?.message);
+    throw new Error(err.error.message);
   }
 };
 // Helper function for "For You" posts
