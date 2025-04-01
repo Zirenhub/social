@@ -1,4 +1,4 @@
-import { createPost } from '@/app/api/post/actions';
+import { createPost } from '@/app/api/posts/actions';
 import { setFormErrors } from '@/helpers/setFormErrors';
 import { PostContent, PostContentZ } from '@/types/post';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,7 +6,11 @@ import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-export const useCreatePost = () => {
+type Props = {
+  onSuccess?: () => void;
+};
+
+export const useCreatePost = ({ onSuccess }: Props) => {
   const formMethods = useForm<PostContentZ>({
     resolver: zodResolver(PostContent),
     defaultValues: { content: '' },
@@ -29,6 +33,7 @@ export const useCreatePost = () => {
     });
     if (result.success) {
       formMethods.resetField('content', { keepDirty: true, defaultValue: '' });
+      if (onSuccess) onSuccess();
     } else {
       // Display the general error message
       toast.error(result.error.message);
