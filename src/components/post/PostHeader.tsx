@@ -2,19 +2,30 @@
 import { useRouter } from 'next/navigation';
 import { User2Icon } from 'lucide-react';
 import { useDebouncedCallback } from 'use-debounce';
-import { GetProfileType } from '@/types/profile';
 import { Suspense, useState } from 'react';
 import dynamic from 'next/dynamic';
+import useProfile from '@/hooks/profile/useProfile';
 
 const ProfileHover = dynamic(() => import('./ProfileHover'));
 
 type Props = {
-  profile: GetProfileType;
+  profile: {
+    firstName: string;
+    lastName: string;
+    username: string;
+    id: string;
+  };
   createdAt: string;
 };
 
 export default function PostHeader({ profile, createdAt }: Props) {
   const [hover, setHover] = useState<boolean>(false);
+  const {
+    profile: data,
+    isError,
+    isLoading,
+  } = useProfile(hover ? profile.id : undefined);
+  if (isError) return <div>Error: {isError.message}</div>;
 
   const router = useRouter();
 
@@ -42,7 +53,7 @@ export default function PostHeader({ profile, createdAt }: Props) {
           <User2Icon size={'full'} color="gray" />
         </div>
 
-        {hover && (
+        {hover && data && (
           <Suspense
             key={profile.id}
             fallback={
@@ -53,7 +64,7 @@ export default function PostHeader({ profile, createdAt }: Props) {
               </div>
             }
           >
-            <ProfileHover profile={profile} />
+            <ProfileHover profile={data} isLoading={isLoading} />
           </Suspense>
         )}
 
