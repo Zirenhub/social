@@ -39,7 +39,7 @@ export default function Modal({ title, close, children, isOpen }: Props) {
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 {title && (
-                  <h3 className="text-xl font-medium text-[var(--color-dark-500)] dark:text-white">
+                  <h3 className="text-xl font-medium text-[var(--color-dark-500)]/60 dark:text-white">
                     {title}
                   </h3>
                 )}
