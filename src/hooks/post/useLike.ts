@@ -1,6 +1,6 @@
 'use client';
 
-import { likePost } from '@/app/api/post/actions';
+import { likePost } from '@/app/api/posts/actions';
 import { PostWithCounts } from '@/types/post';
 import { useTransition } from 'react';
 import { toast } from 'react-toastify';
