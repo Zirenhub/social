@@ -1,15 +1,19 @@
-import { getHomePosts } from '@/app/api/post/fetching';
 import Filter from '@/components/ui/Filter';
-import Feed from '@/components/post/Feed';
 import Notifications from '@/components/home/Notifications';
 import ProfileCard from '@/components/home/ProfileCard';
 import Sidebar from '@/components/home/Sidebar';
 import LoaderPlaceholder from '@/components/ui/LoaderPlaceholder';
 import CreatePost from '@/components/ui/CreatePost';
-import { HOME_PAGE_POSTS_FILTERS, homeFilters } from '@/types/constants';
+import {
+  HOME_PAGE_POSTS_FILTERS,
+  homeFilters,
+  PER_PAGE,
+} from '@/types/constants';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import getSession from '@/lib/getSession';
+import { getHomePosts } from '@/app/api/posts/fetching';
+import Feed from '@/components/post/Feed';
 
 export const metadata: Metadata = {
   title: 'Home Feed',
@@ -23,18 +27,14 @@ type Props = {
 export default async function Home({ searchParams }: Props) {
   const { filter, query } = await searchParams;
 
-  const getCurrentFilter = () => {
-    const matchingFilter = HOME_PAGE_POSTS_FILTERS.find((x) => x === filter);
-    if (matchingFilter) {
-      return matchingFilter;
-    } else {
-      return 'forYou';
-    }
-  };
-  const session = await getSession();
-  const { posts } = await getHomePosts({
-    filter: getCurrentFilter(),
-    userProfileId: session.user.profile,
+  const currentFilter =
+    HOME_PAGE_POSTS_FILTERS.find((x) => x === filter) || 'forYou';
+  const userProfileId = (await getSession()).user.profile;
+
+  const { posts, hasMore } = await getHomePosts({
+    filter: currentFilter,
+    userProfileId,
+    perPage: PER_PAGE,
   });
 
   return (
@@ -54,19 +54,16 @@ export default async function Home({ searchParams }: Props) {
           <CreatePost />
         </div>
         {/* Feed Filter */}
-        <Filter currentFilter={getCurrentFilter()} filters={homeFilters} />
+        <Filter currentFilter={currentFilter} filters={homeFilters} />
         <Suspense
-          key={getCurrentFilter()}
+          key={currentFilter}
           fallback={
             <div className="flex items-center justify-center">
               <LoaderPlaceholder size={32} text="Loading posts..." />
             </div>
           }
         >
-          <Feed
-            posts={posts}
-            showCreatePost={getCurrentFilter() === 'forYou'}
-          />
+          <Feed posts={posts} showCreatePost={currentFilter === 'forYou'} />
         </Suspense>
       </div>
 
