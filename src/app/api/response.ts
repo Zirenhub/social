@@ -1,4 +1,4 @@
-import { ApiError, ApiResponse } from '@/types/api';
+import { ApiError, ApiErrorType, ApiResponse } from '@/types/api';
 import { Prisma } from '@prisma/client';
 import { AuthError } from 'next-auth';
 import { ZodError } from 'zod';
@@ -25,8 +25,8 @@ export default function successResponse<T>(data: T): ApiResponse<T> {
 export function errorResponse(
   error: unknown,
   defaultMessage: string = 'An unexpected error occurred'
-): ApiResponse<null> {
-  const response: ApiResponse<null> = {
+): { success: false; data: null; error: ApiErrorType } {
+  const response: ApiError = {
     success: false,
     data: null,
     error: { message: defaultMessage },
