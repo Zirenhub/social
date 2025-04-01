@@ -1,5 +1,5 @@
 import { UseFormReturn, Path } from 'react-hook-form';
-import { ApiError } from '@/types/api';
+import { ApiErrorType } from '@/types/api';
 
 /**
  * Sets form errors from an API error response
@@ -10,7 +10,7 @@ import { ApiError } from '@/types/api';
  */
 export function setFormErrors<T extends Record<string, any>>(
   formMethods: UseFormReturn<T>,
-  apiError: ApiError | undefined | null,
+  apiError: ApiErrorType | undefined | null,
   shouldFocus: boolean = true
 ): void {
   if (!apiError?.fields) return;
