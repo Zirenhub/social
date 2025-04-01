@@ -84,7 +84,10 @@ export default async function Profile({ params, searchParams }: Props) {
 
             <Filter currentFilter={currentFilter} filters={profileFilters} />
 
-            <Feed posts={result.posts} />
+            <Feed
+              posts={result.posts}
+              showCreatePost={isCurrentUser && currentFilter === 'posts'}
+            />
           </div>
 
           <aside className="md:w-1/3 space-y-6 sticky top-4 self-start">
