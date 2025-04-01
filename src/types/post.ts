@@ -18,6 +18,9 @@ type PostContentZ = z.infer<typeof PostContent>;
 const postWithCountsArgs = (userProfileId: string) =>
   ({
     include: {
+      profile: {
+        select: { firstName: true, lastName: true, username: true },
+      } as const,
       _count: { select: { likes: true, comments: true } } as const,
       likes: {
         where: {
@@ -51,6 +54,11 @@ export const postQuery = ({
   }
 
   return query;
+};
+
+export type PaginatedPosts = {
+  posts: PostWithCounts[];
+  hasMore: boolean;
 };
 
 export type { PostContentZ, Post, PostWithCounts };
