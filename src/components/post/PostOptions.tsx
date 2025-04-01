@@ -4,8 +4,9 @@ import { EllipsisVertical, Trash } from 'lucide-react';
 import { useState } from 'react';
 import { DropdownMenu, DropdownMenuItem } from '../ui/DropdownMenu';
 import Follow from '../profile/profile-interactions/Follow';
-import { GetProfileType } from '@/types/profile';
 import dynamic from 'next/dynamic';
+import { useSession } from 'next-auth/react';
+import LoaderPlaceholder from '../ui/LoaderPlaceholder';
 
 const DeletePostModal = dynamic(() => import('./DeletePostModal'), {
   loading: () => null,
@@ -13,16 +14,21 @@ const DeletePostModal = dynamic(() => import('./DeletePostModal'), {
 
 type PostOptionsProps = {
   post: PostWithCounts;
-  profile: GetProfileType;
-  isOwner: boolean;
 };
 
-export default function PostOptions({
-  post,
-  profile,
-  isOwner,
-}: PostOptionsProps) {
+export default function PostOptions({ post }: PostOptionsProps) {
   const [showDeletePostModal, setShowDeletePostModal] = useState(false);
+  const session = useSession();
+  if (session.status === 'loading') {
+    return <LoaderPlaceholder />;
+  }
+  if (session.status === 'unauthenticated') {
+    throw new Error('Session not found');
+  }
+  if (!session.data) {
+    return null;
+  }
+  const isOwner = session.data.user.profile === post.profileId;
 
   return (
     <>
@@ -45,7 +51,7 @@ export default function PostOptions({
             Delete Post
           </DropdownMenuItem>
         ) : (
-          <Follow profile={profile} asDropdownItem />
+          <Follow profileId={post.profileId} asDropdownItem />
         )}
       </DropdownMenu>
     </>
