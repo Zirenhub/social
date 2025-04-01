@@ -17,51 +17,15 @@ export default function Follow({
 }: Props) {
   const { isLoading, isFollowing, buttonText, handleFollowAction } =
     useFollow(profileId);
-
-  if (isLoading) {
-    return (
-      <LoaderPlaceholder className="flex items-center justify-center w-full" />
-    );
-  }
-
   const { default: buttonTextDefault, hover } = buttonText();
 
   const onFollowAction = () => {
     handleFollowAction();
-    if (sideEffect) {
-      sideEffect();
-    }
+    sideEffect?.();
   };
-  // fix, could be better
-  if (asDropdownItem) {
-    return (
-      <DropdownMenuItem
-        className={`${isFollowing ? 'group' : ''}`}
-        disabled={isLoading}
-        onClick={onFollowAction}
-      >
-        {isFollowing ? (
-          <>
-            <span className="hidden group-hover:flex items-center">
-              <UserRoundMinusIcon size={16} className="mr-2" /> {hover}
-            </span>
-            <span className="group-hover:hidden">{buttonTextDefault}</span>
-          </>
-        ) : (
-          <div className="flex items-center">
-            <UserRoundPlusIcon size={16} className="mr-2" /> {buttonTextDefault}
-          </div>
-        )}
-      </DropdownMenuItem>
-    );
-  }
 
-  return (
-    <button
-      className={`primary-button ${isFollowing ? 'group' : ''}`}
-      disabled={isLoading}
-      onClick={onFollowAction}
-    >
+  const FollowContent = () => (
+    <>
       {isFollowing ? (
         <>
           <span className="hidden group-hover:flex items-center">
@@ -74,6 +38,28 @@ export default function Follow({
           <UserRoundPlusIcon size={16} className="mr-2" /> {buttonTextDefault}
         </div>
       )}
+    </>
+  );
+
+  if (asDropdownItem) {
+    return (
+      <DropdownMenuItem
+        className={isFollowing ? 'group' : ''}
+        disabled={isLoading}
+        onClick={onFollowAction}
+      >
+        {isLoading ? <LoaderPlaceholder color="white" /> : <FollowContent />}
+      </DropdownMenuItem>
+    );
+  }
+
+  return (
+    <button
+      className={`primary-button ${isFollowing ? 'group' : ''}`}
+      disabled={isLoading}
+      onClick={onFollowAction}
+    >
+      {isLoading ? <LoaderPlaceholder color="white" /> : <FollowContent />}
     </button>
   );
 }
