@@ -1,20 +1,30 @@
 'use client';
 import { UserRoundMinusIcon, UserRoundPlusIcon } from 'lucide-react';
 import { useFollow } from '@/hooks/profile/useFollow';
-import { GetProfileType } from '@/types/profile';
 import { DropdownMenuItem } from '@/components/ui/DropdownMenu';
+import LoaderPlaceholder from '@/components/ui/LoaderPlaceholder';
 
 type Props = {
-  profile: GetProfileType;
+  profileId: string;
   sideEffect?: () => void;
   asDropdownItem?: boolean;
 };
 
-export default function Follow({ sideEffect, profile, asDropdownItem }: Props) {
+export default function Follow({
+  sideEffect,
+  profileId,
+  asDropdownItem,
+}: Props) {
   const { isLoading, isFollowing, buttonText, handleFollowAction } =
-    useFollow(profile);
+    useFollow(profileId);
 
-  const { default: buttonTextDefault, hover } = buttonText;
+  if (isLoading) {
+    return (
+      <LoaderPlaceholder className="flex items-center justify-center w-full" />
+    );
+  }
+
+  const { default: buttonTextDefault, hover } = buttonText();
 
   const onFollowAction = () => {
     handleFollowAction();
@@ -22,7 +32,7 @@ export default function Follow({ sideEffect, profile, asDropdownItem }: Props) {
       sideEffect();
     }
   };
-
+  // fix, could be better
   if (asDropdownItem) {
     return (
       <DropdownMenuItem
