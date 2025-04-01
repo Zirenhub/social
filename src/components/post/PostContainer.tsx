@@ -2,21 +2,13 @@ import { PostWithCounts } from '@/types/post';
 import PostHeader from './PostHeader';
 import { formatCreatedAtDate } from '@/helpers/formatDate';
 import PostInteractions from './PostInteractions';
-import { getProfile } from '@/app/api/profile/fetching';
 import PostOptions from './PostOptions';
-import getSession from '@/lib/getSession';
 
 type Props = {
   post: PostWithCounts;
 };
 
-export default async function PostContainer({ post }: Props) {
-  const session = await getSession();
-  const profile = await getProfile({
-    profileId: post.profileId,
-    userProfileId: session.user.profile,
-  });
-
+export default function PostContainer({ post }: Props) {
   return (
     <div
       key={post.id}
@@ -24,14 +16,10 @@ export default async function PostContainer({ post }: Props) {
     >
       <div className="flex justify-between items-start">
         <PostHeader
-          profile={profile}
+          profile={{ ...post.profile, id: post.profileId }}
           createdAt={formatCreatedAtDate(post.createdAt)}
         />
-        <PostOptions
-          post={post}
-          profile={profile}
-          isOwner={post.profileId === session.user.profile}
-        />
+        <PostOptions post={post} />
       </div>
       <p className="text-gray-800 dark:text-gray-200 mb-4">{post.content}</p>
       <PostInteractions post={post} />
