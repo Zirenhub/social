@@ -12,28 +12,25 @@ import Message from '@/components/profile/profile-interactions/Message';
 import Filter from '@/components/ui/Filter';
 import { PROFILE_PAGE_POSTS_FILTERS, profileFilters } from '@/types/constants';
 import Search from '@/components/ui/search/Search';
-import { GetUser } from '@/app/api/auth/fetching';
 import getSession from '@/lib/getSession';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfilePictureSection from '@/components/profile/ProfileAvatar';
 import ProfileInfoSection from '@/components/profile/ProfileInfo';
+import { getUser } from '@/app/api/auth/fetching';
 
 type Props = {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ filter?: string; query?: string }>;
 };
 
-const getCurrentFilter = (filter: string | undefined) => {
-  const matchingFilter = PROFILE_PAGE_POSTS_FILTERS.find((x) => x === filter);
-  return matchingFilter || 'post';
-};
-
 export default async function Profile({ params, searchParams }: Props) {
   const { slug } = await params;
   const { filter, query } = await searchParams;
 
+  const currentFilter =
+    PROFILE_PAGE_POSTS_FILTERS.find((x) => x === filter) || 'posts';
   const session = await getSession();
-  const currentUser = await GetUser(session.user.id);
+  const currentUser = await getUser(session.user.id);
 
   const [profileResult, profilePosts, profileLastActive] = await Promise.all([
     getProfile({
@@ -54,7 +51,6 @@ export default async function Profile({ params, searchParams }: Props) {
   };
 
   const isCurrentUser = currentUser.profile.id === result.id;
-  const currentFilter = getCurrentFilter(filter);
 
   return (
     <div className="mx-14 mt-6">
@@ -79,7 +75,7 @@ export default async function Profile({ params, searchParams }: Props) {
 
                 {!isCurrentUser && (
                   <div className="flex gap-4">
-                    <Follow profile={profileResult} />
+                    <Follow profileId={result.id} />
                     <Message />
                   </div>
                 )}
