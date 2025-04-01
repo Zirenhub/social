@@ -14,13 +14,13 @@ export default function LoaderPlaceholder({
   className,
 }: Props) {
   return (
-    <>
+    <div className={`flex items-center ${className ? className : ''} `}>
       <Loader2
         size={size || 24}
-        className={`animate-spin ${className} `}
+        className="animate-spin"
         color={color || 'gray'}
       />
       {text && <p className="text-gray-500">{text}</p>}
-    </>
+    </div>
   );
 }
