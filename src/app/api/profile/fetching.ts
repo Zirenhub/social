@@ -90,11 +90,10 @@ export const getProfile = async ({
       },
       ...profileQuery(userProfileId),
     });
-
     return profile;
   } catch (error) {
     const err = errorResponse(error, 'Failed getting profile.');
-    throw new Error(err.error?.message);
+    throw new Error(err.error.message);
   }
 };
 
@@ -103,8 +102,7 @@ export const getProfilePosts = async ({
   userProfileId,
 }: getProfileProps) => {
   'use cache';
-  cacheTag(CACHE_TAGS.POSTS);
-  cacheTag(CACHE_TAGS.PROFILE_POSTS(profileId));
+  cacheTag(CACHE_TAGS.POSTS, CACHE_TAGS.PROFILE_POSTS(profileId));
   try {
     const posts = await prisma.post.findMany(
       postQuery({ profileId, userProfileId })
@@ -112,7 +110,7 @@ export const getProfilePosts = async ({
     return posts;
   } catch (error) {
     const err = errorResponse(error, 'Failed getting profile posts.');
-    throw new Error(err.error?.message);
+    throw new Error(err.error.message);
   }
 };
 
