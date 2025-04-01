@@ -7,6 +7,7 @@ export default async function ProfileCard() {
   const session = await getSession();
   const profileResult = await getProfile({
     profileId: session.user.profile,
+    userProfileId: session.user.profile,
   });
 
   const { _count } = profileResult;
