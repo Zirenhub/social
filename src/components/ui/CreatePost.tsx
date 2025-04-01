@@ -5,9 +5,13 @@ import LoaderPlaceholder from './LoaderPlaceholder';
 import { ArrowRight } from 'lucide-react';
 import Textarea from './Textarea';
 
-export default function CreatePost() {
+type Props = {
+  onSuccess?: () => void;
+};
+
+export default function CreatePost({ onSuccess }: Props) {
   const { submit, formErrors, register, isSubmitting, charCount } =
-    useCreatePost();
+    useCreatePost({ onSuccess });
 
   // Calculate percentage for progress bar
   const isOverLimit = charCount > MAX_POST_CHARS;
