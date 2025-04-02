@@ -6,7 +6,7 @@ import {
 import successResponse, { errorResponse } from '../response';
 import { prisma } from '@/lib/prisma';
 import getSession from '@/lib/getSession';
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { CACHE_TAGS } from '@/types/constants';
 
 export async function updateProfile(updatedData: AdditinalProfileInfoZ) {
