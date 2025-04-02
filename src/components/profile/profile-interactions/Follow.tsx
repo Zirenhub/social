@@ -48,7 +48,7 @@ export default function Follow({
         disabled={isLoading}
         onClick={onFollowAction}
       >
-        {isLoading ? <LoaderPlaceholder color="white" /> : <FollowContent />}
+        {isLoading ? <LoaderPlaceholder /> : <FollowContent />}
       </DropdownMenuItem>
     );
   }
