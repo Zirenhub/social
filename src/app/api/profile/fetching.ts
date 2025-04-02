@@ -4,6 +4,7 @@ import { postQuery } from '@/types/post';
 import { profileQuery } from '@/types/profile';
 import { unstable_cacheTag as cacheTag } from 'next/cache';
 import { CACHE_TAGS } from '@/types/constants';
+import { subDays } from 'date-fns';
 
 // export const getPostsCount = (profileId: string, since?: Date) => {
 //   return unstable_cache(
@@ -116,9 +117,27 @@ export const getProfilePosts = async ({
 
 // Get fresh lastActive separately
 export const getProfileLastActive = async (profileId: string) => {
-  const result = await prisma.profile.findUnique({
-    where: { id: profileId },
-    select: { lastActive: true },
-  });
-  return result?.lastActive;
+  'use cache';
+  cacheTag(CACHE_TAGS.PROFILE(profileId));
+  try {
+    const dateThreshold = subDays(new Date(), 30);
+
+    const result = await prisma.profile.findUniqueOrThrow({
+      where: { id: profileId },
+      select: {
+        lastActive: true,
+        _count: {
+          select: {
+            followers: { where: { createdAt: { gte: dateThreshold } } },
+            posts: { where: { createdAt: { gte: dateThreshold } } },
+          },
+        },
+      },
+    });
+
+    return result;
+  } catch (error) {
+    const err = errorResponse(error, 'Failed getting profile activity.');
+    throw new Error(err.error.message);
+  }
 };

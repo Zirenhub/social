@@ -3,19 +3,17 @@ import { ACTIVITY_THRESHOLDS } from '@/types/constants';
 import { differenceInMinutes } from 'date-fns';
 
 type Props = {
-  lastActive: Date | undefined;
+  activity: { lastActive: Date; _count: { posts: number; followers: number } };
 };
 
-export default function ActivitySummary({ lastActive }: Props) {
+export default function ActivitySummary({ activity }: Props) {
   function getLastActiveStatus(): string {
-    if (!lastActive) {
+    if (!activity.lastActive) {
       return 'Unknown';
     }
-
     const now = new Date();
-    const lastActiveDate = new Date(lastActive);
+    const lastActiveDate = new Date(activity.lastActive);
     const minutesDifference = differenceInMinutes(now, lastActiveDate);
-
     // Show "Now" if within threshold
     if (minutesDifference <= ACTIVITY_THRESHOLDS.UPDATE_LAST_ACTIVE_MINUTES) {
       return 'Now';
@@ -38,13 +36,15 @@ export default function ActivitySummary({ lastActive }: Props) {
           <span className="text-sm text-gray-500 dark:text-gray-400">
             Posts this month
           </span>
-          <span className="text-sm font-medium">0</span>
+          <span className="text-sm font-medium">{activity._count.posts}</span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-500 dark:text-gray-400">
-            New followers
+            Followers this month
           </span>
-          <span className="text-sm font-medium">0</span>
+          <span className="text-sm font-medium">
+            {activity._count.followers}
+          </span>
         </div>
       </div>
       <div className="mt-6 pt-4 top-seperator">
