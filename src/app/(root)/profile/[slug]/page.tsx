@@ -32,7 +32,7 @@ export default async function Profile({ params, searchParams }: Props) {
   const session = await getSession();
   const currentUser = await getUser(session.user.id);
 
-  const [profileResult, profilePosts, profileLastActive] = await Promise.all([
+  const [profileResult, profilePosts, profileActivity] = await Promise.all([
     getProfile({
       profileId: slug,
       userProfileId: currentUser.profile.id,
@@ -47,7 +47,7 @@ export default async function Profile({ params, searchParams }: Props) {
   const result = {
     ...profileResult,
     posts: profilePosts,
-    lastActive: profileLastActive,
+    activity: profileActivity,
   };
 
   const isCurrentUser = currentUser.profile.id === result.id;
@@ -92,7 +92,7 @@ export default async function Profile({ params, searchParams }: Props) {
 
           <aside className="md:w-1/3 space-y-6 sticky top-4 self-start">
             <Search query={query} />
-            <ActivitySummary lastActive={result.lastActive} />
+            <ActivitySummary activity={result.activity} />
             <MightKnow />
           </aside>
         </div>
