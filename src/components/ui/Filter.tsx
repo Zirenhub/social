@@ -24,8 +24,8 @@ export default function Filter({ currentFilter, filters }: Props) {
                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
             }`}
           >
-            {filter.icon && <filter.icon size={20} className="pt-1" />}
-            <span>{filter.label}</span>
+            {filter.icon && <filter.icon size={18} />}
+            {filter.label}
           </Link>
         );
       })}
