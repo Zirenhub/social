@@ -2,9 +2,10 @@
 import { auth, signIn, signOut } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { LogInZ, SignUpContent, SignUpZ } from '@/types/auth';
-import { ACTIVITY_THRESHOLDS } from '@/types/constants';
+import { ACTIVITY_THRESHOLDS, CACHE_TAGS } from '@/types/constants';
 const bcrypt = require('bcryptjs');
 import successResponse, { errorResponse } from '../response';
+import { revalidateTag } from 'next/cache';
 
 let lastUpdateTimestamp = 0;
 
@@ -108,6 +109,7 @@ export async function updateLastActive(
 
     // Update our timestamp tracker
     lastUpdateTimestamp = now;
+    revalidateTag(CACHE_TAGS.PROFILE(session.user.profile));
 
     return { success: true, data: updatedProfile, error: null };
   } catch (err) {
