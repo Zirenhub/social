@@ -1,30 +1,63 @@
 'use client';
 
 import { likePost } from '@/app/api/posts/actions';
+import { CACHE_TAGS } from '@/types/constants';
 import { PostWithCounts } from '@/types/post';
-import { useTransition } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useState, useTransition, useCallback } from 'react';
 import { toast } from 'react-toastify';
 
 type Props = {
   post: PostWithCounts;
+  initialIsLiked: boolean;
+  initialLikeCount: number;
 };
 
-export default function useLike({ post }: Props) {
+export default function useLike({
+  post,
+  initialIsLiked,
+  initialLikeCount,
+}: Props) {
+  const [likesStatus, setLikesStatus] = useState({
+    isLiked: initialIsLiked,
+    count: initialLikeCount,
+  });
+
+  const queryClient = useQueryClient();
   const [isPending, startTransition] = useTransition();
 
-  const postIsLiked = post.likes.length > 0;
+  const handleLike = useCallback(() => {
+    // Optimistic update
+    setLikesStatus((prev) => ({
+      isLiked: !prev.isLiked,
+      count: prev.isLiked ? prev.count - 1 : prev.count + 1,
+    }));
 
-  const handleLike = () => {
     startTransition(async () => {
-      const result = await likePost({ postId: post.id });
-      if (!result.success || !result.data) {
+      try {
+        const result = await likePost({ postId: post.id });
+
+        if (!result.success || !result.data) {
+          throw new Error(result.error?.message || 'Failed to like post');
+        }
+
+        // Invalidate both the posts list and individual post cache
+        await queryClient.invalidateQueries({
+          queryKey: [CACHE_TAGS.POSTS],
+          refetchType: 'inactive',
+        });
+      } catch (error) {
+        // Revert on error
+        setLikesStatus((prev) => ({
+          isLiked: !prev.isLiked,
+          count: prev.isLiked ? prev.count + 1 : prev.count - 1,
+        }));
         toast.error(
-          `Something went wrong,
-                ${result.error?.message || 'unknown'}`
+          `Something went wrong: ${error instanceof Error ? error.message : 'Unknown error'}`
         );
       }
     });
-  };
+  }, [post.id, queryClient]);
 
-  return { isPending, handleLike, postIsLiked };
+  return { isPending, handleLike, likesStatus };
 }

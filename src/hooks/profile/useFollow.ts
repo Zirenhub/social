@@ -1,9 +1,13 @@
 'use client';
 
 import { followProfile, unfollowProfile } from '@/app/api/profile/actions';
-import { useCallback, useMemo, useTransition } from 'react';
+import { useCallback, useMemo } from 'react';
 import { toast } from 'react-toastify';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { ApiResponse } from '@/types/api';
+import type { Follow } from '@prisma/client';
 import useProfile from './useProfile';
+import { CACHE_TAGS, HOME_PAGE_POSTS_FILTERS } from '@/types/constants';
 
 const BUTTON_STATES = {
   FOLLOWING: { default: 'Following', hover: 'Unfollow' },
@@ -12,8 +16,8 @@ const BUTTON_STATES = {
 };
 
 export function useFollow(profileId: string) {
-  const [isPending, startTransition] = useTransition();
-  const { profile, isLoading, isError, mutate } = useProfile(profileId);
+  const queryClient = useQueryClient();
+  const { profile, isLoading, error, refetch } = useProfile(profileId);
 
   const isFollowing = useMemo(
     () => profile?.followers && Boolean(profile.followers.length > 0),
@@ -25,50 +29,33 @@ export function useFollow(profileId: string) {
     [profile?.following]
   );
 
-  // Determine button text based on relationship status
   const buttonText = () => {
     if (isFollowing) return BUTTON_STATES.FOLLOWING;
     if (isFollowingMe) return BUTTON_STATES.FOLLOW_BACK;
     return BUTTON_STATES.FOLLOW;
   };
 
-  // Handle follow/unfollow action
-  const handleFollowAction = useCallback(() => {
-    if (!profile) {
-      toast.error('Profile data not available');
-      return;
-    }
-
-    startTransition(async () => {
-      try {
-        let result;
-        let optimisticData;
-
-        if (isFollowing) {
-          result = await unfollowProfile(profile.id);
-          if (!result.success) throw new Error('Unfollow failed');
-          optimisticData = { ...profile, followers: [] };
-        } else {
-          result = await followProfile(profile.id);
-          if (!result.success || !result.data) throw new Error('Follow failed');
-          optimisticData = { ...profile, followers: [result.data] };
-        }
-        await mutate(optimisticData, {
-          optimisticData: optimisticData,
-          revalidate: true,
-          populateCache: true,
-          rollbackOnError: true,
-        });
-        toast.success(
-          isFollowing
-            ? `Unfollowed @${profile.username}`
-            : `Followed ${isFollowingMe ? 'back ' : ''}@${profile.username}`
-        );
-      } catch (error) {
-        toast.error('Action failed. Please try again.');
+  const { mutate: toggleFollow, isPending } = useMutation<
+    ApiResponse<Follow | null>
+  >({
+    mutationFn: () =>
+      isFollowing ? unfollowProfile(profileId) : followProfile(profileId),
+    onSettled: async (data) => {
+      if (!data || !data.success) {
+        toast.error(data?.error.message || 'Operation failed');
+        return;
       }
-    });
-  }, [profile, isFollowing, isFollowingMe, startTransition]);
+      await refetch();
+      queryClient.invalidateQueries({
+        queryKey: [CACHE_TAGS.POSTS, HOME_PAGE_POSTS_FILTERS[1]],
+      });
+      toast.success(
+        isFollowing
+          ? `Unfollowed @${profile?.username}`
+          : `Followed @${profile?.username}`
+      );
+    },
+  });
 
   const isLoadingState = isPending || isLoading || !profile;
 
@@ -80,6 +67,6 @@ export function useFollow(profileId: string) {
     isLoading: isLoadingState,
     isFollowing,
     buttonText,
-    handleFollowAction: isError ? errorHandler : handleFollowAction,
+    handleFollowAction: error ? errorHandler : toggleFollow,
   };
 }

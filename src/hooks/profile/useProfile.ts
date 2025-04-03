@@ -1,24 +1,22 @@
 'use client';
-import { createTypedFetcher } from '@/lib/fetcher';
+import { fetcher } from '@/lib/fetcher';
+import { CACHE_TAGS } from '@/types/constants';
 import { GetProfileType } from '@/types/profile';
-import useSWR from 'swr';
+import { useQuery } from '@tanstack/react-query';
 
-const profileFetcher = createTypedFetcher<GetProfileType>();
+export default function useProfile(id: string, enabled: boolean = true) {
+  const { data, error, isLoading, refetch } = useQuery<GetProfileType, Error>({
+    queryKey: [CACHE_TAGS.PROFILE(id)],
+    queryFn: () => fetcher(`/api/profile/${id}`),
+    enabled,
+    refetchOnWindowFocus: false,
+    staleTime: 60000,
+  });
 
-export default function useProfile(id?: string) {
-  const { data, error, isLoading, mutate } = useSWR<GetProfileType, Error>(
-    id ? `/api/profile/${id}` : null,
-    profileFetcher,
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 60000,
-    }
-  );
-  console.log(data);
   return {
     profile: data,
     isLoading,
-    isError: error,
-    mutate,
+    error,
+    refetch,
   };
 }

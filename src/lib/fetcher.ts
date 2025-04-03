@@ -11,7 +11,3 @@ export async function fetcher<T>(url: string): Promise<T> {
 
   return result.data;
 }
-
-export function createTypedFetcher<T>() {
-  return (url: string) => fetcher<T>(url);
-}
