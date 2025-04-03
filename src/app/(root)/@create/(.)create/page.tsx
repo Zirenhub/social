@@ -6,9 +6,11 @@ import { useRouter } from 'next/navigation';
 export default function Page() {
   const router = useRouter();
 
+  const goBack = () => router.back();
+
   return (
-    <Modal close={() => router.back()} isOpen={true} title="Create a post.">
-      <CreatePost onSuccess={() => router.back()} />
+    <Modal close={goBack} isOpen={true} title="Create a post.">
+      <CreatePost onSuccess={goBack} />
     </Modal>
   );
 }

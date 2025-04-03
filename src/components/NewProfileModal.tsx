@@ -43,7 +43,6 @@ export default function NewProfileModal({ user }: Props) {
   const bioWatch = watch('bio');
 
   useEffect(() => {
-    console.log(formMethods.getValues());
     if (avatarImageWatch) {
       const reader = new FileReader();
       reader.onloadend = () => {

@@ -1,11 +1,11 @@
 import { prisma } from '@/lib/prisma';
-import { CACHE_TAGS, HomePagePostsFilter, PER_PAGE } from '@/types/constants';
+import { CACHE_TAGS, HomePagePostsFilter } from '@/types/constants';
 import { PaginatedPosts, postQuery } from '@/types/post';
 import { errorResponse } from '../response';
 import { unstable_cacheTag as cacheTag } from 'next/cache';
+import paginationParams from '@/helpers/paginationParams';
 
 // Constants for pagination
-const MAX_POSTS_PER_PAGE = 50;
 
 type GetHomePostsOptions = {
   filter: HomePagePostsFilter;
@@ -17,18 +17,13 @@ type GetHomePostsOptions = {
 export const getHomePosts = async ({
   filter,
   userProfileId,
-  page = 1,
-  perPage = PER_PAGE,
+  page,
+  perPage,
 }: GetHomePostsOptions): Promise<PaginatedPosts> => {
   'use cache';
   cacheTag(CACHE_TAGS.POSTS, CACHE_TAGS.HOME_POSTS(filter));
   try {
-    // Validate pagination parameters
-    const validatedPerPage = Math.min(Math.max(1, perPage), MAX_POSTS_PER_PAGE);
-    const validatedPage = Math.max(1, page);
-
-    const skip = (validatedPage - 1) * validatedPerPage;
-    const take = validatedPerPage;
+    const { skip, take } = paginationParams(page, perPage);
 
     if (filter === 'forYou') {
       return await getForYouPosts(userProfileId, skip, take);
@@ -44,14 +39,13 @@ export const getHomePosts = async ({
     throw new Error(err.error.message);
   }
 };
-// Helper function for "For You" posts
+
 async function getForYouPosts(profileId: string, skip: number, take: number) {
   const [posts, totalCount] = await prisma.$transaction([
     prisma.post.findMany({
       ...postQuery({ userProfileId: profileId }),
       skip,
       take,
-      orderBy: { createdAt: 'desc' },
     }),
     prisma.post.count(),
   ]);
@@ -62,7 +56,6 @@ async function getForYouPosts(profileId: string, skip: number, take: number) {
   };
 }
 
-// Helper function for "Following" posts
 async function getFollowingPosts(
   profileId: string,
   skip: number,
@@ -85,7 +78,6 @@ async function getFollowingPosts(
       where: { profileId: { in: followingIds } },
       skip,
       take,
-      orderBy: { createdAt: 'desc' },
     }),
     prisma.post.count({
       where: {
