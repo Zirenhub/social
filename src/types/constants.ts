@@ -45,7 +45,8 @@ export const PROFILE_PAGE_POSTS_FILTERS = [
   'liked',
   'reposts',
 ] as const;
-type ProfilePagePostsFilter = (typeof PROFILE_PAGE_POSTS_FILTERS)[number];
+export type ProfilePagePostsFilter =
+  (typeof PROFILE_PAGE_POSTS_FILTERS)[number];
 export const profileFilters: {
   label: string;
   url: ProfilePagePostsFilter;
@@ -103,6 +104,9 @@ export const NAVIGATION_CONFIG = {
 
 // SERVER -------------------------------------------------------------
 
+export const INIT_PAGE = 1 as const;
+export const PER_PAGE = 5 as const;
+
 // Constants for activity tracking
 export const ACTIVITY_THRESHOLDS = {
   UPDATE_LAST_ACTIVE_MINUTES: 5, // if (n) minutes have passed, trigger update
@@ -116,7 +120,8 @@ export const CACHE_TAGS = {
   HOME_POSTS: (filter: HomePagePostsFilter) => `home:${filter}`,
   POST: (id: string) => `post:${id}`,
   PROFILE: (id: string) => `profile:${id}`,
-  PROFILE_POSTS: (id: string) => `profile:${id}:posts`,
+  PROFILE_POSTS: (id: string, filter: string) =>
+    `profile:${id}:posts:${filter}`,
   PROFILE_POSTSCOUNT: (id: string) => `profile:${id}:postsCount`,
   PROFILE_FOLLOWINGCOUNT: (id: string) => `profile:${id}:followingCount`,
   PROFILE_FOLLOWERSCOUNT: (id: string) => `profile:${id}:followersCount`,
