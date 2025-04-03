@@ -20,12 +20,8 @@ type Props = {
 
 export default function PostHeader({ profile, createdAt }: Props) {
   const [hover, setHover] = useState<boolean>(false);
-  const {
-    profile: data,
-    isError,
-    isLoading,
-  } = useProfile(hover ? profile.id : undefined);
-  if (isError) return <div>Error: {isError.message}</div>;
+  const { profile: data, error, isLoading } = useProfile(profile.id, hover);
+  if (error) return <div>Error: {error.message}</div>;
 
   const router = useRouter();
 
@@ -33,20 +29,21 @@ export default function PostHeader({ profile, createdAt }: Props) {
     router.push(`/profile/${profile.id}`);
   };
 
-  const handleMouseEnter = useDebouncedCallback(() => {
+  const debouncedShowHover = useDebouncedCallback(() => {
     setHover(true);
   }, 300);
 
-  const handleMouseLeave = useDebouncedCallback(() => {
+  const hideHover = () => {
+    debouncedShowHover.cancel();
     setHover(false);
-  }, 300);
+  };
 
   return (
     <div className="relative mb-3 flex items-start">
       <div
         onClick={handleNavigateToProfile}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+        onMouseEnter={debouncedShowHover}
+        onMouseLeave={hideHover}
         className="flex cursor-pointer items-center hover:underline"
       >
         <div className="w-12 h-12 p-1 rounded-full mr-3 border-2 border-gray-400 cursor-pointer">
