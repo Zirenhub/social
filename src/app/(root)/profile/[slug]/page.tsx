@@ -38,6 +38,7 @@ export default async function Profile({ params, searchParams }: Props) {
       userProfileId: currentUser.profile.id,
     }),
     getProfilePosts({
+      filter: currentFilter,
       profileId: slug,
       userProfileId: currentUser.profile.id,
     }),
@@ -85,7 +86,9 @@ export default async function Profile({ params, searchParams }: Props) {
             <Filter currentFilter={currentFilter} filters={profileFilters} />
 
             <Feed
-              posts={result.posts}
+              initialPosts={result.posts}
+              filter={currentFilter}
+              endpoint={`/api/profile/${result.id}/posts`}
               showCreatePost={isCurrentUser && currentFilter === 'posts'}
             />
           </div>

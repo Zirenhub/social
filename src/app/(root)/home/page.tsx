@@ -9,7 +9,7 @@ import {
   homeFilters,
   PER_PAGE,
 } from '@/types/constants';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import getSession from '@/lib/getSession';
 import { getHomePosts } from '@/app/api/posts/fetching';
@@ -31,7 +31,8 @@ export default async function Home({ searchParams }: Props) {
     HOME_PAGE_POSTS_FILTERS.find((x) => x === filter) || 'forYou';
   const userProfileId = (await getSession()).user.profile;
 
-  const { posts, hasMore } = await getHomePosts({
+  // Get initial posts for server-side rendering
+  const initialPosts = await getHomePosts({
     filter: currentFilter,
     userProfileId,
     perPage: PER_PAGE,
@@ -63,7 +64,12 @@ export default async function Home({ searchParams }: Props) {
             </div>
           }
         >
-          <Feed posts={posts} showCreatePost={currentFilter === 'forYou'} />
+          <Feed
+            endpoint="/api/posts"
+            initialPosts={initialPosts}
+            showCreatePost={currentFilter === 'forYou'}
+            filter={currentFilter}
+          />
         </Suspense>
       </div>
 
