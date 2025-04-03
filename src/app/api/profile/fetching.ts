@@ -3,8 +3,9 @@ import { errorResponse } from '../response';
 import { postQuery } from '@/types/post';
 import { profileQuery } from '@/types/profile';
 import { unstable_cacheTag as cacheTag } from 'next/cache';
-import { CACHE_TAGS } from '@/types/constants';
+import { CACHE_TAGS, ProfilePagePostsFilter } from '@/types/constants';
 import { subDays } from 'date-fns';
+import paginationParams from '@/helpers/paginationParams';
 
 // export const getPostsCount = (profileId: string, since?: Date) => {
 //   return unstable_cache(
@@ -73,15 +74,23 @@ import { subDays } from 'date-fns';
 //   )();
 // };
 
-type getProfileProps = {
+type GetProfileProps = {
   profileId: string;
   userProfileId: string;
+};
+
+type GetProfilePostsProps = {
+  profileId: string;
+  filter: ProfilePagePostsFilter;
+  userProfileId: string;
+  page?: number;
+  perPage?: number;
 };
 
 export const getProfile = async ({
   profileId,
   userProfileId,
-}: getProfileProps) => {
+}: GetProfileProps) => {
   'use cache';
   cacheTag(CACHE_TAGS.PROFILE(profileId));
   try {
@@ -101,14 +110,32 @@ export const getProfile = async ({
 export const getProfilePosts = async ({
   profileId,
   userProfileId,
-}: getProfileProps) => {
+  page,
+  perPage,
+  filter,
+}: GetProfilePostsProps) => {
   'use cache';
-  cacheTag(CACHE_TAGS.POSTS, CACHE_TAGS.PROFILE_POSTS(profileId));
+  cacheTag(CACHE_TAGS.POSTS, CACHE_TAGS.PROFILE_POSTS(profileId, filter));
   try {
-    const posts = await prisma.post.findMany(
-      postQuery({ profileId, userProfileId })
-    );
-    return posts;
+    const { skip, take } = paginationParams(page, perPage);
+
+    if (filter === 'posts') {
+      const [posts, totalCount] = await prisma.$transaction([
+        prisma.post.findMany({
+          ...postQuery({ profileId, userProfileId }),
+          skip,
+          take,
+        }),
+        prisma.post.count({ where: { profileId } }),
+      ]);
+
+      return {
+        posts,
+        hasMore: skip + take < totalCount,
+      };
+    }
+
+    throw new Error('Invalid filter type');
   } catch (error) {
     const err = errorResponse(error, 'Failed getting profile posts.');
     throw new Error(err.error.message);
