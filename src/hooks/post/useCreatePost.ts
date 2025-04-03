@@ -1,7 +1,13 @@
 import { createPost } from '@/app/api/posts/actions';
 import { setFormErrors } from '@/helpers/setFormErrors';
+import {
+  CACHE_TAGS,
+  HOME_PAGE_POSTS_FILTERS,
+  PROFILE_PAGE_POSTS_FILTERS,
+} from '@/types/constants';
 import { PostContent, PostContentZ } from '@/types/post';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -11,6 +17,7 @@ type Props = {
 };
 
 export const useCreatePost = ({ onSuccess }: Props) => {
+  const queryClient = useQueryClient();
   const formMethods = useForm<PostContentZ>({
     resolver: zodResolver(PostContent),
     defaultValues: { content: '' },
@@ -32,8 +39,14 @@ export const useCreatePost = ({ onSuccess }: Props) => {
       content: formData.content,
     });
     if (result.success) {
-      formMethods.resetField('content', { keepDirty: true, defaultValue: '' });
+      await queryClient.invalidateQueries({
+        queryKey: [CACHE_TAGS.POSTS, PROFILE_PAGE_POSTS_FILTERS[0]],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: [CACHE_TAGS.POSTS, HOME_PAGE_POSTS_FILTERS[0]],
+      });
       if (onSuccess) onSuccess();
+      formMethods.resetField('content', { keepDirty: true, defaultValue: '' });
     } else {
       // Display the general error message
       toast.error(result.error.message);
