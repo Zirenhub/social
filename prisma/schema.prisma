@@ -78,7 +78,7 @@ model Post {
   comments         Comment[]
   
   @@index([profileId])
-  @@index([createdAt])
+  @@index([createdAt, id])
 }
 
 // Efficient Like model with composite primary key
