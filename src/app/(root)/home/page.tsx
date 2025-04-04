@@ -41,7 +41,7 @@ export default async function Home({ searchParams }: Props) {
   return (
     <div className="flex items-start text-lg justify-between mx-14 pr-[72px]">
       {/* Left Sidebar */}
-      <aside className="hidden xl:flex flex-col gap-3 sticky top-4 h-[calc(100vh-2rem)] flex-shrink 2xl:flex-1 items-start">
+      <aside className="hidden xl:flex flex-col gap-3 sticky mt-4 top-4 h-[calc(100vh-2rem)] flex-shrink 2xl:flex-1 items-start">
         <ProfileCard />
         <Notifications />
       </aside>

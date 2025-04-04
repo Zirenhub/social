@@ -24,7 +24,7 @@ export default async function AppLayout({
       {isUserNew && <NewProfileModal user={user} />}
       <LastActiveUpdater lastActive={user.profile.lastActive} />
       <Navigation user={user} />
-      <main className="flex-1 min-h-screen bg-gradient-to-br from-white to-[var(--color-cyan-500)]/5 dark:from-[var(--color-dark-500)] dark:to-[var(--color-purple-500)]/10 pb-12 overflow-auto">
+      <main className="flex-1 min-h-screen bg-gradient-to-br from-white to-[var(--color-cyan-500)]/5 dark:from-[var(--color-dark-500)] dark:to-[var(--color-purple-500)]/10 pb-2 overflow-auto">
         {children}
       </main>
       {create}
