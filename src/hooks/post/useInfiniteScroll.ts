@@ -8,26 +8,18 @@ import type { PaginatedPosts } from '@/types/post';
 import { fetcher } from '@/lib/fetcher';
 import { CACHE_TAGS } from '@/types/constants';
 
-type UseInfinitePostsOptions = {
-  initialData?: PaginatedPosts;
+type UseInfiniteScrollOptions = {
   endpoint: string;
   filter: string;
-  enabled?: boolean;
+  nextCursor: string | null;
 };
 
-export default function useInfinitePosts({
-  initialData,
+export default function useInfiniteScroll({
   endpoint,
   filter,
-  enabled = true,
-}: UseInfinitePostsOptions) {
-  // Create a stable query key
+  nextCursor,
+}: UseInfiniteScrollOptions) {
   const queryKey = [CACHE_TAGS.POSTS, filter];
-
-  // Track if we should load more to prevent duplicate requests
-  const shouldLoadMore = useRef(false);
-
-  // Use React Query infinite query with improved configuration
   const {
     data,
     error,
@@ -37,44 +29,41 @@ export default function useInfinitePosts({
     isFetchingNextPage,
     refetch,
     isError,
-  } = useInfiniteQuery<PaginatedPosts>({
+  } = useInfiniteQuery<
+    PaginatedPosts,
+    Error,
+    { pages: PaginatedPosts[] },
+    string[],
+    string | null
+  >({
     queryKey,
-    queryFn: async ({ pageParam = 1 }) => {
+    queryFn: async ({ pageParam }) => {
       const params = new URLSearchParams();
       params.append('filter', filter);
-      params.append('page', String(pageParam));
+      if (pageParam) params.append('cursor', pageParam);
 
       return await fetcher(`${endpoint}?${params.toString()}`);
     },
-    initialData: initialData
-      ? {
-          pages: [initialData],
-          pageParams: [1],
-        }
-      : undefined,
-    initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages) => {
-      return lastPage.hasMore ? allPages.length + 1 : undefined;
-    },
+    enabled: nextCursor ? true : false,
+    initialPageParam: nextCursor,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
     refetchOnWindowFocus: false,
-    enabled,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: false,
+    gcTime: 0, // maybe fix in the future
   });
+  // Extract posts from all pages
+  const posts = data?.pages?.flatMap((page) => page.posts) || [];
 
-  // Flatten all pages into posts with memoization
-  const posts = data?.pages.flatMap((page) => page.posts) || [];
-
-  // Set up intersection observer with better configuration
   const { ref, inView } = useInView({
     threshold: 0.1,
-    rootMargin: '0px 0px 200px 0px', // Load more before reaching the end
+    rootMargin: '0px 0px 200px 0px',
     triggerOnce: false,
   });
 
-  // Debounce the inView value to prevent rapid changes
   const [debouncedInView] = useDebounce(inView, 200);
 
-  // Memoized load more function
+  const shouldLoadMore = useRef(false);
+
   const loadMore = useCallback(() => {
     if (!isFetching && !isFetchingNextPage && hasNextPage) {
       shouldLoadMore.current = true;
@@ -82,7 +71,6 @@ export default function useInfinitePosts({
     }
   }, [fetchNextPage, hasNextPage, isFetching, isFetchingNextPage]);
 
-  // Load more posts when sentinel is visible with debounce
   useEffect(() => {
     if (debouncedInView && !shouldLoadMore.current) {
       loadMore();

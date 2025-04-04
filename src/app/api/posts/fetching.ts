@@ -1,9 +1,8 @@
 import { prisma } from '@/lib/prisma';
-import { CACHE_TAGS, HomePagePostsFilter } from '@/types/constants';
+import { CACHE_TAGS, HomePagePostsFilter, PER_PAGE } from '@/types/constants';
 import { PaginatedPosts, postQuery } from '@/types/post';
 import { errorResponse } from '../response';
 import { unstable_cacheTag as cacheTag } from 'next/cache';
-import paginationParams from '@/helpers/paginationParams';
 import { subDays } from 'date-fns';
 
 // Constants for pagination
@@ -11,37 +10,30 @@ import { subDays } from 'date-fns';
 type GetHomePostsOptions = {
   filter: HomePagePostsFilter;
   userProfileId: string;
-  page?: number;
-  perPage?: number;
+  cursor?: string;
 };
 
 type filterProps = {
   profileId: string;
-  skip: number;
-  take: number;
+  cursor?: string;
 };
 
 export const getHomePosts = async ({
   filter,
   userProfileId,
-  page,
-  perPage,
+  cursor,
 }: GetHomePostsOptions): Promise<PaginatedPosts> => {
-  'use cache';
-  cacheTag(CACHE_TAGS.POSTS, CACHE_TAGS.HOME_POSTS(filter));
   try {
-    const { skip, take } = paginationParams(page, perPage);
-
     if (filter === 'forYou') {
-      return await getForYouPosts({ profileId: userProfileId, skip, take });
+      return await getForYouPosts({ profileId: userProfileId, cursor });
     }
 
     if (filter === 'following') {
-      return await getFollowingPosts({ profileId: userProfileId, skip, take });
+      return await getFollowingPosts({ profileId: userProfileId, cursor });
     }
 
     if (filter === 'trending') {
-      return await getTrendingPosts({ profileId: userProfileId, skip, take });
+      return await getTrendingPosts({ profileId: userProfileId, cursor });
     }
 
     throw new Error('Invalid filter type');
@@ -51,23 +43,27 @@ export const getHomePosts = async ({
   }
 };
 
-async function getForYouPosts({ profileId, skip, take }: filterProps) {
-  const [posts, totalCount] = await prisma.$transaction([
-    prisma.post.findMany({
-      ...postQuery({ userProfileId: profileId }),
-      skip,
-      take,
+async function getForYouPosts({ profileId, cursor }: filterProps) {
+  const posts = await prisma.post.findMany({
+    ...postQuery({ userProfileId: profileId }),
+    orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+    take: PER_PAGE + 1,
+    ...(cursor && {
+      skip: 1,
+      cursor: { id: cursor },
     }),
-    prisma.post.count(),
-  ]);
+  });
+
+  const hasMore = posts.length === PER_PAGE + 1;
+  if (hasMore) posts.pop();
 
   return {
     posts,
-    hasMore: skip + take < totalCount,
+    nextCursor: hasMore ? posts[posts.length - 1]?.id : null,
   };
 }
 
-async function getFollowingPosts({ profileId, skip, take }: filterProps) {
+async function getFollowingPosts({ profileId, cursor }: filterProps) {
   const followingRelationships = await prisma.follow.findMany({
     where: { followerId: profileId },
     select: { followingId: true },
@@ -76,54 +72,51 @@ async function getFollowingPosts({ profileId, skip, take }: filterProps) {
   const followingIds = followingRelationships.map((rel) => rel.followingId);
 
   if (followingIds.length === 0) {
-    return { posts: [], hasMore: false };
+    return { posts: [], nextCursor: null };
   }
 
-  const [posts, totalCount] = await prisma.$transaction([
-    prisma.post.findMany({
-      ...postQuery({ userProfileId: profileId }),
-      where: { profileId: { in: followingIds } },
-      skip,
-      take,
+  const posts = await prisma.post.findMany({
+    ...postQuery({ userProfileId: profileId }),
+    where: { profileId: { in: followingIds } },
+    orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+    take: PER_PAGE + 1,
+    ...(cursor && {
+      skip: 1,
+      cursor: { id: cursor },
     }),
-    prisma.post.count({
-      where: {
-        profileId: { in: followingIds },
-      },
-    }),
-  ]);
+  });
+
+  const hasMore = posts.length === PER_PAGE + 1;
+  if (hasMore) posts.pop();
 
   return {
     posts,
-    hasMore: skip + take < totalCount,
+    nextCursor: hasMore ? posts[posts.length - 1]?.id : null,
   };
 }
 
-async function getTrendingPosts({ profileId, skip, take }: filterProps) {
-  const yesterday = subDays(new Date(), 1);
+async function getTrendingPosts({ profileId, cursor }: filterProps) {
+  const yesterday = subDays(new Date(), 30);
 
-  const [posts, totalCount] = await prisma.$transaction([
-    prisma.post.findMany({
-      ...postQuery({ userProfileId: profileId }),
-      where: {
-        createdAt: { gte: yesterday },
-        likes: { some: {} },
-      },
-      skip,
-      take,
+  const posts = await prisma.post.findMany({
+    ...postQuery({ userProfileId: profileId }),
+    where: {
+      createdAt: { gte: yesterday },
+      likes: { some: {} },
+    },
+    orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+    take: PER_PAGE + 1,
+    ...(cursor && {
+      skip: 1,
+      cursor: { id: cursor },
     }),
-    prisma.post.count({
-      where: {
-        createdAt: { gte: yesterday },
-        likes: { some: {} },
-      },
-    }),
-  ]);
+  });
 
-  const orderedPosts = posts.sort((a, b) => a._count.likes - b._count.likes);
+  const hasMore = posts.length === PER_PAGE + 1;
+  if (hasMore) posts.pop();
 
   return {
-    posts: orderedPosts,
-    hasMore: skip + take < totalCount,
+    posts,
+    nextCursor: hasMore ? posts[posts.length - 1]?.id : null,
   };
 }

@@ -13,19 +13,14 @@ export async function GET(
     const searchParams = request.nextUrl.searchParams;
     const filter =
       (searchParams.get('filter') as HomePagePostsFilter) || 'forYou';
-    const page = Number.parseInt(searchParams.get('page') || '1', 10);
-    const perPage = Number.parseInt(
-      searchParams.get('perPage') || String(PER_PAGE),
-      10
-    );
+    const cursor = searchParams.get('cursor') ?? undefined;
 
     const session = await getSession();
 
     const paginatedPosts = await getHomePosts({
       filter,
       userProfileId: session.user.profile,
-      perPage,
-      page,
+      cursor,
     });
 
     return NextResponse.json(successResponse(paginatedPosts));

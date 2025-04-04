@@ -58,7 +58,7 @@ export const postQuery = ({
 
 export type PaginatedPosts = {
   posts: PostWithCounts[];
-  hasMore: boolean;
+  nextCursor: string | null;
 };
 
 export type { PostContentZ, Post, PostWithCounts };

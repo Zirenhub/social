@@ -35,7 +35,6 @@ export default async function Home({ searchParams }: Props) {
   const initialPosts = await getHomePosts({
     filter: currentFilter,
     userProfileId,
-    perPage: PER_PAGE,
   });
 
   return (

@@ -104,8 +104,7 @@ export const NAVIGATION_CONFIG = {
 
 // SERVER -------------------------------------------------------------
 
-export const INIT_PAGE = 1 as const;
-export const PER_PAGE = 5 as const;
+export const PER_PAGE = 3 as const;
 
 // Constants for activity tracking
 export const ACTIVITY_THRESHOLDS = {

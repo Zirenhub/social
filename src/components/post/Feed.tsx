@@ -1,11 +1,10 @@
 'use client';
-
 import { SessionProvider } from 'next-auth/react';
 import PostContainer from './PostContainer';
 import type { PaginatedPosts } from '@/types/post';
 import Link from 'next/link';
-import useInfiniteScroll from '@/hooks/post/useInfiniteScroll';
 import LoaderPlaceholder from '../ui/LoaderPlaceholder';
+import useInfiniteScroll from '@/hooks/post/useInfiniteScroll';
 
 type FeedProps = {
   initialPosts: PaginatedPosts;
@@ -29,9 +28,9 @@ export default function Feed({
     sentinelRef,
     isLoading,
   } = useInfiniteScroll({
-    initialData: initialPosts,
     endpoint,
     filter,
+    nextCursor: initialPosts.nextCursor,
   });
 
   if (error) {
@@ -50,8 +49,11 @@ export default function Feed({
       </div>
     );
   }
+  // Combine initial server-rendered posts with client-fetched posts
+  const allPosts = [...initialPosts.posts, ...posts];
+  const combinedIsEmpty = allPosts.length === 0;
 
-  if (isEmpty) {
+  if (combinedIsEmpty) {
     return (
       <div className="p-12 text-center flex flex-col bg-white rounded-xl shadow-md dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <p className="text-[var(--color-dark-500)]/60 dark:text-white/60">
@@ -69,7 +71,7 @@ export default function Feed({
   return (
     <main>
       <SessionProvider>
-        {posts.map((post) => (
+        {allPosts.map((post) => (
           <PostContainer key={post.id} post={post} />
         ))}
       </SessionProvider>
