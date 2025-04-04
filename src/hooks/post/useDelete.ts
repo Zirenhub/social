@@ -2,6 +2,7 @@
 import { deletePost } from '@/app/api/posts/actions';
 import { CACHE_TAGS } from '@/types/constants';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { toast } from 'react-toastify';
 
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export default function useDelete({ postId, onSuccess }: Props) {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [isPending, startTransition] = useTransition();
 
@@ -21,6 +23,7 @@ export default function useDelete({ postId, onSuccess }: Props) {
         toast.error(result.error.message);
         return;
       }
+      router.refresh();
       await queryClient.invalidateQueries({
         queryKey: [CACHE_TAGS.POSTS],
       });
