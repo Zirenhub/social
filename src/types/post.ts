@@ -29,7 +29,6 @@ const postWithCountsArgs = (userProfileId: string) =>
         take: 1,
       },
     },
-    orderBy: { createdAt: Prisma.SortOrder.desc } as const,
   }) as const;
 
 const validatedArgs = (userProfileId: string) =>
