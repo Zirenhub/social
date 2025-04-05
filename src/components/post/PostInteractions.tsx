@@ -83,7 +83,10 @@ export default function PostInteractions({ post }: Props) {
           <button
             disabled={interaction.isPending}
             key={interaction.label}
-            onClick={interaction.onClick}
+            onClick={(e) => {
+              e.stopPropagation();
+              interaction.onClick();
+            }}
             className="cursor-pointer flex items-center gap-1 hover:text-[var(--color-cyan-500)] transition-colors h-9"
           >
             <span className="h-[21px] flex items-center">

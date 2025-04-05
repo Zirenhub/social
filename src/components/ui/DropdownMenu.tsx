@@ -34,7 +34,10 @@ export function DropdownMenu({
   return (
     <div ref={menuRef} className="relative">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
         className="cursor-pointer"
         aria-label="Menu options"
         aria-expanded={isOpen}
@@ -61,14 +64,17 @@ export function DropdownMenuItem({
   className = '',
 }: {
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick: () => void;
   className?: string;
   disabled?: boolean;
 }) {
   return (
     <button
       disabled={disabled}
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
       className={`cursor-pointer flex items-center w-full px-4 py-2 text-sm text-left transition-colors text-[var(--color-dark-500)]/80 dark:text-white/80 hover:bg-[var(--color-magenta-500)]/10 hover:text-[var(--color-magenta-500)] ${className}`}
     >
       {children}

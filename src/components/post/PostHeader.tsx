@@ -41,7 +41,10 @@ export default function PostHeader({ profile, createdAt }: Props) {
   return (
     <div className="relative mb-3 flex items-start">
       <div
-        onClick={handleNavigateToProfile}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleNavigateToProfile();
+        }}
         onMouseEnter={debouncedShowHover}
         onMouseLeave={hideHover}
         className="flex cursor-pointer items-center hover:underline"

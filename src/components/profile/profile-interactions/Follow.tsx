@@ -57,7 +57,10 @@ export default function Follow({
     <button
       className={`primary-button ${isFollowing ? 'group' : ''}`}
       disabled={isLoading}
-      onClick={onFollowAction}
+      onClick={(e) => {
+        e.stopPropagation();
+        onFollowAction;
+      }}
     >
       {isLoading ? <LoaderPlaceholder color="white" /> : <FollowContent />}
     </button>
