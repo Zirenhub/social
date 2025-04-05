@@ -3,9 +3,12 @@ import { errorResponse } from '../response';
 import { postQuery } from '@/types/post';
 import { profileQuery } from '@/types/profile';
 import { unstable_cacheTag as cacheTag } from 'next/cache';
-import { CACHE_TAGS, ProfilePagePostsFilter } from '@/types/constants';
+import {
+  CACHE_TAGS,
+  PER_PAGE,
+  ProfilePagePostsFilter,
+} from '@/types/constants';
 import { subDays } from 'date-fns';
-import paginationParams from '@/helpers/paginationParams';
 
 // export const getPostsCount = (profileId: string, since?: Date) => {
 //   return unstable_cache(
@@ -83,8 +86,7 @@ type GetProfilePostsProps = {
   profileId: string;
   filter: ProfilePagePostsFilter;
   userProfileId: string;
-  page?: number;
-  perPage?: number;
+  cursor?: string;
 };
 
 export const getProfile = async ({
@@ -109,29 +111,55 @@ export const getProfile = async ({
 
 export const getProfilePosts = async ({
   profileId,
+  cursor,
   userProfileId,
-  page,
-  perPage,
   filter,
 }: GetProfilePostsProps) => {
-  'use cache';
-  cacheTag(CACHE_TAGS.POSTS, CACHE_TAGS.PROFILE_POSTS(profileId, filter));
   try {
-    const { skip, take } = paginationParams(page, perPage);
-
     if (filter === 'posts') {
-      const [posts, totalCount] = await prisma.$transaction([
-        prisma.post.findMany({
-          ...postQuery({ profileId, userProfileId }),
-          skip,
-          take,
+      const posts = await prisma.post.findMany({
+        ...postQuery({ profileId, userProfileId }),
+        orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+        take: PER_PAGE + 1,
+        ...(cursor && {
+          skip: 1,
+          cursor: { id: cursor },
         }),
-        prisma.post.count({ where: { profileId } }),
-      ]);
+      });
+
+      const hasMore = posts.length === PER_PAGE + 1;
+      if (hasMore) posts.pop();
 
       return {
         posts,
-        hasMore: skip + take < totalCount,
+        nextCursor: hasMore ? posts[posts.length - 1]?.id : null,
+      };
+    }
+
+    if (filter === 'liked') {
+      const posts = await prisma.post.findMany({
+        ...postQuery({ profileId, userProfileId }),
+        where: {
+          likes: {
+            some: {
+              profileId: profileId,
+            },
+          },
+        },
+        orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+        take: PER_PAGE + 1,
+        ...(cursor && {
+          skip: 1,
+          cursor: { id: cursor },
+        }),
+      });
+
+      const hasMore = posts.length === PER_PAGE + 1;
+      if (hasMore) posts.pop();
+
+      return {
+        posts,
+        nextCursor: hasMore ? posts[posts.length - 1]?.id : null,
       };
     }
 
