@@ -24,6 +24,12 @@ export const MONTHS = [
   'December',
 ] as const;
 
+export type Filters<T> = {
+  label: string;
+  tooltip?: string;
+  url: T;
+};
+
 // HOME PAGE -----------------------------------------------------------
 
 export const HOME_PAGE_POSTS_FILTERS = [
@@ -32,10 +38,14 @@ export const HOME_PAGE_POSTS_FILTERS = [
   'trending',
 ] as const;
 export type HomePagePostsFilter = (typeof HOME_PAGE_POSTS_FILTERS)[number];
-export const homeFilters: { label: string; url: HomePagePostsFilter }[] = [
-  { label: 'For You', url: 'forYou' },
-  { label: 'Following', url: 'following' },
-  { label: 'Trending', url: 'trending' },
+export const homeFilters: Filters<HomePagePostsFilter>[] = [
+  { label: 'For You', url: 'forYou', tooltip: 'Posts picked just for you!' },
+  {
+    label: 'Following',
+    url: 'following',
+    tooltip: 'Posts from profiles you follow!',
+  },
+  { label: 'Trending', url: 'trending', tooltip: 'Trending posts! >= 1 like' },
 ] as const;
 
 // PROFILE PAGE -----------------------------------------------------------
@@ -47,14 +57,10 @@ export const PROFILE_PAGE_POSTS_FILTERS = [
 ] as const;
 export type ProfilePagePostsFilter =
   (typeof PROFILE_PAGE_POSTS_FILTERS)[number];
-export const profileFilters: {
-  label: string;
-  url: ProfilePagePostsFilter;
-  icon: LucideIcon;
-}[] = [
-  { label: 'Posts', url: 'posts', icon: GridIcon },
-  { label: 'Likes', url: 'liked', icon: HeartIcon },
-  { label: 'Reposts', url: 'reposts', icon: Repeat2Icon },
+export const profileFilters: Filters<ProfilePagePostsFilter>[] = [
+  { label: 'Posts', url: 'posts' },
+  { label: 'Likes', url: 'liked' },
+  { label: 'Reposts', url: 'reposts' },
 ] as const;
 
 // NAVIGATION  -----------------------------------------------------------
