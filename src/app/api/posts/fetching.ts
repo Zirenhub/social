@@ -1,8 +1,7 @@
 import { prisma } from '@/lib/prisma';
-import { CACHE_TAGS, HomePagePostsFilter, PER_PAGE } from '@/types/constants';
+import { HomePagePostsFilter, PER_PAGE } from '@/types/constants';
 import { PaginatedPosts, postQuery } from '@/types/post';
 import { errorResponse } from '../response';
-import { unstable_cacheTag as cacheTag } from 'next/cache';
 import { subDays } from 'date-fns';
 
 // Constants for pagination

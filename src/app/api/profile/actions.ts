@@ -50,7 +50,6 @@ export async function followProfile(profileId: string) {
 
     revalidateTag(CACHE_TAGS.PROFILE(profileId)); // revalidate since followers count has changed
     revalidateTag(CACHE_TAGS.PROFILE(session.user.profile)); // revalidate since following count has changed
-    revalidateTag(CACHE_TAGS.HOME_POSTS('following')); // revalidate since we wanna show posts from the newly followed profile
 
     return successResponse(result);
   } catch (error) {
@@ -84,7 +83,6 @@ export async function unfollowProfile(profileId: string) {
 
     revalidateTag(CACHE_TAGS.PROFILE(profileId)); // revalidate since followers count has changed
     revalidateTag(CACHE_TAGS.PROFILE(session.user.profile)); // revalidate since following count has changed
-    revalidateTag(CACHE_TAGS.HOME_POSTS('following')); // revalidate since we wanna show posts from the newly followed profile
 
     return successResponse(null);
   } catch (error) {
