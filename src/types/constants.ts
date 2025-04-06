@@ -121,6 +121,7 @@ export const CACHE_TAGS = {
   POSTS: 'posts',
 
   // Specific resources (for targeted invalidation)
+  SEARCH: (query: string) => `search:${query}`,
   USER: (userId: string) => `user:${userId}`,
   HOME_POSTS: (filter: HomePagePostsFilter) => `home:${filter}`,
   POST: (id: string) => `post:${id}`,
