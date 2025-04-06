@@ -126,6 +126,11 @@ export type GetProfileType = Prisma.ProfileGetPayload<{
   };
 }>;
 
+export type ProfileActivity = {
+  lastActive: Date;
+  _count: { posts: number; followers: number };
+};
+
 export type AdditinalProfileInfoZ = z.infer<typeof AdditinalProfileInfoContent>;
 export type FullProfileZ = z.infer<typeof FullProfileContent>;
 
