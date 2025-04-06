@@ -59,7 +59,7 @@ export default function Follow({
       disabled={isLoading}
       onClick={(e) => {
         e.stopPropagation();
-        onFollowAction;
+        onFollowAction();
       }}
     >
       {isLoading ? <LoaderPlaceholder color="white" /> : <FollowContent />}
