@@ -20,12 +20,12 @@ import { getUser } from '@/app/api/auth/fetching';
 
 type Props = {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ filter?: string; query?: string }>;
+  searchParams: Promise<{ filter?: string }>;
 };
 
 export default async function Profile({ params, searchParams }: Props) {
   const { slug } = await params;
-  const { filter, query } = await searchParams;
+  const { filter } = await searchParams;
 
   const currentFilter =
     PROFILE_PAGE_POSTS_FILTERS.find((x) => x === filter) || 'posts';
@@ -94,7 +94,7 @@ export default async function Profile({ params, searchParams }: Props) {
           </div>
 
           <aside className="md:w-1/3 space-y-6 sticky top-4 self-start">
-            <Search query={query} />
+            <Search />
             <ActivitySummary activity={result.activity} />
             <MightKnow />
           </aside>
