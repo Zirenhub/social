@@ -1,35 +1,38 @@
+'use client';
+import { useRef } from 'react';
 import MightKnow from '../ui/MightKnow';
 import Search from '../ui/search/Search';
+import useSyncScroll from '@/hooks/useSyncScroll';
 
-type Props = {
-  query?: string;
-};
+export default function Sidebar() {
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
-export default function Sidebar({ query }: Props) {
-  // Sample trending topics
-  const trendingTopics = [
-    { topic: 'Technology', posts: '1.2K' },
-    { topic: 'Sports', posts: '856' },
-    { topic: 'Music', posts: '673' },
-    { topic: 'Travel', posts: '542' },
-    { topic: 'Food', posts: '489' },
-  ];
+  useSyncScroll(sidebarRef);
 
   return (
-    <div className="overflow-auto flex flex-col gap-3 no-scrollbar">
+    <div
+      ref={sidebarRef}
+      className="overflow-y-scroll flex flex-col gap-3 no-scrollbar h-screen py-4"
+    >
       {/* Search Box */}
-      <Search query={query} />
+      <Search />
 
       {/* Trending Topics */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-200 dark:border-gray-700 mt-3">
         <h3 className="container-title mb-4">Trending Topics</h3>
-        {trendingTopics.map((item, index) => (
+        {[
+          { topic: 'Technology', posts: '1.2K' },
+          { topic: 'Sports', posts: '856' },
+          { topic: 'Music', posts: '673' },
+          { topic: 'Travel', posts: '542' },
+          { topic: 'Food', posts: '489' },
+        ].map((item, index) => (
           <div
             key={index}
             className="flex justify-between items-center py-2 hover:bg-gray-50 dark:hover:bg-gray-700 px-2 rounded-lg transition-colors cursor-pointer"
           >
             <div className="flex items-center">
-              <span className="w-6 h-6 flex items-center justify-center rounded-full bg-[var(--color-cyan-500)] bg-opacity-10 text-[var(--color-cyan-100)] text-xs font-bold mr-3">
+              <span className="w-6 h-6 flex items-center justify-center rounded-full bg-[var(--color-cyan-500)] bg-opacity-10 text-[var(--color-cyan-500)] text-xs font-bold mr-3">
                 {index + 1}
               </span>
               <span className="text-gray-800 dark:text-gray-200 font-medium">
@@ -50,7 +53,7 @@ export default function Sidebar({ query }: Props) {
       <MightKnow />
 
       {/* Footer Links */}
-      <div className="text-xs text-gray-500 dark:text-gray-400 px-4">
+      <div className="text-xs text-gray-500 dark:text-gray-400 px-4 mt-3">
         <div className="flex flex-wrap gap-x-2 gap-y-1 mb-2">
           {[
             'About',
