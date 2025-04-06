@@ -1,5 +1,6 @@
 'use client';
 import { likePost } from '@/app/api/posts/actions';
+import { CACHE_TAGS } from '@/types/constants';
 import { PostWithCounts } from '@/types/post';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState, useTransition, useCallback } from 'react';
@@ -37,6 +38,10 @@ export default function useLike({
         if (!result.success || !result.data) {
           throw new Error(result.error?.message || 'Failed to like post');
         }
+
+        await queryClient.invalidateQueries({
+          queryKey: [CACHE_TAGS.POSTS],
+        });
       } catch (error) {
         // Revert on error
         setLikesStatus((prev) => ({
