@@ -14,20 +14,16 @@ export async function GET(
     const searchParams = request.nextUrl.searchParams;
     const filter =
       (searchParams.get('filter') as ProfilePagePostsFilter) || 'posts';
-    const page = Number.parseInt(searchParams.get('page') || '1', 10);
-    const perPage = Number.parseInt(
-      searchParams.get('perPage') || String(PER_PAGE),
-      10
-    );
+    const cursor = searchParams.get('cursor') ?? undefined;
+
     const { slug } = await params;
     const session = await getSession();
 
     const profilePosts = await getProfilePosts({
       filter,
-      perPage,
-      page,
       profileId: slug,
       userProfileId: session.user.profile,
+      cursor,
     });
 
     return NextResponse.json(successResponse(profilePosts));
