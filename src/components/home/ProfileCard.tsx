@@ -2,6 +2,7 @@ import { getProfile } from '@/app/api/profile/fetching';
 import { Settings, User2Icon } from 'lucide-react';
 import ProfileStats from '../profile/ProfileStats';
 import getSession from '@/lib/getSession';
+import Avatar from '../ui/Avatar';
 
 export default async function ProfileCard() {
   const session = await getSession();
@@ -19,9 +20,7 @@ export default async function ProfileCard() {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-200 dark:border-gray-700">
       <div className="flex items-center mb-4 gap-2">
-        <div className="p-2 border-2 border-gray-400 rounded-full">
-          <User2Icon size={32} color="gray" />
-        </div>
+        <Avatar profile={profileResult} className="h-12 w-12" />
         <div className="mb-1">
           <p className="font-['bold'] text-gray-600 dark:text-gray-100">
             {profileResult.firstName} {profileResult.lastName}

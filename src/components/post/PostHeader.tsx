@@ -1,10 +1,10 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { User2Icon } from 'lucide-react';
 import { useDebouncedCallback } from 'use-debounce';
 import { Suspense, useState } from 'react';
 import dynamic from 'next/dynamic';
 import useProfile from '@/hooks/profile/useProfile';
+import Avatar from '../ui/Avatar';
 
 const ProfileHover = dynamic(() => import('./ProfileHover'));
 
@@ -47,11 +47,9 @@ export default function PostHeader({ profile, createdAt }: Props) {
         }}
         onMouseEnter={debouncedShowHover}
         onMouseLeave={hideHover}
-        className="flex cursor-pointer items-center hover:underline"
+        className="flex cursor-pointer items-center gap-3"
       >
-        <div className="w-12 h-12 p-1 rounded-full mr-3 border-2 border-gray-400 cursor-pointer">
-          <User2Icon size={'full'} color="gray" />
-        </div>
+        <Avatar profile={profile} />
 
         {hover && data && (
           <Suspense
@@ -68,12 +66,12 @@ export default function PostHeader({ profile, createdAt }: Props) {
           </Suspense>
         )}
 
-        <div>
-          <h3 className="font-['bold'] text-gray-800 dark:text-gray-100">
+        <div className="flex flex-col hover:underline">
+          <h3 className="font-semibold text-lg dark:text-white">
             {profile.firstName} {profile.lastName}
           </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            {createdAt}
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            @{profile.username} • {createdAt}
           </p>
         </div>
       </div>

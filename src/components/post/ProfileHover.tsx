@@ -1,13 +1,9 @@
 'use client';
-import {
-  User2Icon,
-  BriefcaseIcon,
-  MapPinIcon,
-  CalendarIcon,
-} from 'lucide-react';
+import { BriefcaseIcon, MapPinIcon, CalendarIcon } from 'lucide-react';
 import { formatJoinedDate } from '@/helpers/formatDate';
 import LoaderPlaceholder from '../ui/LoaderPlaceholder';
 import { GetProfileType } from '@/types/profile';
+import Avatar from '../ui/Avatar';
 
 type Props = {
   profile: GetProfileType;
@@ -25,10 +21,8 @@ export default function ProfileHover({ profile, isLoading }: Props) {
           <div className="absolute -top-2 left-6 w-4 h-4 bg-white dark:bg-gray-800 transform rotate-45 border-t border-l border-gray-200 dark:border-gray-700"></div>
 
           {/* Profile Content */}
-          <div className="flex items-center mb-3">
-            <div className="w-12 h-12 p-1 rounded-full mr-2 border-2 border-gray-400">
-              <User2Icon size={'full'} color="gray" />
-            </div>
+          <div className="flex items-center mb-3 gap-3">
+            <Avatar profile={profile} />
             <div>
               <h3 className="font-['bold'] text-gray-800 dark:text-gray-100">
                 {profile?.firstName} {profile?.lastName}
