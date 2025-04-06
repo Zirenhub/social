@@ -36,6 +36,7 @@ export async function deletePost({ postId }: { postId: string }) {
     const deletedPost = await prisma.post.delete({ where: { id: postId } });
 
     revalidateTag(CACHE_TAGS.PROFILE(session.user.profile)); // revalidate profile page (this will also revalidate the count)
+    revalidateTag(CACHE_TAGS.POST(postId));
 
     return successResponse(deletedPost);
   } catch (error) {
@@ -77,6 +78,8 @@ export async function likePost({ postId }: { postId: string }) {
         },
       });
     });
+
+    revalidateTag(CACHE_TAGS.POST(result.postId));
 
     return successResponse(result);
   } catch (error) {

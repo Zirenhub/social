@@ -10,7 +10,7 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
+    // route to home if not found
     console.error('Application error:', error);
   }, [error]);
 

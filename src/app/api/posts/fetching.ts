@@ -1,8 +1,9 @@
 import { prisma } from '@/lib/prisma';
-import { HomePagePostsFilter, PER_PAGE } from '@/types/constants';
+import { CACHE_TAGS, HomePagePostsFilter, PER_PAGE } from '@/types/constants';
 import { PaginatedPosts, postQuery } from '@/types/post';
 import { errorResponse } from '../response';
 import { subDays } from 'date-fns';
+import { unstable_cacheTag as cacheTag } from 'next/cache';
 
 // Constants for pagination
 
@@ -118,4 +119,25 @@ async function getTrendingPosts({ profileId, cursor }: filterProps) {
     posts,
     nextCursor: hasMore ? posts[posts.length - 1]?.id : null,
   };
+}
+
+export async function getPost({
+  postId,
+  userProfileId,
+}: {
+  postId: string;
+  userProfileId: string;
+}) {
+  'use cache';
+  cacheTag(CACHE_TAGS.POST(postId));
+  try {
+    const post = await prisma.post.findUniqueOrThrow({
+      where: { id: postId },
+      ...postQuery({ userProfileId }),
+    });
+    return post;
+  } catch (error) {
+    const err = errorResponse(error, 'Failed getting post.');
+    throw new Error(err.error.message);
+  }
 }
