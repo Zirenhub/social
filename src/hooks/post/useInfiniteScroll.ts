@@ -11,13 +11,11 @@ import { CACHE_TAGS } from '@/types/constants';
 type UseInfiniteScrollOptions = {
   endpoint: string;
   filter: string;
-  nextCursor: string | null;
 };
 
 export default function useInfiniteScroll({
   endpoint,
   filter,
-  nextCursor,
 }: UseInfiniteScrollOptions) {
   const queryKey = [CACHE_TAGS.POSTS, filter];
   const {
@@ -44,8 +42,7 @@ export default function useInfiniteScroll({
 
       return await fetcher(`${endpoint}?${params.toString()}`);
     },
-    enabled: nextCursor ? true : false,
-    initialPageParam: nextCursor,
+    initialPageParam: null,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     refetchOnWindowFocus: false,
     retry: false,

@@ -4,8 +4,6 @@ import CreatePost from '@/components/ui/CreatePost';
 import { HOME_PAGE_POSTS_FILTERS, homeFilters } from '@/types/constants';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import getSession from '@/lib/getSession';
-import { getHomePosts } from '@/app/api/posts/fetching';
 import Feed from '@/components/post/Feed';
 
 export const metadata: Metadata = {
@@ -22,13 +20,6 @@ export default async function Home({ searchParams }: Props) {
 
   const currentFilter =
     HOME_PAGE_POSTS_FILTERS.find((x) => x === filter) || 'forYou';
-  const userProfileId = (await getSession()).user.profile;
-
-  // Get initial posts for server-side rendering
-  const initialPosts = await getHomePosts({
-    filter: currentFilter,
-    userProfileId,
-  });
 
   return (
     <>
@@ -51,7 +42,6 @@ export default async function Home({ searchParams }: Props) {
       >
         <Feed
           endpoint="/api/posts"
-          initialPosts={initialPosts}
           showCreatePost={currentFilter === 'forYou'}
           filter={currentFilter}
         />

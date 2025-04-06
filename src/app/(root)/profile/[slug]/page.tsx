@@ -1,22 +1,16 @@
-import MightKnow from '@/components/ui/MightKnow';
-import ActivitySummary from '@/components/profile/ActivitySummary';
 import Feed from '@/components/post/Feed';
-import {
-  getProfile,
-  getProfileLastActive,
-  getProfilePosts,
-} from '@/app/api/profile/fetching';
+import { getProfile, getProfileLastActive } from '@/app/api/profile/fetching';
 import ProfileStats from '@/components/profile/ProfileStats';
 import Follow from '@/components/profile/profile-interactions/Follow';
 import Message from '@/components/profile/profile-interactions/Message';
 import Filter from '@/components/ui/Filter';
 import { PROFILE_PAGE_POSTS_FILTERS, profileFilters } from '@/types/constants';
-import Search from '@/components/ui/search/Search';
 import getSession from '@/lib/getSession';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfilePictureSection from '@/components/profile/ProfileAvatar';
 import ProfileInfoSection from '@/components/profile/ProfileInfo';
 import { getUser } from '@/app/api/auth/fetching';
+import Sidebar from '@/components/profile/Sidebar';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -32,36 +26,28 @@ export default async function Profile({ params, searchParams }: Props) {
   const session = await getSession();
   const currentUser = await getUser(session.user.id);
 
-  const [profileResult, profilePosts, profileActivity] = await Promise.all([
+  const [profileResult, profileActivity] = await Promise.all([
     getProfile({
-      profileId: slug,
-      userProfileId: currentUser.profile.id,
-    }),
-    getProfilePosts({
-      filter: currentFilter,
       profileId: slug,
       userProfileId: currentUser.profile.id,
     }),
     getProfileLastActive(slug),
   ]);
 
-  const result = {
-    ...profileResult,
-    posts: profilePosts,
-    activity: profileActivity,
-  };
-
-  const isCurrentUser = currentUser.profile.id === result.id;
+  const isCurrentUser = currentUser.profile.id === profileResult.id;
 
   return (
     <div className="mx-14 mt-6">
       <ProfileHeader isCurrentUser={isCurrentUser} />
 
       <div className="max-w-5xl mx-auto -mt-24">
-        <div className="flex gap-6">
+        <div className="flex gap-6 relative">
           <div className="md:w-2/3">
             <div className="relative mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
-              <ProfilePictureSection isCurrentUser={isCurrentUser} />
+              <ProfilePictureSection
+                profile={profileResult}
+                isCurrentUser={isCurrentUser}
+              />
               <ProfileInfoSection
                 profile={profileResult}
                 isCurrentUser={isCurrentUser}
@@ -69,14 +55,14 @@ export default async function Profile({ params, searchParams }: Props) {
 
               <div className="flex justify-between top-seperator mt-3 pt-3 px-8 mb-3">
                 <ProfileStats
-                  postsCount={result._count.posts}
-                  followersCount={result._count.followers}
-                  followingCount={result._count.following}
+                  postsCount={profileResult._count.posts}
+                  followersCount={profileResult._count.followers}
+                  followingCount={profileResult._count.following}
                 />
 
                 {!isCurrentUser && (
                   <div className="flex gap-4">
-                    <Follow profileId={result.id} />
+                    <Follow profileId={profileResult.id} />
                     <Message />
                   </div>
                 )}
@@ -86,18 +72,15 @@ export default async function Profile({ params, searchParams }: Props) {
             <Filter currentFilter={currentFilter} filters={profileFilters} />
 
             <Feed
-              initialPosts={result.posts}
               filter={currentFilter}
-              endpoint={`/api/profile/${result.id}/posts`}
+              endpoint={`/api/profile/${profileResult.id}/posts`}
               showCreatePost={isCurrentUser && currentFilter === 'posts'}
             />
           </div>
 
-          <aside className="md:w-1/3 space-y-6 sticky top-4 self-start">
-            <Search />
-            <ActivitySummary activity={result.activity} />
-            <MightKnow />
-          </aside>
+          <div className="md:w-1/3">
+            <Sidebar {...profileActivity} />
+          </div>
         </div>
       </div>
     </div>
