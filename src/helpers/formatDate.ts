@@ -1,4 +1,4 @@
-import { formatDistance } from 'date-fns';
+import { format, formatDistance, isSameDay } from 'date-fns';
 
 export function formatJoinedDate(createdAt: Date | undefined) {
   if (!createdAt) return null;
@@ -10,8 +10,15 @@ export function formatJoinedDate(createdAt: Date | undefined) {
 }
 
 export function formatCreatedAtDate(createdAt: Date) {
-  return formatDistance(createdAt, new Date(), {
-    addSuffix: true,
-    includeSeconds: true,
-  });
+  const currentDate = new Date();
+  const within24Hours = isSameDay(currentDate, createdAt);
+
+  if (within24Hours) {
+    return formatDistance(createdAt, new Date(), {
+      addSuffix: true,
+      includeSeconds: true,
+    });
+  }
+
+  return format(createdAt, 'MMM d, yyyy • h:mm a');
 }
