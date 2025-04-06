@@ -6,7 +6,6 @@ import { DropdownMenu, DropdownMenuItem } from '../ui/DropdownMenu';
 import Follow from '../profile/profile-interactions/Follow';
 import dynamic from 'next/dynamic';
 import { useSession } from 'next-auth/react';
-import LoaderPlaceholder from '../ui/LoaderPlaceholder';
 
 const DeletePostModal = dynamic(() => import('./DeletePostModal'), {
   loading: () => null,
@@ -19,16 +18,8 @@ type PostOptionsProps = {
 export default function PostOptions({ post }: PostOptionsProps) {
   const [showDeletePostModal, setShowDeletePostModal] = useState(false);
   const session = useSession();
-  if (session.status === 'loading') {
-    return <LoaderPlaceholder />;
-  }
-  if (session.status === 'unauthenticated') {
-    throw new Error('Session not found');
-  }
-  if (!session.data) {
-    return null;
-  }
-  const isOwner = session.data.user.profile === post.profileId;
+  const isOwner =
+    (session.data && session.data.user.profile) === post.profileId;
 
   return (
     <>

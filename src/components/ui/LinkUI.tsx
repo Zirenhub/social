@@ -95,7 +95,7 @@ export default function LinkUI({
     >
       <Link
         href={href}
-        className={`${className}`}
+        className={` ${className ? className : ''}`}
         onNavigate={handleHashChange}
         prefetch={false}
         scroll={false}

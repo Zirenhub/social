@@ -89,7 +89,7 @@ function getPrismaErrorMessage(
     case 'P2002':
       return `This ${error.meta?.target} is already in use.`;
     case 'P2025':
-      return 'Record not found.';
+      return 'Not found.';
     case 'P2003':
       return 'Referenced record not found.';
     case 'P2007': // Validation error

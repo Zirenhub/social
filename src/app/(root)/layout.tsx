@@ -26,7 +26,7 @@ export default async function AppLayout({
       <Navigation user={user} />
       <main
         id="main-content"
-        className="flex-1 min-h-screen bg-gradient-to-br from-white to-[var(--color-cyan-500)]/5 dark:from-[var(--color-dark-500)] dark:to-[var(--color-purple-500)]/10 pb-2 overflow-auto"
+        className="flex-1 min-h-screen bg-gradient-to-br from-white to-[var(--color-cyan-500)]/5 dark:from-[var(--color-dark-500)] dark:to-[var(--color-purple-500)]/10 overflow-auto"
       >
         {children}
       </main>
