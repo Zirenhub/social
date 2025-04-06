@@ -1,9 +1,19 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import useLike from '@/hooks/post/useLike';
 import type { PostWithCounts } from '@/types/post';
 import { HeartIcon, MessageCircleMoreIcon, RepeatIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
+
+function formatCount(count: number) {
+  if (count < 1000) {
+    return `${count}`;
+  }
+  if (count >= 1000 && count < 10000) {
+    return `${Math.floor(count / 1000)}k`;
+  }
+  return `${Math.floor(count / 1000)}k`;
+}
 
 type Props = {
   post: PostWithCounts;
@@ -11,6 +21,7 @@ type Props = {
 
 export default function PostInteractions({ post }: Props) {
   const [isClient, setIsClient] = useState(false);
+
   const { isPending, handleLike, likesStatus } = useLike({
     post,
     initialIsLiked: post.likes.length > 0,
@@ -21,43 +32,89 @@ export default function PostInteractions({ post }: Props) {
     setIsClient(true);
   }, []);
 
-  const interactions = [
-    {
-      label: 'Like',
-      icon: (
-        <HeartIcon
-          size={21}
-          color={
-            isClient && likesStatus.isLiked
-              ? 'oklch(0.704 0.191 22.216)'
-              : undefined
-          }
-          fill={
-            isClient && likesStatus.isLiked
-              ? 'oklch(0.704 0.191 22.216)'
-              : 'transparent'
-          }
-        />
-      ),
-      count: likesStatus.count,
-      onClick: handleLike,
-      isPending: isPending,
+  const formattedLikesCount = useMemo(
+    () => formatCount(likesStatus.count),
+    [likesStatus.count]
+  );
+
+  const formattedCommentsCount = useMemo(
+    () => formatCount(post._count.comments),
+    [post._count.comments]
+  );
+
+  const handleCommentClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      e.stopPropagation();
+      toast.success(`Opening comments on post ${post.id}`);
     },
-    {
-      label: 'Comments',
-      icon: <MessageCircleMoreIcon size={21} />,
-      count: post._count.comments,
-      onClick: () => toast.success(`Opening comments on post ${post.id}`),
-      isPending: false,
+    [post.id]
+  );
+
+  const handleShareClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      e.stopPropagation();
+      toast.success(`Repost post ${post.id}`);
     },
-    {
-      label: 'Share',
-      icon: <RepeatIcon size={21} />,
-      count: 0,
-      onClick: () => toast.success(`Repost post ${post.id}`),
-      isPending: false,
+    [post.id]
+  );
+
+  const handleLikeClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      e.stopPropagation();
+      handleLike();
     },
-  ];
+    [handleLike]
+  );
+
+  const interactions = useMemo(
+    () => [
+      {
+        label: 'Like',
+        icon: (
+          <HeartIcon
+            size={21}
+            color={
+              isClient && likesStatus.isLiked
+                ? 'oklch(0.704 0.191 22.216)'
+                : undefined
+            }
+            fill={
+              isClient && likesStatus.isLiked
+                ? 'oklch(0.704 0.191 22.216)'
+                : 'transparent'
+            }
+          />
+        ),
+        count: formattedLikesCount,
+        onClick: handleLikeClick,
+        isPending: isPending,
+      },
+      {
+        label: 'Comments',
+        icon: <MessageCircleMoreIcon size={21} />,
+        count: formattedCommentsCount,
+        onClick: handleCommentClick,
+        isPending: false,
+      },
+      {
+        label: 'Share',
+        icon: <RepeatIcon size={21} />,
+        count: formattedCommentsCount,
+        onClick: handleShareClick,
+        isPending: false,
+      },
+    ],
+    [
+      isClient,
+      likesStatus.isLiked,
+      formattedLikesCount,
+      formattedCommentsCount,
+      handleLikeClick,
+      handleCommentClick,
+      handleShareClick,
+      isPending,
+    ]
+  );
 
   // Placeholder component when isClient is false
   if (!isClient) {
@@ -83,10 +140,7 @@ export default function PostInteractions({ post }: Props) {
           <button
             disabled={interaction.isPending}
             key={interaction.label}
-            onClick={(e) => {
-              e.stopPropagation();
-              interaction.onClick();
-            }}
+            onClick={(e) => interaction.onClick(e)}
             className="cursor-pointer flex items-center gap-1 hover:text-[var(--color-cyan-500)] transition-colors h-9"
           >
             <span className="h-[21px] flex items-center">
