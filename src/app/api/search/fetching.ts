@@ -1,12 +1,15 @@
 import prisma from '@/lib/prisma';
 import { errorResponse } from '../response';
-import { getProfile } from '../profile/fetching';
-import { GetProfileType } from '@/types/profile';
+import { GetProfileType, profileQuery } from '@/types/profile';
 import getSession from '@/lib/getSession';
 
-export const getSearchProfiles = async (query: string) => {
+export const getSearchProfiles = async (
+  query: string
+): Promise<GetProfileType[]> => {
   try {
     const session = await getSession();
+    const userProfileId = session.user.profile;
+
     // Format query for full-text search
     const formattedQuery = query
       .split(' ')
@@ -14,7 +17,8 @@ export const getSearchProfiles = async (query: string) => {
       .map((term) => `${term}:*`) // Enable prefix matching
       .join(' & ');
 
-    const results = await prisma.profile.findMany({
+    // Perform a single query that includes all the profile data we need
+    const profiles = await prisma.profile.findMany({
       where: {
         OR: [
           // Full-text search across multiple fields
@@ -23,7 +27,8 @@ export const getSearchProfiles = async (query: string) => {
           { username: { search: formattedQuery } },
         ],
       },
-      select: { id: true },
+      // Use the same select options from profileQuery
+      ...profileQuery(userProfileId),
       orderBy: {
         // Basic relevance sorting
         _relevance: {
@@ -34,21 +39,11 @@ export const getSearchProfiles = async (query: string) => {
       },
     });
 
-    const profiles: GetProfileType[] = [];
-
-    for (const { id } of results) {
-      const profile = await getProfile({
-        profileId: id,
-        userProfileId: session.user.profile,
-      });
-      profiles.push(profile);
-    }
-
     return profiles;
   } catch (error) {
     const err = errorResponse(
       error,
-      'Something went wrong getting serach results.'
+      'Something went wrong getting search results.'
     );
     throw new Error(err.error?.message);
   }
