@@ -1,5 +1,4 @@
 import { getProfile } from '@/app/api/profile/fetching';
-import { Settings, User2Icon } from 'lucide-react';
 import ProfileStats from '../profile/ProfileStats';
 import getSession from '@/lib/getSession';
 import Avatar from '../ui/Avatar';
@@ -10,47 +9,32 @@ export default async function ProfileCard() {
     profileId: session.user.profile,
     userProfileId: session.user.profile,
   });
-
   const { _count } = profileResult;
 
-  const navs = [
-    { label: 'Settings', icon: <Settings size={16} color="gray" /> },
-  ];
-
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-200 dark:border-gray-700">
-      <div className="flex items-center mb-4 gap-2">
-        <Avatar profile={profileResult} className="h-12 w-12" />
-        <div className="mb-1">
-          <p className="font-['bold'] text-gray-600 dark:text-gray-100">
+    <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+      <div className="flex items-center gap-4 mb-6">
+        <Avatar
+          profile={profileResult}
+          className="h-16 w-16 rounded-full ring-2 ring-cyan-500 dark:ring-cyan-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900"
+        />
+        <div className="flex flex-col">
+          <h3 className="font-semibold text-lg text-gray-800 dark:text-gray-100">
             {profileResult.firstName} {profileResult.lastName}
-          </p>
-          <p className="text-sm text-gray-400 dark:text-gray-400">
+          </h3>
+          <p className="text-sm text-cyan-500 dark:text-cyan-400 font-medium">
             @{profileResult.username}
           </p>
         </div>
       </div>
 
-      <div className="top-seperator pt-2">
+      <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
         <ProfileStats
           postsCount={_count.posts}
           followersCount={_count.followers}
           followingCount={_count.following}
         />
       </div>
-
-      <nav className="mt-3 pt-3 top-seperator">
-        {navs.map((item) => (
-          <button
-            key={item.label}
-            className="cursor-pointer w-full px-3 py-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          >
-            <span className="text-sm flex justify-between items-center">
-              {item.label} {item.icon}
-            </span>
-          </button>
-        ))}
-      </nav>
     </div>
   );
 }
