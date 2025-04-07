@@ -3,23 +3,26 @@ import { UseFormRegister } from 'react-hook-form';
 type Props = {
   register: UseFormRegister<any>;
   name: string; // The field name for register
-  maxChars: number;
+  charProps: {
+    charCount: number;
+    maxChars: number;
+    isOverLimit: boolean;
+  };
   placeholder?: string;
-  charCount: number;
   className?: string;
 };
 
 export default function Textarea({
   register,
   name,
-  maxChars,
+  charProps,
   placeholder,
-  charCount,
   className,
 }: Props) {
-  const percentUsed = Math.min((charCount / maxChars) * 100, 100);
-  const isOverLimit = charCount > maxChars;
-
+  const percentUsed = Math.min(
+    (charProps.charCount / charProps.maxChars) * 100,
+    100
+  );
   return (
     <div className="relative group">
       <textarea
@@ -31,15 +34,15 @@ export default function Textarea({
       {/* Character count indicator with progress bar */}
       <div className="absolute bottom-3 right-3 flex flex-col items-end space-y-1">
         <div
-          className={`text-sm font-medium ${isOverLimit ? 'text-[var(--color-magenta-500)]' : 'text-gray-500 dark:text-gray-400'}`}
+          className={`text-sm font-medium ${charProps.isOverLimit ? 'text-[var(--color-magenta-500)]' : 'text-gray-500 dark:text-gray-400'}`}
         >
-          {charCount}/{maxChars}
+          {charProps.charCount}/{charProps.maxChars}
         </div>
 
         {/* Progress bar */}
         <div className="w-24 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
           <div
-            className={`h-full transition-all duration-300 ${isOverLimit ? 'bg-[var(--color-magenta-500)]' : 'bg-[var(--color-cyan-500)]'}`}
+            className={`h-full transition-all duration-300 ${charProps.isOverLimit ? 'bg-[var(--color-magenta-500)]' : 'bg-[var(--color-cyan-500)]'}`}
             style={{ width: `${percentUsed}%` }}
           />
         </div>

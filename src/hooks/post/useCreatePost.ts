@@ -5,7 +5,7 @@ import {
   HOME_PAGE_POSTS_FILTERS,
   PROFILE_PAGE_POSTS_FILTERS,
 } from '@/types/constants';
-import { PostContent, PostContentZ } from '@/types/post';
+import { MAX_POST_CHARS, PostContent, PostContentZ } from '@/types/post';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
@@ -57,6 +57,8 @@ export const useCreatePost = ({ onSuccess }: Props) => {
 
   // Character count is directly derived from the content
   const charCount = content.length;
+  // Calculate percentage for progress bar
+  const isOverLimit = charCount > MAX_POST_CHARS;
 
   useEffect(() => {
     if (errors.content && charCount > 0) {
@@ -71,6 +73,6 @@ export const useCreatePost = ({ onSuccess }: Props) => {
     formErrors: errors,
     register,
     isSubmitting: formMethods.formState.isSubmitting,
-    charCount,
+    charProps: { charCount, maxChars: MAX_POST_CHARS, isOverLimit },
   };
 };
