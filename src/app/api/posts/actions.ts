@@ -60,7 +60,7 @@ export async function likePost({ postId }: { postId: string }) {
       });
       // If already liked, remove the like (toggle functionality)
       if (existingLike) {
-        return await tx.like.delete({
+        await tx.like.delete({
           where: {
             postId_profileId: {
               postId,
@@ -68,6 +68,7 @@ export async function likePost({ postId }: { postId: string }) {
             },
           },
         });
+        return null;
       }
 
       // Create a new like
@@ -79,7 +80,7 @@ export async function likePost({ postId }: { postId: string }) {
       });
     });
 
-    revalidateTag(CACHE_TAGS.POST(result.postId));
+    revalidateTag(CACHE_TAGS.POST(postId));
 
     return successResponse(result);
   } catch (error) {
