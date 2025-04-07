@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Post, Prisma } from '@prisma/client';
+import { getMaxCharError, getMinCharError } from '@/helpers/charLenghtError';
 
 export const MAX_POST_CHARS = 256;
 
@@ -7,10 +8,8 @@ export const PostContent = z.object({
   content: z
     .string({ message: 'Post content must be a string.' })
     .trim()
-    .min(1, { message: "Post can't be empty" })
-    .max(MAX_POST_CHARS, {
-      message: "Post can't be longer than 256 characters.",
-    }),
+    .min(1, getMinCharError('Post', 1))
+    .max(MAX_POST_CHARS, getMaxCharError('Post', MAX_POST_CHARS)),
 });
 
 type PostContentZ = z.infer<typeof PostContent>;
