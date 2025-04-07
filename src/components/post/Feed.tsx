@@ -4,6 +4,7 @@ import PostContainer from './PostContainer';
 import Link from 'next/link';
 import LoaderPlaceholder from '../ui/LoaderPlaceholder';
 import useInfiniteScroll from '@/hooks/post/useInfiniteScroll';
+import { useEffect } from 'react';
 
 type FeedProps = {
   showCreatePost?: boolean;
@@ -28,6 +29,17 @@ export default function Feed({
     endpoint,
     filter,
   });
+
+  useEffect(() => {
+    const lastViewedPostId = sessionStorage.getItem('lastViewedPostId');
+    if (lastViewedPostId) {
+      const postElement = document.getElementById(`post-${lastViewedPostId}`);
+      if (postElement) {
+        postElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      sessionStorage.removeItem('lastViewedPostId');
+    }
+  }, []);
 
   if (error) {
     console.error('Feed error:', error);
