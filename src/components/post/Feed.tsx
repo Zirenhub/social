@@ -1,7 +1,6 @@
 'use client';
 import { SessionProvider } from 'next-auth/react';
 import PostContainer from './PostContainer';
-import type { PaginatedPosts } from '@/types/post';
 import Link from 'next/link';
 import LoaderPlaceholder from '../ui/LoaderPlaceholder';
 import useInfiniteScroll from '@/hooks/post/useInfiniteScroll';
@@ -41,7 +40,7 @@ export default function Feed({
 
   if (isLoading) {
     return (
-      <div className="p-12 text-center">
+      <div className="p-12 w-full">
         <LoaderPlaceholder size={32} text="Loading posts..." />
       </div>
     );
@@ -62,8 +61,12 @@ export default function Feed({
     );
   }
 
+  if (posts.length <= 0) {
+    return null;
+  }
+
   return (
-    <main>
+    <main className="space-y-4">
       <SessionProvider>
         {posts.map((post) => (
           <PostContainer key={post.id} post={post} />

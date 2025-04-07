@@ -21,7 +21,7 @@ export default function PostContainer({ post }: Props) {
     <div
       key={post.id}
       onClick={handleNavigatePost}
-      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-4 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 hover:bg-gray-200/10 cursor-pointer"
+      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 hover:bg-gray-200/10 cursor-pointer"
     >
       <div className="flex justify-between items-start">
         <PostHeader
