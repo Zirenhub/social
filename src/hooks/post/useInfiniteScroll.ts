@@ -42,11 +42,10 @@ export default function useInfiniteScroll({
 
       return await fetcher(`${endpoint}?${params.toString()}`);
     },
+    refetchOnMount: 'always',
     initialPageParam: null,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
-    refetchOnWindowFocus: false,
     retry: false,
-    gcTime: 0, // maybe fix in the future
   });
   // Extract posts from all pages
   const posts = data?.pages?.flatMap((page) => page.posts) || [];

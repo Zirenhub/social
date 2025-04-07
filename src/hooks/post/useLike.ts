@@ -1,7 +1,7 @@
 'use client';
 import { likePost } from '@/app/api/posts/actions';
 import { CACHE_TAGS } from '@/types/constants';
-import { PostWithCounts } from '@/types/post';
+import { PaginatedPosts, PostWithCounts } from '@/types/post';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState, useTransition, useCallback } from 'react';
 import { toast } from 'react-toastify';
@@ -35,12 +35,37 @@ export default function useLike({
       try {
         const result = await likePost({ postId: post.id });
 
-        if (!result.success || !result.data) {
+        if (!result.success) {
           throw new Error(result.error?.message || 'Failed to like post');
         }
 
-        await queryClient.invalidateQueries({
-          queryKey: [CACHE_TAGS.POSTS],
+        queryClient.setQueriesData<{
+          pages: PaginatedPosts[];
+          pageParam: string[];
+        }>({ queryKey: [CACHE_TAGS.POSTS] }, (oldData) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              ...page,
+              posts: page.posts.map((p) => {
+                if (p.id === post.id) {
+                  return {
+                    ...p,
+                    likes: result.data ? [result.data] : [],
+                    _count: {
+                      ...p._count,
+                      likes: result.data
+                        ? p._count.likes + 1
+                        : p._count.likes - 1,
+                    },
+                  };
+                }
+                return p;
+              }),
+            })),
+          };
         });
       } catch (error) {
         // Revert on error
