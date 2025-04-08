@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearchPostgres"]
 }
 
@@ -11,51 +11,51 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 // User model - absolute minimum with only authentication data
 model User {
-  id                String    @id @default(uuid())
-  email             String    @unique
-  hashedPassword    String
-  
+  id             String @id @default(uuid())
+  email          String @unique
+  hashedPassword String
+
   // One-to-one relation with Profile
-  profile           Profile?
+  profile Profile?
 
   @@index([email])
 }
 
 // Profile model - all user information including activity references
 model Profile {
-  id               String     @id @default(uuid())
-  userId           String     @unique
-  firstName        String
-  lastName         String
-  username         String     @unique
-  bio              String?    @db.Text
-  avatarUrl        String?
-  coverImageUrl    String?
-  location         String?
-  website          String?
-  birthday         DateTime
-  phoneNumber      String?
-  gender           GENDER     
-  isVerified       Boolean    @default(false)
-  isActive         Boolean    @default(true)
-  lastActive       DateTime   @default(now())
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
-  
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  firstName     String
+  lastName      String
+  username      String   @unique
+  bio           String?  @db.Text
+  avatarUrl     String?
+  coverImageUrl String?
+  location      String?
+  website       String?
+  birthday      DateTime
+  phoneNumber   String?
+  gender        GENDER
+  isVerified    Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  lastActive    DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
   // One-to-one relation with User
-  user             User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   // One-to-many relations for user activities
-  posts            Post[]
-  likes            Like[]
-  comments         Comment[]
-  
+  posts        Post[]
+  likes        Like[]
+  commentsLikes CommentLike[]
+  comments     Comment[]
+
   // Followers/Following system
-  followers        Follow[]   @relation("ProfileFollowers")
-  following        Follow[]   @relation("ProfileFollowing")
+  followers Follow[] @relation("ProfileFollowers")
+  following Follow[] @relation("ProfileFollowing")
 
   @@index([username])
   @@index([firstName, lastName])
@@ -63,34 +63,34 @@ model Profile {
 
 // Post model with efficient indexes
 model Post {
-  id               String     @id @default(uuid())
-  content          String     @db.Text
-  profileId        String
-  published        Boolean    @default(true)
-  imageUrls        String[]   // Array of image URLs
-  videoUrl         String?
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
-  
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  profileId String
+  published Boolean  @default(true)
+  imageUrls String[] // Array of image URLs
+  videoUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  profile          Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  likes            Like[]
-  comments         Comment[]
-  
+  profile  Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  likes    Like[]
+  comments Comment[]
+
   @@index([profileId]) // possibly remove
   @@index([createdAt, id])
 }
 
 // Efficient Like model with composite primary key
 model Like {
-  postId           String
-  profileId        String
-  createdAt        DateTime   @default(now())
-  
+  postId    String
+  profileId String
+  createdAt DateTime @default(now())
+
   // Relations
-  post             Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
-  profile          Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  
+  post    Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
   // Composite primary key - more efficient than separate id + unique constraint
   @@id([postId, profileId])
   @@index([profileId]) // possibly remove
@@ -99,36 +99,51 @@ model Like {
 
 // Comment model with parent-child relationship for nested comments
 model Comment {
-  id               String     @id @default(uuid())
-  content          String     @db.Text
-  postId           String
-  profileId        String
-  parentId         String?
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
-  
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  postId    String
+  profileId String
+  parentId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  post             Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
-  profile          Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  parent           Comment?   @relation("CommentReplies", fields: [parentId], references: [id], onDelete: SetNull)
-  replies          Comment[]  @relation("CommentReplies")
-  
+  post    Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  profile Profile       @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  parent  Comment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: SetNull)
+  replies Comment[]     @relation("CommentReplies")
+  likes   CommentLike[]
+
   @@index([postId])
   @@index([profileId])
   @@index([parentId])
-  @@index([createdAt])
+  @@index([createdAt, id])
+}
+
+model CommentLike {
+  commentId String
+  profileId String
+  createdAt DateTime @default(now())
+  // Relations
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  // Composite primary key
+  @@id([commentId, profileId])
+  @@index([profileId])
+  @@index([createdAt, commentId])
 }
 
 // Follow model with composite primary key for followers/following relationship
 model Follow {
-  followerId       String
-  followingId      String
-  createdAt        DateTime   @default(now())
-  
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
   // Relations
-  follower         Profile    @relation("ProfileFollowing", fields: [followerId], references: [id], onDelete: Cascade)
-  following        Profile    @relation("ProfileFollowers", fields: [followingId], references: [id], onDelete: Cascade)
-  
+  follower  Profile @relation("ProfileFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following Profile @relation("ProfileFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
   // Composite primary key - more efficient than separate id + unique constraint
   @@id([followerId, followingId])
   @@index([createdAt])
