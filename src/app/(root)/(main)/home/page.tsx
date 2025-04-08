@@ -24,8 +24,8 @@ export default async function Home({ searchParams }: Props) {
   return (
     <>
       {/* Main Feed */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 mb-4">
-        <h1 className="container-title text-2xl mb-6 tracking-tight ">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 mb-4 h-80 flex flex-col gap-4">
+        <h1 className="container-title text-2xl tracking-tight ">
           Share your thoughts!
         </h1>
         <CreatePost />

@@ -24,11 +24,11 @@ export default function Textarea({
     100
   );
   return (
-    <div className="relative group">
+    <div className="relative group h-full w-full">
       <textarea
         {...register(name)}
         placeholder={placeholder ? placeholder : "Tell us what's on your mind."}
-        className="w-full h-40 input-text resize-none p-5"
+        className={`w-full h-full input-text resize-none p-5 ${className ? className : ''}`}
       />
 
       {/* Character count indicator with progress bar */}

@@ -13,7 +13,7 @@ export default function CreatePost({ onSuccess }: Props) {
     useCreatePost({ onSuccess });
 
   return (
-    <form onSubmit={submit} className="space-y-4">
+    <form onSubmit={submit} className="flex flex-col gap-3 h-full">
       <Textarea register={register} name={'content'} charProps={charProps} />
 
       <div className="flex items-center justify-between">

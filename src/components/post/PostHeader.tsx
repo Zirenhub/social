@@ -66,8 +66,8 @@ export default function PostHeader({ profile, createdAt }: Props) {
           </Suspense>
         )}
 
-        <div className="flex flex-col hover:underline">
-          <h3 className="font-semibold text-lg dark:text-white">
+        <div className="flex flex-col">
+          <h3 className="font-semibold text-lg dark:text-white leading-4">
             {profile.firstName} {profile.lastName}
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">

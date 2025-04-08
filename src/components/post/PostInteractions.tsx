@@ -4,6 +4,7 @@ import useLike from '@/hooks/post/useLike';
 import type { PostWithCounts } from '@/types/post';
 import { HeartIcon, MessageCircleMoreIcon, RepeatIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 function formatCount(count: number) {
   if (count < 1000) {
@@ -20,6 +21,7 @@ type Props = {
 };
 
 export default function PostInteractions({ post }: Props) {
+  const router = useRouter();
   const [isClient, setIsClient] = useState(false);
 
   const { isPending, handleLike, likesStatus } = useLike({
@@ -45,7 +47,8 @@ export default function PostInteractions({ post }: Props) {
   const handleCommentClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       e.stopPropagation();
-      toast.success(`Opening comments on post ${post.id}`);
+      sessionStorage.setItem('hash', 'comments');
+      router.push(`/post/${post.id}`);
     },
     [post.id]
   );
@@ -70,36 +73,22 @@ export default function PostInteractions({ post }: Props) {
     () => [
       {
         label: 'Like',
-        icon: (
-          <HeartIcon
-            size={21}
-            color={
-              isClient && likesStatus.isLiked
-                ? 'oklch(0.704 0.191 22.216)'
-                : undefined
-            }
-            fill={
-              isClient && likesStatus.isLiked
-                ? 'oklch(0.704 0.191 22.216)'
-                : 'transparent'
-            }
-          />
-        ),
-        count: formattedLikesCount,
+        icon: HeartIcon,
+        status: likesStatus,
         onClick: handleLikeClick,
         isPending: isPending,
       },
       {
         label: 'Comments',
-        icon: <MessageCircleMoreIcon size={21} />,
-        count: formattedCommentsCount,
+        icon: MessageCircleMoreIcon,
+        status: { isLiked: false, count: post._count.comments },
         onClick: handleCommentClick,
         isPending: false,
       },
       {
         label: 'Share',
-        icon: <RepeatIcon size={21} />,
-        count: formattedCommentsCount,
+        icon: RepeatIcon,
+        status: { isLiked: false, count: 0 },
         onClick: handleShareClick,
         isPending: false,
       },
@@ -134,20 +123,33 @@ export default function PostInteractions({ post }: Props) {
   }
 
   return (
-    <div className="flex gap-4 text-gray-500 dark:text-gray-400 pt-3 top-seperator">
+    <div className="flex gap-4 text-gray-500 dark:text-gray-400 p-2 top-seperator">
       {interactions.map((interaction) => {
         return (
           <button
             disabled={interaction.isPending}
             key={interaction.label}
             onClick={(e) => interaction.onClick(e)}
-            className="cursor-pointer flex items-center gap-1 hover:text-[var(--color-cyan-500)] transition-colors h-9"
+            className={`cursor-pointer rounded-full flex items-center gap-1 hover:text-magenta-500 transition-colors px-2 hover:bg-magenta-500/20 ${interaction.status.isLiked ? 'bg-magenta-500/20' : ''}`}
           >
             <span className="h-[21px] flex items-center">
-              {interaction.icon}
+              {
+                <interaction.icon
+                  color={
+                    interaction.status?.isLiked
+                      ? 'oklch(0.75 0.18 320)'
+                      : undefined
+                  }
+                  fill={
+                    interaction.status?.isLiked
+                      ? 'oklch(0.75 0.18 320)'
+                      : 'transparent'
+                  }
+                />
+              }
             </span>
             <span className="min-w-[1ch] text-center mt-1">
-              {interaction.count}
+              {interaction.status?.count}
             </span>
           </button>
         );
