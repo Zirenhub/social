@@ -110,7 +110,7 @@ export const NAVIGATION_CONFIG = {
 
 // SERVER -------------------------------------------------------------
 
-export const PER_PAGE = 3 as const;
+export const PER_PAGE = 10 as const;
 
 // Constants for activity tracking
 export const ACTIVITY_THRESHOLDS = {
@@ -125,6 +125,7 @@ export const CACHE_TAGS = {
   USER: (userId: string) => `user:${userId}`,
   HOME_POSTS: (filter: HomePagePostsFilter) => `home:${filter}`,
   POST: (id: string) => `post:${id}`,
+  COMMENTS: (postId: string) => `comments:${postId}`,
   PROFILE: (id: string) => `profile:${id}`,
   PROFILE_POSTS: (id: string, filter: string) =>
     `profile:${id}:posts:${filter}`,
