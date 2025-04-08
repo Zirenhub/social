@@ -1,14 +1,14 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getHomePosts } from '@/app/api/posts/fetching';
 import getSession from '@/lib/getSession';
-import { type HomePagePostsFilter, PER_PAGE } from '@/types/constants';
-import type { ApiResponse } from '@/types/api';
-import type { PaginatedPosts } from '@/types/post';
+import { type HomePagePostsFilter } from '@/types/constants';
+import type { ApiResponse, PaginatedData } from '@/types/api';
 import successResponse, { errorResponse } from '../response';
+import { PostWithCounts } from '@/types/post';
 
 export async function GET(
   request: NextRequest
-): Promise<NextResponse<ApiResponse<PaginatedPosts>>> {
+): Promise<NextResponse<ApiResponse<PaginatedData<PostWithCounts>>>> {
   try {
     const searchParams = request.nextUrl.searchParams;
     const filter =

@@ -1,7 +1,8 @@
 'use client';
 import { likePost } from '@/app/api/posts/actions';
+import { PaginatedData } from '@/types/api';
 import { CACHE_TAGS } from '@/types/constants';
-import { PaginatedPosts, PostWithCounts } from '@/types/post';
+import { PostWithCounts } from '@/types/post';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState, useTransition, useCallback } from 'react';
 import { toast } from 'react-toastify';
@@ -40,7 +41,7 @@ export default function useLike({
         }
 
         queryClient.setQueriesData<{
-          pages: PaginatedPosts[];
+          pages: PaginatedData<PostWithCounts>[];
           pageParam: string[];
         }>({ queryKey: [CACHE_TAGS.POSTS] }, (oldData) => {
           if (!oldData) return oldData;
@@ -49,7 +50,7 @@ export default function useLike({
             ...oldData,
             pages: oldData.pages.map((page) => ({
               ...page,
-              posts: page.posts.map((p) => {
+              data: page.data.map((p) => {
                 if (p.id === post.id) {
                   return {
                     ...p,

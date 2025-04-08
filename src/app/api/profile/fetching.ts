@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { errorResponse } from '../response';
-import { postQuery } from '@/types/post';
+import { postQuery, PostWithCounts } from '@/types/post';
 import { profileQuery } from '@/types/profile';
 import { unstable_cacheTag as cacheTag } from 'next/cache';
 import {
@@ -9,6 +9,7 @@ import {
   ProfilePagePostsFilter,
 } from '@/types/constants';
 import { subDays } from 'date-fns';
+import { PaginatedData } from '@/types/api';
 
 // export const getPostsCount = (profileId: string, since?: Date) => {
 //   return unstable_cache(
@@ -114,7 +115,7 @@ export const getProfilePosts = async ({
   cursor,
   userProfileId,
   filter,
-}: GetProfilePostsProps) => {
+}: GetProfilePostsProps): Promise<PaginatedData<PostWithCounts>> => {
   try {
     if (filter === 'posts') {
       const posts = await prisma.post.findMany({
@@ -131,7 +132,7 @@ export const getProfilePosts = async ({
       if (hasMore) posts.pop();
 
       return {
-        posts,
+        data: posts,
         nextCursor: hasMore ? posts[posts.length - 1]?.id : null,
       };
     }
@@ -158,7 +159,7 @@ export const getProfilePosts = async ({
       if (hasMore) posts.pop();
 
       return {
-        posts,
+        data: posts,
         nextCursor: hasMore ? posts[posts.length - 1]?.id : null,
       };
     }

@@ -1,15 +1,15 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import getSession from '@/lib/getSession';
-import { ApiResponse } from '@/types/api';
-import { PaginatedPosts } from '@/types/post';
+import { ApiResponse, PaginatedData } from '@/types/api';
 import successResponse, { errorResponse } from '@/app/api/response';
 import { getProfilePosts } from '../../fetching';
-import { PER_PAGE, ProfilePagePostsFilter } from '@/types/constants';
+import { ProfilePagePostsFilter } from '@/types/constants';
+import { PostWithCounts } from '@/types/post';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
-): Promise<NextResponse<ApiResponse<PaginatedPosts>>> {
+): Promise<NextResponse<ApiResponse<PaginatedData<PostWithCounts>>>> {
   try {
     const searchParams = request.nextUrl.searchParams;
     const filter =

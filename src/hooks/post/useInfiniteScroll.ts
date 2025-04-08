@@ -1,23 +1,22 @@
 'use client';
-
 import { useEffect, useRef, useCallback } from 'react';
 import { useDebounce } from 'use-debounce';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
-import type { PaginatedPosts } from '@/types/post';
 import { fetcher } from '@/lib/fetcher';
-import { CACHE_TAGS } from '@/types/constants';
+import { PaginatedData } from '@/types/api';
 
 type UseInfiniteScrollOptions = {
   endpoint: string;
   filter: string;
+  queryKey: string[];
 };
 
-export default function useInfiniteScroll({
+export default function useInfiniteScroll<T>({
   endpoint,
   filter,
+  queryKey,
 }: UseInfiniteScrollOptions) {
-  const queryKey = [CACHE_TAGS.POSTS, filter];
   const {
     data,
     error,
@@ -28,9 +27,9 @@ export default function useInfiniteScroll({
     refetch,
     isError,
   } = useInfiniteQuery<
-    PaginatedPosts,
+    PaginatedData<T>,
     Error,
-    { pages: PaginatedPosts[] },
+    { pages: PaginatedData<T>[] },
     string[],
     string | null
   >({
@@ -48,7 +47,7 @@ export default function useInfiniteScroll({
     retry: false,
   });
   // Extract posts from all pages
-  const posts = data?.pages?.flatMap((page) => page.posts) || [];
+  const result = data?.pages?.flatMap((page) => page.data) || [];
 
   const { ref, inView } = useInView({
     threshold: 0.1,
@@ -78,11 +77,11 @@ export default function useInfiniteScroll({
   }, [debouncedInView, loadMore]);
 
   return {
-    posts,
+    result,
     error,
-    isLoading: isFetching && !isFetchingNextPage && posts.length === 0,
+    isLoading: isFetching && !isFetchingNextPage && result.length === 0,
     isFetchingNextPage,
-    isEmpty: posts.length === 0 && !isFetching,
+    isEmpty: result.length === 0 && !isFetching,
     isReachingEnd: !hasNextPage,
     isError,
     sentinelRef: ref,

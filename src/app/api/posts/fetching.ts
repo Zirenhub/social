@@ -1,9 +1,10 @@
 import { prisma } from '@/lib/prisma';
 import { CACHE_TAGS, HomePagePostsFilter, PER_PAGE } from '@/types/constants';
-import { PaginatedPosts, postQuery } from '@/types/post';
+import { postQuery, PostWithCounts } from '@/types/post';
 import { errorResponse } from '../response';
 import { subDays } from 'date-fns';
 import { unstable_cacheTag as cacheTag } from 'next/cache';
+import { PaginatedData } from '@/types/api';
 
 // Constants for pagination
 
@@ -22,7 +23,7 @@ export const getHomePosts = async ({
   filter,
   userProfileId,
   cursor,
-}: GetHomePostsOptions): Promise<PaginatedPosts> => {
+}: GetHomePostsOptions): Promise<PaginatedData<PostWithCounts>> => {
   try {
     if (filter === 'forYou') {
       return await getForYouPosts({ profileId: userProfileId, cursor });
@@ -58,7 +59,7 @@ async function getForYouPosts({ profileId, cursor }: filterProps) {
   if (hasMore) posts.pop();
 
   return {
-    posts,
+    data: posts,
     nextCursor: hasMore ? posts[posts.length - 1]?.id : null,
   };
 }
@@ -72,7 +73,7 @@ async function getFollowingPosts({ profileId, cursor }: filterProps) {
   const followingIds = followingRelationships.map((rel) => rel.followingId);
 
   if (followingIds.length === 0) {
-    return { posts: [], nextCursor: null };
+    return { data: [], nextCursor: null };
   }
 
   const posts = await prisma.post.findMany({
@@ -90,7 +91,7 @@ async function getFollowingPosts({ profileId, cursor }: filterProps) {
   if (hasMore) posts.pop();
 
   return {
-    posts,
+    data: posts,
     nextCursor: hasMore ? posts[posts.length - 1]?.id : null,
   };
 }
@@ -116,7 +117,7 @@ async function getTrendingPosts({ profileId, cursor }: filterProps) {
   if (hasMore) posts.pop();
 
   return {
-    posts,
+    data: posts,
     nextCursor: hasMore ? posts[posts.length - 1]?.id : null,
   };
 }

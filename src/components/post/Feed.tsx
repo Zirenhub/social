@@ -5,6 +5,9 @@ import Link from 'next/link';
 import LoaderPlaceholder from '../ui/LoaderPlaceholder';
 import useInfiniteScroll from '@/hooks/post/useInfiniteScroll';
 import { useEffect } from 'react';
+import ContainerPlaceholder from '../ui/ContainerPlaceholder';
+import { PostWithCounts } from '@/types/post';
+import { CACHE_TAGS } from '@/types/constants';
 
 type FeedProps = {
   showCreatePost?: boolean;
@@ -17,27 +20,30 @@ export default function Feed({
   filter,
   endpoint,
 }: FeedProps) {
+  const queryKey = [CACHE_TAGS.POSTS, filter];
+
   const {
-    posts,
+    result,
     error,
     isEmpty,
     isFetchingNextPage,
     isReachingEnd,
     sentinelRef,
     isLoading,
-  } = useInfiniteScroll({
+  } = useInfiniteScroll<PostWithCounts>({
     endpoint,
     filter,
+    queryKey,
   });
 
   useEffect(() => {
-    const lastViewedPostId = sessionStorage.getItem('lastViewedPostId');
-    if (lastViewedPostId) {
-      const postElement = document.getElementById(`post-${lastViewedPostId}`);
+    const hash = sessionStorage.getItem('hash');
+    if (hash) {
+      const postElement = document.getElementById(hash);
       if (postElement) {
         postElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
-      sessionStorage.removeItem('lastViewedPostId');
+      sessionStorage.removeItem('hash');
     }
   }, []);
 
@@ -52,8 +58,10 @@ export default function Feed({
 
   if (isLoading) {
     return (
-      <div className="p-12 w-full">
-        <LoaderPlaceholder size={32} text="Loading posts..." />
+      <div className="space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <ContainerPlaceholder key={i} />
+        ))}
       </div>
     );
   }
@@ -73,14 +81,14 @@ export default function Feed({
     );
   }
 
-  if (posts.length <= 0) {
+  if (result.length <= 0) {
     return null;
   }
 
   return (
     <main className="space-y-4">
       <SessionProvider>
-        {posts.map((post) => (
+        {result.map((post) => (
           <PostContainer key={post.id} post={post} />
         ))}
       </SessionProvider>
