@@ -5,7 +5,9 @@ import {
   CommentContentZ,
   MAX_COMMENT_CHARS,
 } from '@/types/comment';
+import { CACHE_TAGS } from '@/types/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -15,6 +17,7 @@ type Props = {
 };
 
 export const useCreateComment = ({ postId }: Props) => {
+  const queryClient = useQueryClient();
   const formMethods = useForm<CommentContentZ>({
     resolver: zodResolver(CommentContent),
     defaultValues: { content: '' },
@@ -37,6 +40,9 @@ export const useCreateComment = ({ postId }: Props) => {
       postId,
     });
     if (result.success) {
+      await queryClient.invalidateQueries({
+        queryKey: [CACHE_TAGS.COMMENTS(postId)],
+      });
       formMethods.resetField('content', { keepDirty: true, defaultValue: '' });
     } else {
       // Display the general error message
@@ -49,7 +55,6 @@ export const useCreateComment = ({ postId }: Props) => {
   // Character count is directly derived from the content
   const charCount = content.length;
   // Calculate percentage for progress bar
-  const isOverLimit = charCount > MAX_COMMENT_CHARS;
 
   useEffect(() => {
     if (errors.content && charCount > 0) {
@@ -64,6 +69,6 @@ export const useCreateComment = ({ postId }: Props) => {
     formErrors: errors,
     register,
     isSubmitting: formMethods.formState.isSubmitting,
-    charProps: { charCount, maxChars: MAX_COMMENT_CHARS, isOverLimit },
+    charProps: { charCount, maxChars: MAX_COMMENT_CHARS },
   };
 };

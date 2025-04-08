@@ -3,6 +3,8 @@ import getSession from '@/lib/getSession';
 import { prisma } from '@/lib/prisma';
 import { CommentContent } from '@/types/comment';
 import successResponse, { errorResponse } from '../response';
+import { revalidateTag } from 'next/cache';
+import { CACHE_TAGS } from '@/types/constants';
 
 export async function createComment({
   content,
@@ -21,6 +23,8 @@ export async function createComment({
         postId,
       },
     });
+
+    revalidateTag(CACHE_TAGS.POST(postId));
 
     return successResponse(post);
   } catch (error) {
