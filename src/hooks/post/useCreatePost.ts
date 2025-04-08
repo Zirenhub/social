@@ -57,8 +57,6 @@ export const useCreatePost = ({ onSuccess }: Props) => {
 
   // Character count is directly derived from the content
   const charCount = content.length;
-  // Calculate percentage for progress bar
-  const isOverLimit = charCount > MAX_POST_CHARS;
 
   useEffect(() => {
     if (errors.content && charCount > 0) {
@@ -73,6 +71,6 @@ export const useCreatePost = ({ onSuccess }: Props) => {
     formErrors: errors,
     register,
     isSubmitting: formMethods.formState.isSubmitting,
-    charProps: { charCount, maxChars: MAX_POST_CHARS, isOverLimit },
+    charProps: { charCount, maxChars: MAX_POST_CHARS },
   };
 };

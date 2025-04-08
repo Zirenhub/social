@@ -25,7 +25,7 @@ export default function CreatePost({ onSuccess }: Props) {
 
         <button
           type="submit"
-          disabled={isSubmitting || charProps.isOverLimit}
+          disabled={isSubmitting || charProps.charCount > charProps.maxChars}
           className="primary-button"
         >
           {isSubmitting ? (

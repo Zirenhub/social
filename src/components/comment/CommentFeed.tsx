@@ -1,6 +1,6 @@
 'use client';
 import { MessageSquare, RefreshCw } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import CommentContainer from './CommentContainer';
 import useInfiniteScroll from '@/hooks/post/useInfiniteScroll';
 import ContainerPlaceholder from '../ui/ContainerPlaceholder';
@@ -26,25 +26,15 @@ export default function CommentFeed({ postId }: Props) {
   //   }
   // });
 
-  const { isLoading, isEmpty, result } = useInfiniteScroll<CommentWithCounts>({
-    endpoint: `/api/comments/${postId}`,
-    filter,
-    queryKey: [CACHE_TAGS.COMMENTS(postId), filter],
-  });
-
-  useEffect(() => {
-    const hash = sessionStorage.getItem('hash');
-    if (hash) {
-      const postElement = document.getElementById(hash);
-      if (postElement) {
-        postElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-      sessionStorage.setItem('hash', postId);
-    }
-  }, []);
+  const { isLoading, isEmpty, result, isError, error } =
+    useInfiniteScroll<CommentWithCounts>({
+      endpoint: `/api/comments/${postId}`,
+      filter,
+      queryKey: [CACHE_TAGS.COMMENTS(postId), filter],
+    });
 
   return (
-    <div id="comments" className="space-y-6">
+    <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-4 dark:border-gray-800">
         <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-1 dark:bg-gray-800">
           <button
@@ -80,6 +70,8 @@ export default function CommentFeed({ postId }: Props) {
           ))}
         </div>
       )}
+
+      {isError && <p className="text-red-400 text-center">{error?.message}</p>}
 
       {isEmpty ? (
         <div className="my-8 flex flex-col items-center justify-center rounded-xl bg-gradient-to-br from-gray-50/80 to-white p-10 text-center shadow-sm dark:from-gray-800/80 dark:to-gray-900">

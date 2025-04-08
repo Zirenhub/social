@@ -3,6 +3,7 @@ import { setFormErrors } from '@/helpers/setFormErrors';
 import {
   AdditinalProfileInfoContent,
   AdditinalProfileInfoZ,
+  MAX_BIO_CHARS,
 } from '@/types/profile';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRef } from 'react';
@@ -44,11 +45,18 @@ export const useAdditionalProfileInfoForm = () => {
 
   const submit = handleSubmit(onSubmit);
 
+  const avatarImageWatch = watch('avatarImageFile');
+  const bioLength = watch('bio')?.length || 0;
+
   return {
     submit,
     register,
     formMethods,
-    watch,
     hasErrors: hasErrorsRef.current || Object.values(errors).length > 0,
+    avatarImageWatch,
+    charProps: {
+      charCount: bioLength,
+      maxChars: MAX_BIO_CHARS,
+    },
   };
 };

@@ -1,21 +1,20 @@
 import Image from 'next/image';
 
 type Props = {
-  profile: { firstName: string; lastName: string };
-  avatarUrl?: string | null;
+  profile: { firstName: string; lastName: string; avatarUrl: string | null };
   className?: string;
 };
 
-export default function Avatar({ profile, avatarUrl, className }: Props) {
+export default function Avatar({ profile, className }: Props) {
   const initials = `${profile.firstName[0]}${profile.lastName[0]}`;
 
   return (
     <div
       className={`@container shrink-0 relative h-10 w-10 rounded-full overflow-hidden bg-[var(--color-cyan-500)] flex items-center justify-center text-white font-medium no-underline cursor-pointer select-none ${className ? className : ''}`}
     >
-      {avatarUrl ? (
+      {profile.avatarUrl ? (
         <Image
-          src={avatarUrl}
+          src={profile.avatarUrl}
           alt={`${profile.firstName} ${profile.lastName}`}
           fill
           className="object-cover"

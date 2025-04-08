@@ -47,7 +47,6 @@ export default function PostInteractions({ post }: Props) {
   const handleCommentClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       e.stopPropagation();
-      sessionStorage.setItem('hash', 'comments');
       router.push(`/post/${post.id}`);
     },
     [post.id]

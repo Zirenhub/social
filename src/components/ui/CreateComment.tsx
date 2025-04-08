@@ -52,7 +52,9 @@ export default function CreateComment({ post, profile }: Props) {
         <button
           type="submit"
           disabled={
-            isSubmitting || charProps.isOverLimit || charProps.charCount <= 0
+            isSubmitting ||
+            charProps.charCount > charProps.maxChars ||
+            charProps.charCount <= 0
           }
           className="primary-button p-3"
         >

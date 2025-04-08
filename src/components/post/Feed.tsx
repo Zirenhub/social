@@ -1,5 +1,4 @@
 'use client';
-import { SessionProvider } from 'next-auth/react';
 import PostContainer from './PostContainer';
 import Link from 'next/link';
 import LoaderPlaceholder from '../ui/LoaderPlaceholder';
@@ -87,11 +86,9 @@ export default function Feed({
 
   return (
     <main className="space-y-4">
-      <SessionProvider>
-        {result.map((post) => (
-          <PostContainer key={post.id} post={post} />
-        ))}
-      </SessionProvider>
+      {result.map((post) => (
+        <PostContainer key={post.id} post={post} />
+      ))}
 
       {/* Sentinel element for infinite loading */}
       <div

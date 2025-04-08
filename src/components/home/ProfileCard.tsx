@@ -2,6 +2,7 @@ import { getProfile } from '@/app/api/profile/fetching';
 import ProfileStats from '../profile/ProfileStats';
 import getSession from '@/lib/getSession';
 import Avatar from '../ui/Avatar';
+import OnlineIndicator from '../ui/OnlineIndicator';
 
 export default async function ProfileCard() {
   const session = await getSession();
@@ -12,12 +13,15 @@ export default async function ProfileCard() {
   const { _count } = profileResult;
 
   return (
-    <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
       <div className="flex items-center gap-4 mb-6">
-        <Avatar
-          profile={profileResult}
-          className="h-16 w-16 rounded-full ring-2 ring-cyan-500 dark:ring-cyan-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900"
-        />
+        <div className="relative">
+          <Avatar
+            profile={profileResult}
+            className="h-16 w-16 rounded-full ring-2 ring-cyan-500 dark:ring-cyan-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900"
+          />
+          <OnlineIndicator className="h-5 w-5" />
+        </div>
         <div className="flex flex-col">
           <h3 className="font-semibold text-lg text-gray-800 dark:text-gray-100">
             {profileResult.firstName} {profileResult.lastName}

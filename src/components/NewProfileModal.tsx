@@ -1,12 +1,14 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Modal from './ui/Modal';
-import { UserCircle2Icon, Upload, X } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import { useAdditionalProfileInfoForm } from '@/hooks/profile/useAdditionalProfileInfoForm';
 import showFormErrors from '@/helpers/showFormErrors';
-import { ImageFileSchema, MAX_BIO_CHARS } from '@/types/profile';
+import { ImageFileSchema } from '@/types/profile';
 import Textarea from './ui/Textarea';
 import { GetUserType } from '@/types/auth';
+import Avatar from './ui/Avatar';
+import OnlineIndicator from './ui/OnlineIndicator';
 
 type Props = {
   user: GetUserType;
@@ -18,8 +20,14 @@ export default function NewProfileModal({ user }: Props) {
     user.profile.avatarUrl || null
   );
 
-  const { register, submit, hasErrors, watch, formMethods } =
-    useAdditionalProfileInfoForm();
+  const {
+    register,
+    submit,
+    hasErrors,
+    formMethods,
+    avatarImageWatch,
+    charProps,
+  } = useAdditionalProfileInfoForm();
 
   async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files[0]) {
@@ -38,9 +46,6 @@ export default function NewProfileModal({ user }: Props) {
       // pic is still the value of avatarImage
     }
   }
-
-  const avatarImageWatch = watch('avatarImageFile');
-  const bioWatch = watch('bio');
 
   useEffect(() => {
     if (avatarImageWatch) {
@@ -66,7 +71,6 @@ export default function NewProfileModal({ user }: Props) {
     setImagePreview(null);
     formMethods.resetField('avatarImageFile', {});
   };
-  const bioLength = bioWatch?.length ?? 0;
 
   return (
     <Modal isOpen={isOpen} close={() => setIsOpen(false)}>
@@ -84,11 +88,9 @@ export default function NewProfileModal({ user }: Props) {
                 className="w-12 h-12 rounded-full ring-2 ring-purple-500 p-0.5 object-cover"
               />
             ) : (
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center">
-                <UserCircle2Icon className="w-8 h-8 text-white" />
-              </div>
+              <Avatar profile={user.profile} />
             )}
-            <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-lime-500 rounded-full border-2 border-white dark:border-dark-500"></span>
+            <OnlineIndicator />
           </div>
         </div>
 
@@ -128,9 +130,7 @@ export default function NewProfileModal({ user }: Props) {
                     </button>
                   </div>
                 ) : (
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
-                    <UserCircle2Icon className="w-12 h-12 text-gray-400 dark:text-gray-500" />
-                  </div>
+                  <Avatar profile={user.profile} className="w-24 h-24" />
                 )}
               </div>
               <div className="flex flex-col justify-center">
@@ -167,8 +167,7 @@ export default function NewProfileModal({ user }: Props) {
               register={register}
               name="bio"
               placeholder="Tell us something about yourself."
-              charCount={bioLength}
-              maxChars={MAX_BIO_CHARS}
+              charProps={charProps}
             />
           </div>
 
@@ -183,7 +182,11 @@ export default function NewProfileModal({ user }: Props) {
             </button>
             <button
               type="submit"
-              disabled={formMethods.formState.isSubmitting}
+              disabled={
+                formMethods.formState.isSubmitting ||
+                charProps.charCount > charProps.maxChars ||
+                charProps.charCount <= 0
+              }
               className="primary-button"
             >
               {formMethods.formState.isSubmitting
