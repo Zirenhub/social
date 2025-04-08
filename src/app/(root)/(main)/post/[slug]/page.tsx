@@ -1,11 +1,11 @@
 import { getPost } from '@/app/api/posts/fetching';
 import { PostWithCounts } from '@/types/post';
-import Image from 'next/image';
-import { MessageCircle, Heart, Share2 } from 'lucide-react';
-import Avatar from '@/components/ui/Avatar';
 import PostContainer from '@/components/post/PostContainer';
 import { SessionProvider } from 'next-auth/react';
 import getSession from '@/lib/getSession';
+import CreateComment from '@/components/ui/CreateComment';
+import { getProfile } from '@/app/api/profile/fetching';
+import CommentFeed from '@/components/comment/CommentFeed';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -18,11 +18,21 @@ export default async function Post({ params }: Props) {
     postId: slug,
     userProfileId: auth.user.profile,
   });
+  const profile = await getProfile({
+    profileId: auth.user.profile,
+    userProfileId: auth.user.profile,
+  });
 
   return (
-    // like is stale since this is server pull and use like is invalidating only client cache
-    <SessionProvider>
-      <PostContainer post={post} />
-    </SessionProvider>
+    <div className="flex flex-col gap-3">
+      <SessionProvider>
+        <PostContainer post={post} />
+      </SessionProvider>
+      <CreateComment
+        post={{ id: post.id, profile: { username: post.profile.username } }}
+        profile={profile}
+      />
+      <CommentFeed postId={post.id} />
+    </div>
   );
 }
