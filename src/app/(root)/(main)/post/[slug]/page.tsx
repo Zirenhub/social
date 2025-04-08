@@ -1,7 +1,6 @@
 import { getPost } from '@/app/api/posts/fetching';
 import { PostWithCounts } from '@/types/post';
 import PostContainer from '@/components/post/PostContainer';
-import { SessionProvider } from 'next-auth/react';
 import getSession from '@/lib/getSession';
 import CreateComment from '@/components/ui/CreateComment';
 import { getProfile } from '@/app/api/profile/fetching';
@@ -25,9 +24,7 @@ export default async function Post({ params }: Props) {
 
   return (
     <div className="flex flex-col gap-3">
-      <SessionProvider>
-        <PostContainer post={post} />
-      </SessionProvider>
+      <PostContainer post={post} />
       <CreateComment
         post={{ id: post.id, profile: { username: post.profile.username } }}
         profile={profile}
