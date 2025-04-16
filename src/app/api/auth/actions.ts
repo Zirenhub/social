@@ -1,12 +1,14 @@
-'use server';
-import { auth, signIn, signOut } from '@/auth';
-import { prisma } from '@/lib/prisma';
-import { LogInZ, SignUpContent, SignUpZ } from '@/types/auth';
-import { ACTIVITY_THRESHOLDS, CACHE_TAGS } from '@/types/constants';
-const bcrypt = require('bcryptjs');
-import successResponse, { errorResponse } from '../response';
-import { revalidateTag } from 'next/cache';
+"use server";
 
+import { revalidateTag } from "next/cache";
+
+import { auth, signIn, signOut } from "@/auth";
+import { prisma } from "@/lib/prisma";
+import { LogInZ, SignUpContent, SignUpZ } from "@/types/auth";
+import { ACTIVITY_THRESHOLDS, CACHE_TAGS } from "@/types/constants";
+import successResponse, { errorResponse } from "../response";
+
+const bcrypt = require("bcryptjs");
 let lastUpdateTimestamp = 0;
 
 export async function signUp(formData: SignUpZ) {
@@ -46,7 +48,7 @@ export async function signUp(formData: SignUpZ) {
     });
 
     // Sign in the user with NextAuth
-    await signIn('credentials', {
+    await signIn("credentials", {
       email: parsed.email,
       password: parsed.password,
       redirect: false,
@@ -54,26 +56,24 @@ export async function signUp(formData: SignUpZ) {
 
     return successResponse(newUserWithProfile);
   } catch (err) {
-    return errorResponse(err, 'An error occurred while creating the user.');
+    return errorResponse(err, "An error occurred while creating the user.");
   }
 }
 
 export async function login(formData: LogInZ) {
   try {
-    await signIn('credentials', {
+    await signIn("credentials", {
       email: formData.email,
       password: formData.password,
       redirect: false,
     });
     return successResponse(null);
   } catch (err) {
-    return errorResponse(err, 'An error occurred while logging the user.');
+    return errorResponse(err, "An error occurred while logging the user.");
   }
 }
 
-export async function updateLastActive(
-  actionType: 'browse' | 'post' | 'like' | 'comment' = 'browse'
-) {
+export async function updateLastActive(actionType: "browse" | "post" | "like" | "comment" = "browse") {
   try {
     const now = Date.now();
 
@@ -97,7 +97,7 @@ export async function updateLastActive(
       return {
         success: false,
         data: null,
-        error: { message: 'User not authenticated' },
+        error: { message: "User not authenticated" },
       };
     }
 
@@ -109,15 +109,15 @@ export async function updateLastActive(
 
     // Update our timestamp tracker
     lastUpdateTimestamp = now;
-    revalidateTag(CACHE_TAGS.PROFILE(session.user.profile));
+    revalidateTag(CACHE_TAGS.PROFILE_ACTIVITY(session.user.profile));
 
     return { success: true, data: updatedProfile, error: null };
   } catch (err) {
-    console.error('Failed to update last active:', err);
+    console.error("Failed to update last active:", err);
     return {
       success: false,
       data: null,
-      error: { message: 'An error occurred while updating last active prop.' },
+      error: { message: "An error occurred while updating last active prop." },
     };
   }
 }
@@ -127,6 +127,6 @@ export async function logOut() {
     await signOut();
     return successResponse(null);
   } catch (err) {
-    return errorResponse(err, 'An error occurred while logging out.');
+    return errorResponse(err, "An error occurred while logging out.");
   }
 }

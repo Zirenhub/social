@@ -1,9 +1,10 @@
-import { type NextRequest, NextResponse } from 'next/server';
-import getSession from '@/lib/getSession';
-import type { ApiResponse, PaginatedData } from '@/types/api';
-import successResponse, { errorResponse } from '../../response';
-import { CommentsFilter, CommentWithCounts } from '@/types/comment';
-import { getComments } from '../fetching';
+import { NextResponse, type NextRequest } from "next/server";
+
+import getSession from "@/lib/getSession";
+import type { ApiResponse, PaginatedData } from "@/types/api";
+import { CommentsFilter, CommentWithCounts } from "@/types/comment";
+import successResponse, { errorResponse } from "../../response";
+import { getComments } from "../fetching";
 
 export async function GET(
   request: NextRequest,
@@ -11,8 +12,8 @@ export async function GET(
 ): Promise<NextResponse<ApiResponse<PaginatedData<CommentWithCounts>>>> {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const filter = (searchParams.get('filter') as CommentsFilter) || 'newest';
-    const cursor = searchParams.get('cursor') ?? undefined;
+    const filter = (searchParams.get("filter") as CommentsFilter) || "newest";
+    const cursor = searchParams.get("cursor") ?? undefined;
 
     const { slug } = await params;
     const session = await getSession();
@@ -26,7 +27,7 @@ export async function GET(
 
     return NextResponse.json(successResponse(comments));
   } catch (error) {
-    console.error('API Error:', error);
+    console.error("API Error:", error);
     return NextResponse.json(errorResponse(error));
   }
 }

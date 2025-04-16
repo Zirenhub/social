@@ -1,9 +1,10 @@
-import { getSearchProfiles } from '@/app/api/search/fetching';
-import { NextRequest, NextResponse } from 'next/server';
-import successResponse, { errorResponse } from '../response';
+import { NextRequest, NextResponse } from "next/server";
+
+import { getSearchProfiles } from "@/app/api/search/fetching";
+import successResponse, { errorResponse } from "../response";
 
 export async function GET(req: NextRequest) {
-  const query = req.nextUrl.searchParams.get('query');
+  const query = req.nextUrl.searchParams.get("query");
   if (!query) return NextResponse.json([]);
 
   try {

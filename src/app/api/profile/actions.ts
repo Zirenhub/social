@@ -1,13 +1,13 @@
-'use server';
-import {
-  AdditinalProfileInfoContent,
-  AdditinalProfileInfoZ,
-} from '@/types/profile';
-import successResponse, { errorResponse } from '../response';
-import { prisma } from '@/lib/prisma';
-import getSession from '@/lib/getSession';
-import { revalidateTag } from 'next/cache';
-import { CACHE_TAGS } from '@/types/constants';
+"use server";
+
+import { revalidateTag } from "next/cache";
+
+import getSession from "@/lib/getSession";
+import { prisma } from "@/lib/prisma";
+import { CACHE_TAGS } from "@/types/constants";
+import { AdditinalProfileInfoContent, AdditinalProfileInfoZ } from "@/types/profile";
+import { updateLastActive } from "../auth/actions";
+import successResponse, { errorResponse } from "../response";
 
 export async function updateProfile(updatedData: AdditinalProfileInfoZ) {
   try {
@@ -22,7 +22,7 @@ export async function updateProfile(updatedData: AdditinalProfileInfoZ) {
 
     return successResponse(updatedProfile);
   } catch (error) {
-    return errorResponse(error, 'Something went wrong updating profile.');
+    return errorResponse(error, "Something went wrong updating profile.");
   }
 }
 
@@ -30,7 +30,7 @@ export async function followProfile(profileId: string) {
   try {
     const session = await getSession();
     if (session.user.profile === profileId) {
-      throw new Error('You cannot follow yourself.');
+      throw new Error("You cannot follow yourself.");
     }
 
     const profile = await prisma.profile.findUnique({
@@ -38,7 +38,7 @@ export async function followProfile(profileId: string) {
     });
 
     if (!profile) {
-      throw new Error('Profile not found.');
+      throw new Error("Profile not found.");
     }
 
     const result = await prisma.follow.create({
@@ -48,12 +48,13 @@ export async function followProfile(profileId: string) {
       },
     });
 
+    await updateLastActive("post");
     revalidateTag(CACHE_TAGS.PROFILE(profileId)); // revalidate since followers count has changed
     revalidateTag(CACHE_TAGS.PROFILE(session.user.profile)); // revalidate since following count has changed
 
     return successResponse(result);
   } catch (error) {
-    return errorResponse(error, 'Something went wrong following profile.');
+    return errorResponse(error, "Something went wrong following profile.");
   }
 }
 
@@ -61,7 +62,7 @@ export async function unfollowProfile(profileId: string) {
   try {
     const session = await getSession();
     if (session.user.profile === profileId) {
-      throw new Error('You cannot unfollow yourself.');
+      throw new Error("You cannot unfollow yourself.");
     }
 
     const profile = await prisma.profile.findUnique({
@@ -69,7 +70,7 @@ export async function unfollowProfile(profileId: string) {
     });
 
     if (!profile) {
-      throw new Error('Profile not found.');
+      throw new Error("Profile not found.");
     }
 
     await prisma.follow.delete({
@@ -81,11 +82,12 @@ export async function unfollowProfile(profileId: string) {
       },
     });
 
+    await updateLastActive("post");
     revalidateTag(CACHE_TAGS.PROFILE(profileId)); // revalidate since followers count has changed
     revalidateTag(CACHE_TAGS.PROFILE(session.user.profile)); // revalidate since following count has changed
 
     return successResponse(null);
   } catch (error) {
-    return errorResponse(error, 'Something went wrong unfollowing profile.');
+    return errorResponse(error, "Something went wrong unfollowing profile.");
   }
 }

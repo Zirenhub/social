@@ -1,9 +1,10 @@
-import { type NextRequest, NextResponse } from 'next/server';
-import getSession from '@/lib/getSession';
-import { ApiResponse } from '@/types/api';
-import successResponse, { errorResponse } from '../../response';
-import { getProfile } from '../fetching';
-import { GetProfileType } from '@/types/profile';
+import { NextResponse, type NextRequest } from "next/server";
+
+import getSession from "@/lib/getSession";
+import { ApiResponse } from "@/types/api";
+import { GetProfileType } from "@/types/profile";
+import successResponse, { errorResponse } from "../../response";
+import { getProfile } from "../fetching";
 
 export async function GET(
   request: NextRequest,

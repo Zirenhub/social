@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { updateLastActive } from '@/app/api/auth/actions';
-import { ACTIVITY_THRESHOLDS } from '@/types/constants';
-import { differenceInMinutes, minutesToMilliseconds } from 'date-fns';
+import { useEffect } from "react";
+import { differenceInMinutes, minutesToMilliseconds } from "date-fns";
+
+import { updateLastActive } from "@/app/api/auth/actions";
+import { ACTIVITY_THRESHOLDS } from "@/types/constants";
 
 type Props = {
   lastActive: Date;

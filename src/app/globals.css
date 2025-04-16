@@ -1,21 +1,21 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @font-face {
-  font-family: 'regular';
+  font-family: "regular";
   font-weight: 400;
-  src: url('../../public/fonts/regular.otf') format('opentype');
+  src: url("../../public/fonts/regular.otf") format("opentype");
 }
 
 @font-face {
-  font-family: 'bold';
+  font-family: "bold";
   font-weight: 700;
-  src: url('../../public/fonts/bold.otf') format('opentype');
+  src: url("../../public/fonts/bold.otf") format("opentype");
 }
 
 @font-face {
-  font-family: 'thin';
+  font-family: "thin";
   font-weight: 100;
-  src: url('../../public/fonts/thin.otf') format('opentype');
+  src: url("../../public/fonts/thin.otf") format("opentype");
 }
 
 :root {
@@ -24,7 +24,7 @@
 }
 
 body {
-  font-family: 'regular', sans-serif;
+  font-family: "regular", sans-serif;
 }
 
 @layer base {
@@ -88,11 +88,11 @@ body {
   }
 
   .primary-button {
-    @apply ml-auto px-6 py-3 rounded-lg bg-gradient-to-r from-[var(--color-cyan-500)] to-[var(--color-blue-500)] text-white font-medium shadow-md hover:shadow-xl transform hover:-translate-y-1 active:translate-y-0 transition-all duration-300 disabled:opacity-50 disabled:transform-none disabled:hover:shadow-md flex items-center gap-2 cursor-pointer;
+    @apply rounded-lg bg-gradient-to-r from-[var(--color-cyan-500)] to-[var(--color-blue-500)] text-white font-medium shadow-md hover:shadow-xl transform hover:-translate-y-1 active:translate-y-0 transition-all duration-300 disabled:opacity-50 disabled:transform-none disabled:hover:shadow-md cursor-pointer;
   }
 
   .secondary-button {
-    @apply ml-auto px-6 py-3 rounded-lg bg-transparent border-2 border-[var(--color-cyan-500)] text-[var(--color-cyan-500)] font-medium shadow-sm hover:shadow-md transform hover:-translate-y-1 active:translate-y-0 transition-all duration-300 disabled:opacity-50 disabled:transform-none disabled:hover:shadow-sm flex items-center gap-2 cursor-pointer dark:text-white dark:border-[var(--color-cyan-500)];
+    @apply rounded-lg bg-transparent border-2 border-[var(--color-cyan-500)] text-[var(--color-cyan-500)] font-medium shadow-sm hover:shadow-md transform hover:-translate-y-1 active:translate-y-0 transition-all duration-300 disabled:opacity-50 disabled:transform-none disabled:hover:shadow-sm cursor-pointer dark:text-white dark:border-[var(--color-cyan-500)];
   }
 
   .input-text {

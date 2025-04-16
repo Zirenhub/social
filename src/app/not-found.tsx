@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import Head from 'next/head';
+import Head from "next/head";
+import Link from "next/link";
 
 export default function Custom404() {
   return (
@@ -14,9 +14,7 @@ export default function Custom404() {
           404
         </h1>
 
-        <p className="text-xl text-white mb-8">
-          The page you're looking for doesn't exist.
-        </p>
+        <p className="text-xl text-white mb-8">The page you're looking for doesn't exist.</p>
 
         <Link
           href="/"

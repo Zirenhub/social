@@ -1,46 +1,35 @@
-'use client';
-import { useEffect } from 'react';
+"use client";
 
-export default function useSyncScroll(
-  ref: React.RefObject<HTMLDivElement | null>
-) {
+import { useEffect } from "react";
+
+export default function useSyncScroll(ref: React.RefObject<HTMLDivElement | null>) {
   useEffect(() => {
     const sidebar = ref.current;
-    const mainContent = document.getElementById('main-content');
+    const mainContent = document.getElementById("main-content");
     if (!sidebar || !mainContent) return;
 
     let lastScrollTop = mainContent.scrollTop;
-    const stickyTop = parseInt(window.getComputedStyle(sidebar).top, 10) || 0;
+
     const handleScroll = () => {
       const currentScrollTop = mainContent.scrollTop;
-      const sidebarRect = sidebar.getBoundingClientRect();
-
-      // Only sync after reaching sticky position
-      if (sidebarRect.top > stickyTop) {
-        sidebar.scrollTop = 0;
-        lastScrollTop = currentScrollTop;
-        return;
-      }
+      const delta = currentScrollTop - lastScrollTop;
+      lastScrollTop = currentScrollTop;
 
       requestAnimationFrame(() => {
-        const delta = currentScrollTop - lastScrollTop;
-        lastScrollTop = currentScrollTop;
-        sidebar.scrollTop = Math.max(
+        const newScrollTop = Math.max(
           0,
-          Math.min(
-            sidebar.scrollHeight - sidebar.clientHeight,
-            sidebar.scrollTop + delta
-          )
+          Math.min(sidebar.scrollHeight - sidebar.clientHeight, sidebar.scrollTop + delta * 0.5)
         );
+        sidebar.scrollTop = newScrollTop;
       });
     };
 
     // Initial setup
     sidebar.scrollTop = 0;
-    mainContent.addEventListener('scroll', handleScroll, { passive: true });
+    mainContent.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
-      mainContent.removeEventListener('scroll', handleScroll);
+      mainContent.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [ref]);
 }

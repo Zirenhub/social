@@ -1,11 +1,12 @@
-import { signUp } from '@/app/api/auth/actions';
-import { SignUpZ, SignUpContent } from '@/types/auth';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
-import { useRouter } from 'next/navigation';
-import { setFormErrors } from '@/helpers/setFormErrors';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+
+import { signUp } from "@/app/api/auth/actions";
+import { setFormErrors } from "@/helpers/setFormErrors";
+import { SignUpContent, SignUpZ } from "@/types/auth";
 
 // maybe add a check so user is not born in the future?
 
@@ -37,7 +38,7 @@ export const useSignUpForm = () => {
     const result = await signUp(formData);
 
     if (result.success) {
-      router.replace('/home');
+      router.replace("/home");
     } else {
       setIsSubmitting(false);
       // Display the general error message
@@ -48,8 +49,8 @@ export const useSignUpForm = () => {
     }
   };
 
-  const watchMonth = watch('month');
-  const watchYear = watch('year');
+  const watchMonth = watch("month");
+  const watchYear = watch("year");
 
   const getDayOptions = useCallback(() => {
     const daysInMonth = new Date(watchYear, watchMonth + 1, 0).getDate();
@@ -57,8 +58,8 @@ export const useSignUpForm = () => {
   }, [watchMonth, watchYear]);
 
   useEffect(() => {
-    if (Number(formMethods.getValues('day')) > getDayOptions().length) {
-      formMethods.setValue('day', getDayOptions().length);
+    if (Number(formMethods.getValues("day")) > getDayOptions().length) {
+      formMethods.setValue("day", getDayOptions().length);
     }
   }, [watchMonth, watchYear, formMethods, getDayOptions]);
 

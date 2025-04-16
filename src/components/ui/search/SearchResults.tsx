@@ -1,11 +1,13 @@
-'use client';
-import { fetcher } from '@/lib/fetcher';
-import { CACHE_TAGS } from '@/types/constants';
-import { GetProfileType } from '@/types/profile';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, Loader2, SearchIcon, User2Icon } from 'lucide-react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
+"use client";
+
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import { ArrowRight, Loader2, SearchIcon, User2Icon } from "lucide-react";
+
+import { fetcher } from "@/lib/fetcher";
+import { CACHE_TAGS } from "@/types/constants";
+import { GetProfileType } from "@/types/profile";
 
 type Props = {
   query: string;
@@ -58,9 +60,7 @@ export default function SearchResults({ query }: Props) {
             <SearchIcon className="w-6 h-6" />
           </div>
         </div>
-        <p className="text-red-500 dark:text-red-400 font-medium">
-          Failed to load results
-        </p>
+        <p className="text-red-500 dark:text-red-400 font-medium">Failed to load results</p>
       </div>
     );
 
@@ -72,9 +72,7 @@ export default function SearchResults({ query }: Props) {
             <SearchIcon className="w-6 h-6" />
           </div>
         </div>
-        <p className="text-gray-500 dark:text-gray-400">
-          No results for "{query}"
-        </p>
+        <p className="text-gray-500 dark:text-gray-400">No results for "{query}"</p>
       </div>
     );
 
@@ -83,12 +81,8 @@ export default function SearchResults({ query }: Props) {
       {/* Search header */}
       <div className="bg-gray-50 dark:bg-gray-800 px-6 py-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
         <h3 className="font-medium text-gray-700 dark:text-gray-200 flex items-center gap-2">
-          <span className="text-sm uppercase tracking-wider text-gray-400 dark:text-gray-500">
-            Results
-          </span>
-          <span className="text-cyan-500 dark:text-cyan-500 font-semibold truncate max-w-48">
-            "{query}"
-          </span>
+          <span className="text-sm uppercase tracking-wider text-gray-400 dark:text-gray-500">Results</span>
+          <span className="text-cyan-500 dark:text-cyan-500 font-semibold truncate max-w-48">"{query}"</span>
         </h3>
         <span className="px-2.5 py-1 bg-cyan-500/10 text-cyan-500 dark:text-cyan-400 text-xs font-medium rounded-full">
           {results.length}

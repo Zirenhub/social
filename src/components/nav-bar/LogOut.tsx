@@ -1,10 +1,12 @@
-'use client';
-import { useTransition } from 'react';
-import LoaderPlaceholder from '../ui/LoaderPlaceholder';
-import { motion } from 'framer-motion';
-import { LogOut as LogOutIcon } from 'lucide-react';
-import { logOut as logOutAction } from '@/app/api/auth/actions';
-import { useRouter } from 'next/navigation';
+"use client";
+
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { LogOut as LogOutIcon } from "lucide-react";
+
+import { logOut as logOutAction } from "@/app/api/auth/actions";
+import LoaderPlaceholder from "../ui/LoaderPlaceholder";
 
 export default function LogOut() {
   const router = useRouter();
@@ -13,7 +15,7 @@ export default function LogOut() {
   function handleLogOut() {
     startTransition(async () => {
       await logOutAction();
-      router.replace('/');
+      router.replace("/");
     });
   }
 
@@ -23,12 +25,15 @@ export default function LogOut() {
 
   return (
     <motion.button
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
       onClick={handleLogOut}
-      className="cursor-pointer w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-400 hover:to-emerald-400 shadow-lg hover:shadow-sky-300/20 transition-all duration-300"
+      whileHover={{ scale: 1.05, rotate: 3 }}
+      whileTap={{ scale: 0.98 }}
+      className="h-8 w-8 flex items-center justify-center rounded-full border border-white/20 bg-gradient-to-br from-indigo-500 to-teal-400 hover:from-indigo-400 hover:to-teal-300 transition-all duration-300 ease-in-out shadow-lg hover:shadow-teal-300/30 backdrop-blur-md group"
     >
-      <LogOutIcon size={20} className="text-white" />
+      <LogOutIcon
+        size={16}
+        className="text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.2)] group-hover:animate-pulse"
+      />
     </motion.button>
   );
 }

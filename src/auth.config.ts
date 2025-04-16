@@ -1,8 +1,9 @@
-import Credentials from 'next-auth/providers/credentials';
-import type { NextAuthConfig } from 'next-auth';
-import { LogInContent } from './types/auth';
-import { prisma } from './lib/prisma';
-import bcrypt from 'bcryptjs';
+import bcrypt from "bcryptjs";
+import type { NextAuthConfig } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+
+import { prisma } from "./lib/prisma";
+import { LogInContent } from "./types/auth";
 
 export default {
   callbacks: {
@@ -34,7 +35,7 @@ export default {
     },
     async session({ session, token }) {
       if (!token || !token.id || !token.email || !token.profile) {
-        throw new Error('Token not found');
+        throw new Error("Token not found");
       }
       // Add custom properties to the session
       session.user = {
@@ -49,13 +50,13 @@ export default {
   providers: [
     Credentials({
       credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
         try {
           if (!credentials?.email || !credentials?.password) {
-            throw new Error('Email and password required');
+            throw new Error("Email and password required");
           }
 
           const parsed = await LogInContent.parseAsync(credentials);
@@ -65,22 +66,19 @@ export default {
           });
 
           if (!user) {
-            console.log('User not found');
+            console.log("User not found");
             return null;
           }
 
           if (!user.profile) {
-            console.log('User profile not found');
+            console.log("User profile not found");
             return null;
           }
 
-          const isPasswordValid = await bcrypt.compare(
-            parsed.password,
-            user.hashedPassword
-          );
+          const isPasswordValid = await bcrypt.compare(parsed.password, user.hashedPassword);
 
           if (!isPasswordValid) {
-            console.log('Invalid password');
+            console.log("Invalid password");
             return null;
           }
 
@@ -91,7 +89,7 @@ export default {
             profile: user.profile.id,
           };
         } catch (error) {
-          console.error('Authorization error:', error);
+          console.error("Authorization error:", error);
           return null;
         }
       },

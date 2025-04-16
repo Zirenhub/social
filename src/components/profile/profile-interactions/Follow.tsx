@@ -1,22 +1,15 @@
-'use client';
-import { UserRoundMinusIcon, UserRoundPlusIcon } from 'lucide-react';
-import { useFollow } from '@/hooks/profile/useFollow';
-import { DropdownMenuItem } from '@/components/ui/DropdownMenu';
-import LoaderPlaceholder from '@/components/ui/LoaderPlaceholder';
+"use client";
 
-type Props = {
-  profileId: string;
-  sideEffect?: () => void;
-  asDropdownItem?: boolean;
-};
+import { UserRoundMinusIcon, UserRoundPlusIcon } from "lucide-react";
 
-export default function Follow({
-  sideEffect,
-  profileId,
-  asDropdownItem,
-}: Props) {
-  const { isLoading, isFollowing, buttonText, handleFollowAction } =
-    useFollow(profileId);
+import { DropdownMenuItem } from "@/components/ui/DropdownMenu";
+import LoaderPlaceholder from "@/components/ui/LoaderPlaceholder";
+import { useFollow } from "@/hooks/profile/useFollow";
+
+type Props = { profileId: string; sideEffect?: () => void; asDropdownItem?: boolean };
+
+export default function Follow({ sideEffect, profileId, asDropdownItem }: Props) {
+  const { isLoading, isFollowing, buttonText, handleFollowAction } = useFollow(profileId);
   const { default: buttonTextDefault, hover } = buttonText();
 
   const onFollowAction = () => {
@@ -43,11 +36,7 @@ export default function Follow({
 
   if (asDropdownItem) {
     return (
-      <DropdownMenuItem
-        className={isFollowing ? 'group' : ''}
-        disabled={isLoading}
-        onClick={onFollowAction}
-      >
+      <DropdownMenuItem className={isFollowing ? "group" : ""} disabled={isLoading} onClick={onFollowAction}>
         {isLoading ? <LoaderPlaceholder /> : <FollowContent />}
       </DropdownMenuItem>
     );
@@ -55,7 +44,7 @@ export default function Follow({
 
   return (
     <button
-      className={`primary-button ${isFollowing ? 'group' : ''}`}
+      className={`w-full primary-button px-3 py-2 ${isFollowing ? "group" : ""}`}
       disabled={isLoading}
       onClick={(e) => {
         e.stopPropagation();

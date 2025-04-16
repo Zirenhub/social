@@ -1,59 +1,35 @@
-'use client';
-import { useEffect, useRef, useCallback } from 'react';
-import { useDebounce } from 'use-debounce';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { useInView } from 'react-intersection-observer';
-import { fetcher } from '@/lib/fetcher';
-import { PaginatedData } from '@/types/api';
+"use client";
 
-type UseInfiniteScrollOptions = {
-  endpoint: string;
-  filter: string;
-  queryKey: string[];
-};
+import { useCallback, useEffect, useRef } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
+import { useDebounce } from "use-debounce";
 
-export default function useInfiniteScroll<T>({
-  endpoint,
-  filter,
-  queryKey,
-}: UseInfiniteScrollOptions) {
-  const {
-    data,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    refetch,
-    isError,
-  } = useInfiniteQuery<
-    PaginatedData<T>,
-    Error,
-    { pages: PaginatedData<T>[] },
-    string[],
-    string | null
-  >({
-    queryKey,
-    queryFn: async ({ pageParam }) => {
-      const params = new URLSearchParams();
-      params.append('filter', filter);
-      if (pageParam) params.append('cursor', pageParam);
+import { fetcher } from "@/lib/fetcher";
+import { PaginatedData } from "@/types/api";
 
-      return await fetcher(`${endpoint}?${params.toString()}`);
-    },
-    refetchOnMount: 'always',
-    initialPageParam: null,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-    retry: false,
-  });
+type UseInfiniteScrollOptions = { endpoint: string; filter: string; queryKey: string[] };
+
+export default function useInfiniteScroll<T>({ endpoint, filter, queryKey }: UseInfiniteScrollOptions) {
+  const { data, error, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, refetch, isError } =
+    useInfiniteQuery<PaginatedData<T>, Error, { pages: PaginatedData<T>[] }, string[], string | null>({
+      queryKey,
+      queryFn: async ({ pageParam }) => {
+        const params = new URLSearchParams();
+        params.append("filter", filter);
+        if (pageParam) params.append("cursor", pageParam);
+
+        return await fetcher(`${endpoint}?${params.toString()}`);
+      },
+      refetchOnMount: "always",
+      initialPageParam: null,
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+      retry: false,
+    });
   // Extract posts from all pages
   const result = data?.pages?.flatMap((page) => page.data) || [];
 
-  const { ref, inView } = useInView({
-    threshold: 0.1,
-    rootMargin: '0px 0px 200px 0px',
-    triggerOnce: false,
-  });
+  const { ref, inView } = useInView({ threshold: 0.1, rootMargin: "0px 0px 200px 0px", triggerOnce: false });
 
   const [debouncedInView] = useDebounce(inView, 200);
 

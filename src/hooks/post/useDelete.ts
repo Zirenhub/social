@@ -1,9 +1,11 @@
-'use client';
-import { deletePost } from '@/app/api/posts/actions';
-import { CACHE_TAGS } from '@/types/constants';
-import { useQueryClient } from '@tanstack/react-query';
-import { useTransition } from 'react';
-import { toast } from 'react-toastify';
+"use client";
+
+import { useTransition } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+
+import { deletePost } from "@/app/api/posts/actions";
+import { CACHE_TAGS } from "@/types/constants";
 
 type Props = {
   postId: string;
@@ -24,7 +26,7 @@ export default function useDelete({ postId, onSuccess }: Props) {
       await queryClient.invalidateQueries({
         queryKey: [CACHE_TAGS.POSTS],
       });
-      toast.success('Post successfully deleted');
+      toast.success("Post successfully deleted");
       if (onSuccess) onSuccess();
     });
   }

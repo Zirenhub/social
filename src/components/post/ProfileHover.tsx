@@ -1,14 +1,13 @@
-'use client';
-import { BriefcaseIcon, MapPinIcon, CalendarIcon } from 'lucide-react';
-import { formatJoinedDate } from '@/helpers/formatDate';
-import LoaderPlaceholder from '../ui/LoaderPlaceholder';
-import { GetProfileType } from '@/types/profile';
-import Avatar from '../ui/Avatar';
+"use client";
 
-type Props = {
-  profile: GetProfileType;
-  isLoading: boolean;
-};
+import { BriefcaseIcon, CalendarIcon, MapPinIcon } from "lucide-react";
+
+import { formatJoinedDate } from "@/helpers/formatDate";
+import { GetProfileType } from "@/types/profile";
+import Avatar from "../ui/Avatar";
+import LoaderPlaceholder from "../ui/LoaderPlaceholder";
+
+type Props = { profile: GetProfileType; isLoading: boolean };
 
 export default function ProfileHover({ profile, isLoading }: Props) {
   return (
@@ -27,9 +26,7 @@ export default function ProfileHover({ profile, isLoading }: Props) {
               <h3 className="font-['bold'] text-gray-800 dark:text-gray-100">
                 {profile?.firstName} {profile?.lastName}
               </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                @{profile?.username}
-              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">@{profile?.username}</p>
             </div>
           </div>
 
@@ -41,7 +38,7 @@ export default function ProfileHover({ profile, isLoading }: Props) {
             </div>
             <div className="flex items-center">
               <MapPinIcon size={16} className="mr-2 text-gray-500" />
-              <span>{profile?.location || 'Kuklen'}</span>
+              <span>{profile?.location || "Kuklen"}</span>
             </div>
             <div className="flex items-center">
               <CalendarIcon size={16} className="mr-2 text-gray-500" />
@@ -49,20 +46,12 @@ export default function ProfileHover({ profile, isLoading }: Props) {
             </div>
             <div className="flex justify-between mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
               <div>
-                <span className="font-['bold'] text-gray-800 dark:text-gray-100">
-                  {profile?._count.posts}
-                </span>
-                <span className="text-gray-500 dark:text-gray-400 ml-1">
-                  Posts
-                </span>
+                <span className="font-['bold'] text-gray-800 dark:text-gray-100">{profile?._count.posts}</span>
+                <span className="text-gray-500 dark:text-gray-400 ml-1">Posts</span>
               </div>
               <div>
-                <span className="font-['bold'] text-gray-800 dark:text-gray-100">
-                  {profile?._count.followers}
-                </span>
-                <span className="text-gray-500 dark:text-gray-400 ml-1">
-                  Followers
-                </span>
+                <span className="font-['bold'] text-gray-800 dark:text-gray-100">{profile?._count.followers}</span>
+                <span className="text-gray-500 dark:text-gray-400 ml-1">Followers</span>
               </div>
             </div>
           </div>

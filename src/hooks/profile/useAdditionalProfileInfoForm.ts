@@ -1,14 +1,11 @@
-import { updateProfile } from '@/app/api/profile/actions';
-import { setFormErrors } from '@/helpers/setFormErrors';
-import {
-  AdditinalProfileInfoContent,
-  AdditinalProfileInfoZ,
-  MAX_BIO_CHARS,
-} from '@/types/profile';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useRef } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { useRef } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+
+import { updateProfile } from "@/app/api/profile/actions";
+import { setFormErrors } from "@/helpers/setFormErrors";
+import { AdditinalProfileInfoContent, AdditinalProfileInfoZ, MAX_BIO_CHARS } from "@/types/profile";
 
 export const useAdditionalProfileInfoForm = () => {
   const hasErrorsRef = useRef<boolean>(false);
@@ -27,13 +24,13 @@ export const useAdditionalProfileInfoForm = () => {
   const onSubmit: SubmitHandler<AdditinalProfileInfoZ> = async (formData) => {
     hasErrorsRef.current = false;
     if (!formData.avatarImageFile && !formData.bio) {
-      toast.info('No changes were made');
+      toast.info("No changes were made");
       return;
     }
     const result = await updateProfile(formData);
 
     if (result.success) {
-      toast.success('Profile updated successfully');
+      toast.success("Profile updated successfully");
     } else {
       // Display the general error message
       toast.error(result.error.message);
@@ -45,8 +42,8 @@ export const useAdditionalProfileInfoForm = () => {
 
   const submit = handleSubmit(onSubmit);
 
-  const avatarImageWatch = watch('avatarImageFile');
-  const bioLength = watch('bio')?.length || 0;
+  const avatarImageWatch = watch("avatarImageFile");
+  const bioLength = watch("bio")?.length || 0;
 
   return {
     submit,

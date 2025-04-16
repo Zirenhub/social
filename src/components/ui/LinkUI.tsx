@@ -1,7 +1,8 @@
-'use client';
-import Link from 'next/link';
-import { ReactNode, useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+"use client";
+
+import { ReactNode, useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 
 type Props = {
   href: string;
@@ -19,7 +20,7 @@ export const tooltipVariants = {
     scale: 0.97,
     transition: {
       duration: 0.1,
-      ease: 'easeOut',
+      ease: "easeOut",
     },
   },
   hiddenBottom: {
@@ -28,7 +29,7 @@ export const tooltipVariants = {
     scale: 0.97,
     transition: {
       duration: 0.1,
-      ease: 'easeOut',
+      ease: "easeOut",
     },
   },
   visibleTop: {
@@ -37,7 +38,7 @@ export const tooltipVariants = {
     scale: 1,
     transition: {
       duration: 0.15,
-      ease: 'easeOut',
+      ease: "easeOut",
     },
   },
   visibleBottom: {
@@ -46,19 +47,12 @@ export const tooltipVariants = {
     scale: 1,
     transition: {
       duration: 0.15,
-      ease: 'easeOut',
+      ease: "easeOut",
     },
   },
 };
 
-export default function LinkUI({
-  href,
-  isActive,
-  hash,
-  className,
-  children,
-  tooltip,
-}: Props) {
+export default function LinkUI({ href, isActive, hash, className, children, tooltip }: Props) {
   const [hovered, setHovered] = useState<boolean>(false);
   const [showBelow, setShowBelow] = useState<boolean>(false);
   const linkRef = useRef<HTMLDivElement>(null);
@@ -70,7 +64,7 @@ export default function LinkUI({
       if (hash) {
         const element = document.getElementById(hash);
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
+          element.scrollIntoView({ behavior: "smooth" });
         }
       }
     }
@@ -95,7 +89,7 @@ export default function LinkUI({
     >
       <Link
         href={href}
-        className={` ${className ? className : ''}`}
+        className={` ${className ? className : ""}`}
         onNavigate={handleHashChange}
         prefetch={false}
         scroll={false}
@@ -110,16 +104,16 @@ export default function LinkUI({
               ref={tooltipRef}
               key="tooltip"
               variants={tooltipVariants}
-              initial={showBelow ? 'hiddenBottom' : 'hiddenTop'}
-              animate={showBelow ? 'visibleBottom' : 'visibleTop'}
-              exit={showBelow ? 'hiddenBottom' : 'hiddenTop'}
+              initial={showBelow ? "hiddenBottom" : "hiddenTop"}
+              animate={showBelow ? "visibleBottom" : "visibleTop"}
+              exit={showBelow ? "hiddenBottom" : "hiddenTop"}
               className={`absolute left-1/2 transform -translate-x-1/2 whitespace-nowrap pointer-events-none
-                          ${showBelow ? 'top-[120%]' : '-top-2/3'}
+                          ${showBelow ? "top-[120%]" : "-top-2/3"}
                           bg-white/5 dark:bg-[var(--color-dark-500)]/20
                           text-[var(--color-cyan-500)] dark:text-[var(--color-cyan-500)]
                           py-1 px-2 rounded text-xs
                           ring-1 ring-[var(--color-cyan-500)]/40
-                          backdrop-blur ${tooltip.className ?? ''}`}
+                          backdrop-blur ${tooltip.className ?? ""}`}
             >
               {tooltip.label}
             </motion.div>

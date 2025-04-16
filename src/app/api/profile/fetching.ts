@@ -1,15 +1,12 @@
-import { prisma } from '@/lib/prisma';
-import { errorResponse } from '../response';
-import { postQuery, PostWithCounts } from '@/types/post';
-import { profileQuery } from '@/types/profile';
-import { unstable_cacheTag as cacheTag } from 'next/cache';
-import {
-  CACHE_TAGS,
-  PER_PAGE,
-  ProfilePagePostsFilter,
-} from '@/types/constants';
-import { subDays } from 'date-fns';
-import { PaginatedData } from '@/types/api';
+import { unstable_cacheTag as cacheTag } from "next/cache";
+import { subDays } from "date-fns";
+
+import { prisma } from "@/lib/prisma";
+import { PaginatedData } from "@/types/api";
+import { CACHE_TAGS, PER_PAGE, ProfilePagePostsFilter } from "@/types/constants";
+import { postQuery, PostWithCounts } from "@/types/post";
+import { GetProfileType, profileQuery } from "@/types/profile";
+import { errorResponse } from "../response";
 
 // export const getPostsCount = (profileId: string, since?: Date) => {
 //   return unstable_cache(
@@ -90,11 +87,8 @@ type GetProfilePostsProps = {
   cursor?: string;
 };
 
-export const getProfile = async ({
-  profileId,
-  userProfileId,
-}: GetProfileProps) => {
-  'use cache';
+export const getProfile = async ({ profileId, userProfileId }: GetProfileProps): Promise<GetProfileType> => {
+  "use cache";
   cacheTag(CACHE_TAGS.PROFILE(profileId));
   try {
     const profile = await prisma.profile.findUniqueOrThrow({
@@ -105,7 +99,7 @@ export const getProfile = async ({
     });
     return profile;
   } catch (error) {
-    const err = errorResponse(error, 'Failed getting profile.');
+    const err = errorResponse(error, "Failed getting profile.");
     throw new Error(err.error.message);
   }
 };
@@ -117,10 +111,10 @@ export const getProfilePosts = async ({
   filter,
 }: GetProfilePostsProps): Promise<PaginatedData<PostWithCounts>> => {
   try {
-    if (filter === 'posts') {
+    if (filter === "posts") {
       const posts = await prisma.post.findMany({
         ...postQuery({ profileId, userProfileId }),
-        orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+        orderBy: [{ createdAt: "desc" }, { id: "asc" }],
         take: PER_PAGE + 1,
         ...(cursor && {
           skip: 1,
@@ -137,7 +131,7 @@ export const getProfilePosts = async ({
       };
     }
 
-    if (filter === 'liked') {
+    if (filter === "liked") {
       const posts = await prisma.post.findMany({
         ...postQuery({ profileId, userProfileId }),
         where: {
@@ -147,7 +141,7 @@ export const getProfilePosts = async ({
             },
           },
         },
-        orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+        orderBy: [{ createdAt: "desc" }, { id: "asc" }],
         take: PER_PAGE + 1,
         ...(cursor && {
           skip: 1,
@@ -164,17 +158,16 @@ export const getProfilePosts = async ({
       };
     }
 
-    throw new Error('Invalid filter type');
+    throw new Error("Invalid filter type");
   } catch (error) {
-    const err = errorResponse(error, 'Failed getting profile posts.');
+    const err = errorResponse(error, "Failed getting profile posts.");
     throw new Error(err.error.message);
   }
 };
 
-// Get fresh lastActive separately
-export const getProfileLastActive = async (profileId: string) => {
-  'use cache';
-  cacheTag(CACHE_TAGS.PROFILE(profileId));
+export const getProfileActivity = async (profileId: string) => {
+  "use cache";
+  cacheTag(CACHE_TAGS.PROFILE_ACTIVITY(profileId));
   try {
     const dateThreshold = subDays(new Date(), 30);
 
@@ -193,7 +186,7 @@ export const getProfileLastActive = async (profileId: string) => {
 
     return result;
   } catch (error) {
-    const err = errorResponse(error, 'Failed getting profile activity.');
+    const err = errorResponse(error, "Failed getting profile activity.");
     throw new Error(err.error.message);
   }
 };

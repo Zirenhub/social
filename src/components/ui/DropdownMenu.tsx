@@ -1,17 +1,14 @@
-'use client';
-import React, { useState, useRef, useEffect } from 'react';
+"use client";
+
+import React, { useEffect, useRef, useState } from "react";
 
 type DropdownMenuProps = {
   trigger: React.ReactNode;
   children: React.ReactNode;
-  align?: 'left' | 'right';
+  align?: "left" | "right";
 };
 
-export function DropdownMenu({
-  trigger,
-  children,
-  align = 'right',
-}: DropdownMenuProps) {
+export function DropdownMenu({ trigger, children, align = "right" }: DropdownMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -23,11 +20,11 @@ export function DropdownMenu({
     }
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
 
@@ -48,7 +45,7 @@ export function DropdownMenu({
 
       {isOpen && (
         <div
-          className={`absolute ${align === 'right' ? 'right-0' : 'left-0'} z-10 mt-1 overflow-hidden bg-white rounded-lg shadow-lg dark:bg-[var(--color-dark-500)] border border-[var(--color-dark-500)]/10 dark:border-white/10 min-w-40`}
+          className={`absolute ${align === "right" ? "right-0" : "left-0"} z-10 mt-1 overflow-hidden bg-white rounded-lg shadow-lg dark:bg-[var(--color-dark-500)] border border-[var(--color-dark-500)]/10 dark:border-white/10 min-w-40`}
         >
           {children}
         </div>
@@ -61,7 +58,7 @@ export function DropdownMenuItem({
   children,
   onClick,
   disabled,
-  className = '',
+  className = "",
 }: {
   children: React.ReactNode;
   onClick: () => void;
@@ -75,7 +72,7 @@ export function DropdownMenuItem({
         e.stopPropagation();
         onClick();
       }}
-      className={`cursor-pointer flex items-center w-full px-4 py-2 text-sm text-left transition-colors text-[var(--color-dark-500)]/80 dark:text-white/80 hover:bg-[var(--color-magenta-500)]/10 hover:text-[var(--color-magenta-500)] ${className ? className : ''}`}
+      className={`cursor-pointer flex items-center w-full px-4 py-2 text-sm text-left transition-colors text-[var(--color-dark-500)]/80 dark:text-white/80 hover:bg-[var(--color-magenta-500)]/10 hover:text-[var(--color-magenta-500)] ${className ? className : ""}`}
     >
       {children}
     </button>

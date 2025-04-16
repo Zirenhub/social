@@ -1,8 +1,10 @@
-'use client';
-import { fetcher } from '@/lib/fetcher';
-import { CACHE_TAGS } from '@/types/constants';
-import { GetProfileType } from '@/types/profile';
-import { useQuery } from '@tanstack/react-query';
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+
+import { fetcher } from "@/lib/fetcher";
+import { CACHE_TAGS } from "@/types/constants";
+import { GetProfileType } from "@/types/profile";
 
 export default function useProfile(id: string, enabled: boolean = true) {
   const { data, error, isLoading, refetch } = useQuery<GetProfileType, Error>({

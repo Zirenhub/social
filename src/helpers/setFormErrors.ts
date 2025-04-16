@@ -1,5 +1,6 @@
-import { UseFormReturn, Path } from 'react-hook-form';
-import { ApiErrorType } from '@/types/api';
+import { Path, UseFormReturn } from "react-hook-form";
+
+import { ApiErrorType } from "@/types/api";
 
 /**
  * Sets form errors from an API error response

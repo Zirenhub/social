@@ -1,14 +1,19 @@
-import Filter from '@/components/ui/Filter';
-import LoaderPlaceholder from '@/components/ui/LoaderPlaceholder';
-import CreatePost from '@/components/ui/CreatePost';
-import { HOME_PAGE_POSTS_FILTERS, homeFilters } from '@/types/constants';
-import type { Metadata } from 'next';
-import { Suspense } from 'react';
-import Feed from '@/components/post/Feed';
+import type { Metadata } from "next";
+import dynamic from "next/dynamic";
+
+import Feed from "@/components/post/Feed";
+import { HomeHeader } from "@/components/ui/mobile/headers";
+import { HeaderSlot } from "@/components/ui/mobile/MobileHeader";
+import { HOME_PAGE_POSTS_FILTERS, homeFilters } from "@/types/constants";
+
+const Filter = dynamic(() => import("../../../../components/ui/Filter"), {
+  loading: () => <p>Loading...</p>,
+});
+const CreatePost = dynamic(() => import("../../../../components/ui/CreatePost"));
 
 export const metadata: Metadata = {
-  title: 'Home Feed',
-  description: 'View your personalized feed',
+  title: "Home Feed",
+  description: "View your personalized feed",
 };
 
 type Props = {
@@ -18,34 +23,20 @@ type Props = {
 export default async function Home({ searchParams }: Props) {
   const { filter } = await searchParams;
 
-  const currentFilter =
-    HOME_PAGE_POSTS_FILTERS.find((x) => x === filter) || 'forYou';
+  const currentFilter = HOME_PAGE_POSTS_FILTERS.find((x) => x === filter) || "forYou";
 
   return (
     <>
-      {/* Main Feed */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 mb-4 h-80 flex flex-col gap-4">
-        <h1 className="container-title text-2xl tracking-tight ">
-          Share your thoughts!
-        </h1>
+      <HeaderSlot content={<HomeHeader currentFilter={currentFilter} filters={homeFilters} />} />
+      <div className="hidden not-last-of-type:max-h-74 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 mb-4 h-80 md:flex flex-col gap-4">
+        <h1 className="container-title text-2xl tracking-tight ">Share your thoughts!</h1>
         <CreatePost />
       </div>
-      {/* Feed Filter */}
-      <Filter currentFilter={currentFilter} filters={homeFilters} />
-      <Suspense
-        key={currentFilter}
-        fallback={
-          <div className="flex items-center justify-center">
-            <LoaderPlaceholder size={32} text="Loading posts..." />
-          </div>
-        }
-      >
-        <Feed
-          endpoint="/api/posts"
-          showCreatePost={currentFilter === 'forYou'}
-          filter={currentFilter}
-        />
-      </Suspense>
+      <div className="hidden md:block">
+        <Filter currentFilter={currentFilter} filters={homeFilters} />
+      </div>
+      <div className="hidden md:block md:my-4" />
+      <Feed endpoint="/api/posts" showCreatePost={currentFilter === "forYou"} filter={currentFilter} />
     </>
   );
 }

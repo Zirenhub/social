@@ -1,29 +1,24 @@
-'use client';
-import { useRouter } from 'next/navigation';
-import { useDebouncedCallback } from 'use-debounce';
-import { Suspense, useState } from 'react';
-import dynamic from 'next/dynamic';
-import useProfile from '@/hooks/profile/useProfile';
-import Avatar from '../ui/Avatar';
+"use client";
 
-const ProfileHover = dynamic(() => import('./ProfileHover'));
+import { Suspense, useState } from "react";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
+import { useDebouncedCallback } from "use-debounce";
 
-type Props = {
-  profile: {
-    firstName: string;
-    lastName: string;
-    username: string;
-    id: string;
-  };
-  createdAt: string;
-};
+import { formatCreatedAtDate } from "@/helpers/formatDate";
+import useProfile from "@/hooks/profile/useProfile";
+import { SimpleProfile } from "@/types/post";
+import Avatar from "../ui/Avatar";
+import ProfileMeta from "../ui/ProfileMeta";
 
-export default function PostHeader({ profile, createdAt }: Props) {
+const ProfileHover = dynamic(() => import("./ProfileHover"));
+
+type Props = { profile: SimpleProfile & { id: string }; post: { createdAt: Date } };
+
+export default function PostHeader({ profile, post }: Props) {
+  const router = useRouter();
   const [hover, setHover] = useState<boolean>(false);
   const { profile: data, error, isLoading } = useProfile(profile.id, hover);
-  if (error) return <div>Error: {error.message}</div>;
-
-  const router = useRouter();
 
   const handleNavigateToProfile = () => {
     router.push(`/profile/${profile.id}`);
@@ -38,8 +33,10 @@ export default function PostHeader({ profile, createdAt }: Props) {
     setHover(false);
   };
 
+  if (error) return <div>Error: {error.message}</div>;
+
   return (
-    <div className="relative mb-3 flex items-start">
+    <div className="relative mb-3 flex">
       <div
         onClick={(e) => {
           e.stopPropagation();
@@ -47,7 +44,7 @@ export default function PostHeader({ profile, createdAt }: Props) {
         }}
         onMouseEnter={debouncedShowHover}
         onMouseLeave={hideHover}
-        className="flex cursor-pointer items-center gap-3"
+        className="flex cursor-pointer gap-2 items-start"
       >
         <Avatar profile={profile} />
 
@@ -66,13 +63,8 @@ export default function PostHeader({ profile, createdAt }: Props) {
           </Suspense>
         )}
 
-        <div className="flex flex-col">
-          <h3 className="font-semibold text-lg dark:text-white leading-4">
-            {profile.firstName} {profile.lastName}
-          </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            @{profile.username} • {createdAt}
-          </p>
+        <div className="mt-0.5">
+          <ProfileMeta profile={profile} createdAt={formatCreatedAtDate(post.createdAt)} />
         </div>
       </div>
     </div>

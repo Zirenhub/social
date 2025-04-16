@@ -1,11 +1,13 @@
-'use client';
-import { useSearchParams } from 'next/navigation';
-import SearchResults from './SearchResults';
-import SearchInput from './SearchInput';
+"use client";
+
+import { useSearchParams } from "next/navigation";
+
+import SearchInput from "./SearchInput";
+import SearchResults from "./SearchResults";
 
 export default function Search() {
   const searchParams = useSearchParams();
-  const search = searchParams.get('query');
+  const search = searchParams.get("query");
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700">

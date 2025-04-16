@@ -1,12 +1,16 @@
-import type { Metadata } from 'next';
-import { ToastContainer } from 'react-toastify';
-import Providers from './providers';
-import getSession from '@/lib/getSession';
-import './globals.css';
+import type { Metadata } from "next";
+import { ToastContainer } from "react-toastify";
+
+import { auth } from "@/auth";
+import Providers from "./providers";
+
+import "./globals.css";
+
+import { headers } from "next/headers";
 
 export const metadata: Metadata = {
-  title: 'Social app',
-  description: 'Social media app',
+  title: "Social app",
+  description: "Social media app",
 };
 
 export default async function RootLayout({
@@ -14,14 +18,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const auth = await getSession();
-
+  const session = await auth();
   return (
     <html lang="en" suppressHydrationWarning>
       <body
       // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers session={auth}>
+        <Providers session={session}>
           {children}
           <ToastContainer />
         </Providers>

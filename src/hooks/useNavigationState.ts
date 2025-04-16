@@ -1,15 +1,12 @@
-// useNavigationState.ts
-import { GetUserType } from '@/types/auth';
-import { CUTOFF_LEVELS, NAVIGATION_CONFIG } from '@/types/constants';
-import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
-import { useDebounce } from 'use-debounce';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useDebounce } from "use-debounce";
 
-export default function useNavigationState(user: GetUserType) {
+import { CUTOFF_LEVELS, CutoffLevel, NAVIGATION_CONFIG } from "@/types/constants";
+import { GetProfileType } from "@/types/profile";
+
+export default function useNavigationState(profile: GetProfileType) {
   const isMounted = useRef(true);
-  const [state, setState] = useState({
-    isExpanded: false,
-    activeLevel: 'FULL' as keyof typeof CUTOFF_LEVELS,
-  });
+  const [state, setState] = useState({ isExpanded: false, activeLevel: "FULL" as CutoffLevel });
 
   useEffect(() => {
     return () => {
@@ -22,11 +19,12 @@ export default function useNavigationState(user: GetUserType) {
     () =>
       [
         NAVIGATION_CONFIG.HOME,
-        { ...NAVIGATION_CONFIG.PROFILE, href: `/profile/${user.profile.id}` },
+        { ...NAVIGATION_CONFIG.PROFILE, href: `/profile/${profile.id}` },
         NAVIGATION_CONFIG.ALERTS,
         NAVIGATION_CONFIG.CREATE,
+        NAVIGATION_CONFIG.SEARCH,
       ].sort((a, b) => a.priority - b.priority),
-    [user.profile.id]
+    [profile.id]
   );
 
   // Stable resize handler
@@ -34,20 +32,21 @@ export default function useNavigationState(user: GetUserType) {
     if (!isMounted.current) return;
 
     const height = window.innerHeight;
-    let newLevel: keyof typeof CUTOFF_LEVELS = 'FULL';
+    const width = window.innerWidth;
+    let newLevel: CutoffLevel = "FULL";
 
     switch (true) {
-      case height < CUTOFF_LEVELS.ULTRA_MINIMAL:
-        newLevel = 'ULTRA_MINIMAL';
+      case height < CUTOFF_LEVELS.HEIGHT.ULTRA_MINIMAL || width < CUTOFF_LEVELS.WIDTH.ULTRA_MINIMAL:
+        newLevel = "ULTRA_MINIMAL";
         break;
-      case height < CUTOFF_LEVELS.MINIMAL:
-        newLevel = 'MINIMAL';
+      case height < CUTOFF_LEVELS.HEIGHT.MINIMAL || width < CUTOFF_LEVELS.WIDTH.MINIMAL:
+        newLevel = "MINIMAL";
         break;
-      case height < CUTOFF_LEVELS.COMPACT:
-        newLevel = 'COMPACT';
+      case height < CUTOFF_LEVELS.HEIGHT.COMPACT || width < CUTOFF_LEVELS.WIDTH.COMPACT:
+        newLevel = "COMPACT";
         break;
-      case height < CUTOFF_LEVELS.REDUCED:
-        newLevel = 'REDUCED';
+      case height < CUTOFF_LEVELS.HEIGHT.REDUCED || width < CUTOFF_LEVELS.WIDTH.REDUCED:
+        newLevel = "REDUCED";
         break;
     }
 
@@ -60,45 +59,19 @@ export default function useNavigationState(user: GetUserType) {
 
   // Memoized items calculation
   const { visibleItems, hiddenItems } = useMemo(() => {
-    const maxPriority = {
-      ULTRA_MINIMAL: 1,
-      MINIMAL: 2,
-      COMPACT: 3,
-      REDUCED: 3,
-      FULL: Infinity,
-    }[state.activeLevel];
+    const maxPriority = { ULTRA_MINIMAL: 1, MINIMAL: 2, COMPACT: 3, REDUCED: 3, FULL: Infinity }[state.activeLevel];
 
     const visible = navItems.filter(
-      (item) =>
-        item.priority <= maxPriority &&
-        (state.activeLevel === 'FULL' || item.label !== 'Create')
+      (item) => item.priority <= maxPriority && (state.activeLevel === "FULL" || item.label !== "Create")
     );
 
-    return {
-      visibleItems: visible,
-      hiddenItems: navItems.filter((item) => !visible.includes(item)),
-    };
+    return { visibleItems: visible, hiddenItems: navItems.filter((item) => !visible.includes(item)) };
   }, [navItems, state.activeLevel]);
 
   // Safe state updates
   const toggleExpanded = useCallback(() => {
-    isMounted.current &&
-      setState((prev) => ({
-        ...prev,
-        isExpanded: !prev.isExpanded,
-      }));
+    isMounted.current && setState((prev) => ({ ...prev, isExpanded: !prev.isExpanded }));
   }, []);
 
-  const toggleIsMounted = () => {
-    isMounted.current = true;
-  };
-
-  return {
-    state,
-    visibleItems,
-    hiddenItems,
-    handleResize: debouncedResize,
-    toggleExpanded,
-    toggleIsMounted,
-  };
+  return { state, visibleItems, hiddenItems, handleResize: debouncedResize, toggleExpanded };
 }

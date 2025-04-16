@@ -1,16 +1,13 @@
-import { createComment } from '@/app/api/comments/actions';
-import { setFormErrors } from '@/helpers/setFormErrors';
-import {
-  CommentContent,
-  CommentContentZ,
-  MAX_COMMENT_CHARS,
-} from '@/types/comment';
-import { CACHE_TAGS } from '@/types/constants';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+
+import { createComment } from "@/app/api/comments/actions";
+import { setFormErrors } from "@/helpers/setFormErrors";
+import { CommentContent, CommentContentZ, MAX_COMMENT_CHARS } from "@/types/comment";
+import { CACHE_TAGS } from "@/types/constants";
 
 type Props = {
   postId: string;
@@ -20,8 +17,8 @@ export const useCreateComment = ({ postId }: Props) => {
   const queryClient = useQueryClient();
   const formMethods = useForm<CommentContentZ>({
     resolver: zodResolver(CommentContent),
-    defaultValues: { content: '' },
-    reValidateMode: 'onSubmit',
+    defaultValues: { content: "" },
+    reValidateMode: "onSubmit",
   });
 
   const {
@@ -32,7 +29,7 @@ export const useCreateComment = ({ postId }: Props) => {
     clearErrors,
   } = formMethods;
 
-  const content = watch('content');
+  const content = watch("content");
 
   const onSubmit: SubmitHandler<CommentContentZ> = async (formData) => {
     const result = await createComment({
@@ -43,7 +40,7 @@ export const useCreateComment = ({ postId }: Props) => {
       await queryClient.invalidateQueries({
         queryKey: [CACHE_TAGS.COMMENTS(postId)],
       });
-      formMethods.resetField('content', { keepDirty: true, defaultValue: '' });
+      formMethods.resetField("content", { keepDirty: true, defaultValue: "" });
     } else {
       // Display the general error message
       toast.error(result.error.message);
@@ -58,7 +55,7 @@ export const useCreateComment = ({ postId }: Props) => {
 
   useEffect(() => {
     if (errors.content && charCount > 0) {
-      clearErrors('content');
+      clearErrors("content");
     }
   }, [content, errors, clearErrors, charCount]);
 

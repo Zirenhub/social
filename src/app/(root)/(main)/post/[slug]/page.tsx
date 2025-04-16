@@ -1,10 +1,12 @@
-import { getPost } from '@/app/api/posts/fetching';
-import { PostWithCounts } from '@/types/post';
-import PostContainer from '@/components/post/PostContainer';
-import getSession from '@/lib/getSession';
-import CreateComment from '@/components/ui/CreateComment';
-import { getProfile } from '@/app/api/profile/fetching';
-import CommentFeed from '@/components/comment/CommentFeed';
+import { getPost } from "@/app/api/posts/fetching";
+import { getProfile } from "@/app/api/profile/fetching";
+import CommentFeed from "@/components/comment/CommentFeed";
+import PostContainer from "@/components/post/PostContainer";
+import CreateComment from "@/components/ui/CreateComment";
+import { SimpleHeader } from "@/components/ui/mobile/headers";
+import { HeaderSlot } from "@/components/ui/mobile/MobileHeader";
+import getSession from "@/lib/getSession";
+import { PostWithCounts } from "@/types/post";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -23,12 +25,10 @@ export default async function Post({ params }: Props) {
   });
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col md:gap-3">
+      <HeaderSlot content={<SimpleHeader title="Post" />} avatar={false} />
       <PostContainer post={post} />
-      <CreateComment
-        post={{ id: post.id, profile: { username: post.profile.username } }}
-        profile={profile}
-      />
+      <CreateComment post={{ id: post.id, profile: { username: post.profile.username } }} profile={profile} />
       <CommentFeed postId={post.id} />
     </div>
   );

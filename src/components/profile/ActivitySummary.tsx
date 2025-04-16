@@ -1,7 +1,8 @@
-import { formatCreatedAtDate } from '@/helpers/formatDate';
-import { ACTIVITY_THRESHOLDS } from '@/types/constants';
-import { ProfileActivity } from '@/types/profile';
-import { differenceInMinutes } from 'date-fns';
+import { differenceInMinutes } from "date-fns";
+
+import { formatCreatedAtDate } from "@/helpers/formatDate";
+import { ACTIVITY_THRESHOLDS } from "@/types/constants";
+import { ProfileActivity } from "@/types/profile";
 
 type Props = ProfileActivity;
 
@@ -12,9 +13,9 @@ export default function ActivitySummary({ _count, lastActive }: Props) {
     const minutesDifference = differenceInMinutes(now, lastActiveDate);
     // Show "Now" if within threshold
     if (minutesDifference <= ACTIVITY_THRESHOLDS.UPDATE_LAST_ACTIVE_MINUTES) {
-      return 'Now';
+      return "Now";
     } else {
-      return formatCreatedAtDate(lastActiveDate);
+      return formatCreatedAtDate(lastActiveDate, { hour: false });
     }
   }
 
@@ -23,21 +24,15 @@ export default function ActivitySummary({ _count, lastActive }: Props) {
       <h3 className="mb-4 container-title">Activity Summary</h3>
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            Last active
-          </span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">Last active</span>
           <span className="text-sm font-medium">{getLastActiveStatus()}</span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            Posts this month
-          </span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">Posts this month</span>
           <span className="text-sm font-medium">{_count.posts}</span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            Followers this month
-          </span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">Followers this month</span>
           <span className="text-sm font-medium">{_count.followers}</span>
         </div>
       </div>

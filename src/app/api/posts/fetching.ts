@@ -1,10 +1,11 @@
-import { prisma } from '@/lib/prisma';
-import { CACHE_TAGS, HomePagePostsFilter, PER_PAGE } from '@/types/constants';
-import { postQuery, PostWithCounts } from '@/types/post';
-import { errorResponse } from '../response';
-import { subDays } from 'date-fns';
-import { unstable_cacheTag as cacheTag } from 'next/cache';
-import { PaginatedData } from '@/types/api';
+import { unstable_cacheTag as cacheTag } from "next/cache";
+import { subDays } from "date-fns";
+
+import { prisma } from "@/lib/prisma";
+import { PaginatedData } from "@/types/api";
+import { CACHE_TAGS, HomePagePostsFilter, PER_PAGE } from "@/types/constants";
+import { postQuery, PostWithCounts } from "@/types/post";
+import { errorResponse } from "../response";
 
 // Constants for pagination
 
@@ -25,21 +26,21 @@ export const getHomePosts = async ({
   cursor,
 }: GetHomePostsOptions): Promise<PaginatedData<PostWithCounts>> => {
   try {
-    if (filter === 'forYou') {
+    if (filter === "forYou") {
       return await getForYouPosts({ profileId: userProfileId, cursor });
     }
 
-    if (filter === 'following') {
+    if (filter === "following") {
       return await getFollowingPosts({ profileId: userProfileId, cursor });
     }
 
-    if (filter === 'trending') {
+    if (filter === "trending") {
       return await getTrendingPosts({ profileId: userProfileId, cursor });
     }
 
-    throw new Error('Invalid filter type');
+    throw new Error("Invalid filter type");
   } catch (error) {
-    const err = errorResponse(error, 'Failed getting home page posts.');
+    const err = errorResponse(error, "Failed getting home page posts.");
     throw new Error(err.error.message);
   }
 };
@@ -47,7 +48,7 @@ export const getHomePosts = async ({
 async function getForYouPosts({ profileId, cursor }: filterProps) {
   const posts = await prisma.post.findMany({
     ...postQuery({ userProfileId: profileId }),
-    orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+    orderBy: [{ createdAt: "desc" }, { id: "asc" }],
     take: PER_PAGE + 1,
     ...(cursor && {
       skip: 1,
@@ -79,7 +80,7 @@ async function getFollowingPosts({ profileId, cursor }: filterProps) {
   const posts = await prisma.post.findMany({
     ...postQuery({ userProfileId: profileId }),
     where: { profileId: { in: followingIds } },
-    orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+    orderBy: [{ createdAt: "desc" }, { id: "asc" }],
     take: PER_PAGE + 1,
     ...(cursor && {
       skip: 1,
@@ -105,7 +106,7 @@ async function getTrendingPosts({ profileId, cursor }: filterProps) {
       createdAt: { gte: yesterday },
       likes: { some: {} },
     },
-    orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+    orderBy: [{ createdAt: "desc" }, { id: "asc" }],
     take: PER_PAGE + 1,
     ...(cursor && {
       skip: 1,
@@ -122,14 +123,8 @@ async function getTrendingPosts({ profileId, cursor }: filterProps) {
   };
 }
 
-export async function getPost({
-  postId,
-  userProfileId,
-}: {
-  postId: string;
-  userProfileId: string;
-}) {
-  'use cache';
+export async function getPost({ postId, userProfileId }: { postId: string; userProfileId: string }) {
+  "use cache";
   cacheTag(CACHE_TAGS.POST(postId));
   try {
     const post = await prisma.post.findUniqueOrThrow({
@@ -138,7 +133,7 @@ export async function getPost({
     });
     return post;
   } catch (error) {
-    const err = errorResponse(error, 'Failed getting post.');
+    const err = errorResponse(error, "Failed getting post.");
     throw new Error(err.error.message);
   }
 }

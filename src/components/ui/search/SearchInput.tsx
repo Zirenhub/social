@@ -1,8 +1,9 @@
-'use client';
-import { SearchIcon } from 'lucide-react';
-import { usePathname, useSearchParams, useRouter } from 'next/navigation';
-import { useDebouncedCallback } from 'use-debounce';
-import { useState } from 'react';
+"use client";
+
+import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { SearchIcon } from "lucide-react";
+import { useDebouncedCallback } from "use-debounce";
 
 export default function SearchInput() {
   const searchParams = useSearchParams();
@@ -13,9 +14,9 @@ export default function SearchInput() {
   const handleSearch = useDebouncedCallback((term) => {
     const params = new URLSearchParams(searchParams);
     if (term) {
-      params.set('query', term);
+      params.set("query", term);
     } else {
-      params.delete('query');
+      params.delete("query");
     }
     replace(`${pathname}?${params.toString()}`, { scroll: false });
   }, 300);
@@ -23,7 +24,7 @@ export default function SearchInput() {
   return (
     <div className="relative group">
       <div
-        className={`absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-xl opacity-20 transition-opacity duration-300 ${isFocused ? 'opacity-30' : 'opacity-10'}`}
+        className={`absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-xl opacity-20 transition-opacity duration-300 ${isFocused ? "opacity-30" : "opacity-10"}`}
       ></div>
       <div className="absolute inset-0 bg-white dark:bg-gray-900 rounded-xl m-[1px]"></div>
 
@@ -38,11 +39,11 @@ export default function SearchInput() {
           type="text"
           placeholder="Search..."
           className="w-full pl-12 pr-4 py-3 bg-transparent focus:outline-none text-gray-700 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
-          defaultValue={searchParams.get('query')?.toString()}
+          defaultValue={searchParams.get("query")?.toString()}
         />
 
         <div
-          className={`w-6 h-6 absolute left-4 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${isFocused ? 'text-cyan-500 dark:text-cyan-500' : 'text-gray-400 dark:text-gray-500'}`}
+          className={`w-6 h-6 absolute left-4 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${isFocused ? "text-cyan-500 dark:text-cyan-500" : "text-gray-400 dark:text-gray-500"}`}
         >
           <SearchIcon strokeWidth={2} />
         </div>

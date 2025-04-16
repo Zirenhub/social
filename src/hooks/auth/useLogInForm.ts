@@ -1,11 +1,13 @@
-import { login } from '@/app/api/auth/actions';
-import { setFormErrors } from '@/helpers/setFormErrors';
-import { LogInZ, LogInContent } from '@/types/auth';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { getSession } from "next-auth/react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+
+import { login } from "@/app/api/auth/actions";
+import { setFormErrors } from "@/helpers/setFormErrors";
+import { LogInContent, LogInZ } from "@/types/auth";
 
 export const useLogInForm = () => {
   const router = useRouter();
@@ -29,7 +31,9 @@ export const useLogInForm = () => {
     const result = await login(formData);
 
     if (result.success) {
-      router.replace('/home');
+      // add to signup
+      await getSession();
+      router.refresh();
     } else {
       setIsSubmitting(false);
       // Display the general error message
