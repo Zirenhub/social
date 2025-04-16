@@ -40,8 +40,8 @@ export default async function Profile({ params, searchParams }: Props) {
       <div className="max-w-5xl mx-auto -mt-24">
         <div className="md:flex gap-3 relative">
           <div className="relative flex flex-col sm:gap-3 w-full">
-            <div className="bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 sm:rounded-b-md md:rounded-lg flex flex-grow p-2 gap-3">
-              <div className="flex flex-col flex-grow">
+            <div className="bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 sm:rounded-b-md md:rounded-lg flex w-full p-2 gap-3">
+              <div className="flex flex-col w-full">
                 <ProfilePictureSection profile={profileResult} />
                 <div className="mt-1 text-sm sm:text-base">
                   <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[var(--color-cyan-500)] to-[var(--color-blue-500)] bg-clip-text text-transparent leading-none whitespace-nowrap">
