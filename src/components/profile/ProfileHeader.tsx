@@ -40,7 +40,7 @@ type Props = { isCurrentUser: boolean };
 
 export default function ProfileHeader({ isCurrentUser }: Props) {
   return (
-    <div className="relative h-56 sm:h-64 md:h-72 overflow-hidden">
+    <div className="relative h-56 sm:h-64 md:h-72 overflow-hidden md:rounded-b-lg">
       <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-blue-500)] via-[var(--color-purple-500)] to-[var(--color-cyan-500)]" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
 
