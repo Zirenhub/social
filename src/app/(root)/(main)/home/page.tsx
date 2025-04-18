@@ -32,9 +32,7 @@ export default async function Home({ searchParams }: Props) {
         <h1 className="container-title text-2xl tracking-tight ">Share your thoughts!</h1>
         <CreatePost />
       </div>
-      <div className="hidden md:block">
-        <Filter currentFilter={currentFilter} filters={homeFilters} />
-      </div>
+      <Filter currentFilter={currentFilter} filters={homeFilters} className="hidden md:flex" />
       <div className="hidden md:block md:my-4" />
       <Feed endpoint="/api/posts" showCreatePost={currentFilter === "forYou"} filter={currentFilter} />
     </>

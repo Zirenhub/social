@@ -70,3 +70,20 @@ export async function likeComment(commentId: string) {
     return errorResponse(error, "Something went wrong liking post.");
   }
 }
+
+export async function deleteComment({ id }: { id: string }) {
+  try {
+    const comment = await prisma.comment.findUniqueOrThrow({ where: { id } });
+    const session = await getSession();
+
+    if (comment.profileId !== session.user.profile) {
+      throw new Error("Unauthorized to delete this comment.");
+    }
+
+    const deletedComment = await prisma.comment.delete({ where: { id } });
+
+    return successResponse(deletedComment);
+  } catch (error) {
+    return errorResponse(error, "Something went wrong liking post.");
+  }
+}

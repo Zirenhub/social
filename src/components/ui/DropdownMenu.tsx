@@ -72,7 +72,7 @@ export function DropdownMenuItem({
         e.stopPropagation();
         onClick();
       }}
-      className={`cursor-pointer flex items-center w-full px-4 py-2 text-sm text-left transition-colors text-[var(--color-dark-500)]/80 dark:text-white/80 hover:bg-[var(--color-magenta-500)]/10 hover:text-[var(--color-magenta-500)] ${className ? className : ""}`}
+      className={`cursor-pointer whitespace-nowrap flex items-center w-full px-4 py-2 text-sm text-left transition-colors text-[var(--color-dark-500)]/80 dark:text-white/80 hover:bg-[var(--color-magenta-500)]/10 hover:text-[var(--color-magenta-500)] ${className ? className : ""}`}
     >
       {children}
     </button>
