@@ -10,10 +10,14 @@ export default function useSyncScroll(ref: React.RefObject<HTMLDivElement | null
 
     let lastScrollTop = mainContent.scrollTop;
 
+    const isSidebarScrollable = () => sidebar.scrollHeight > sidebar.clientHeight;
+
     const handleScroll = () => {
       const currentScrollTop = mainContent.scrollTop;
       const delta = currentScrollTop - lastScrollTop;
       lastScrollTop = currentScrollTop;
+
+      if (!isSidebarScrollable()) return;
 
       requestAnimationFrame(() => {
         const newScrollTop = Math.max(
