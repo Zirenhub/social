@@ -1,5 +1,6 @@
 "use client";
 
+import clsx from "clsx";
 import { GridIcon, HeartIcon, Repeat2Icon } from "lucide-react";
 
 import getFilterUrl from "@/helpers/getFilterUrl";
@@ -8,15 +9,20 @@ import LinkUI from "./LinkUI";
 
 const iconMap = { posts: GridIcon, liked: HeartIcon, reposts: Repeat2Icon };
 
-type Props = { currentFilter: string; filters: Filters<string>[] };
+type Props = { currentFilter: string; filters: Filters<string>[]; className?: string };
 
-export default function Filter({ currentFilter, filters }: Props) {
+export default function Filter({ currentFilter, filters, className }: Props) {
   const filterHash = filters.map((filter) => filter.url).toString();
 
   return (
     <>
       <div id={filterHash} />
-      <div className="sticky top-0 z-20 flex bg-white dark:bg-gray-800 sm:rounded-t-xl sm:shadow-sm sm:border border-gray-200 dark:border-gray-700">
+      <div
+        className={clsx(
+          "sticky top-0 z-20 flex bg-white dark:bg-gray-800 sm:rounded-t-xl sm:shadow-sm sm:border border-gray-200 dark:border-gray-700",
+          className && className
+        )}
+      >
         {filters.map((filter) => {
           const Icon = iconMap[filter.url as keyof typeof iconMap] || null;
           const isActive = currentFilter === filter.url;
