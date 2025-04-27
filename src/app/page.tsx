@@ -50,8 +50,9 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTheme } from "next-themes";
 
 import LogIn from "@/components/auth/LogIn";
 import SignUp from "@/components/auth/SignUp";
@@ -60,13 +61,18 @@ import Loading from "./loading";
 export default function Auth() {
   const [authPage, setAuthPage] = useState<"signup" | "login">("signup");
   const [isLoading, setIsLoading] = useState(false);
+  const { setTheme } = useTheme();
 
   const handleLoading = (loading: boolean) => {
     setIsLoading(loading);
   };
 
+  useEffect(() => {
+    setTheme("light");
+  }, []);
+
   return (
-    <>
+    <div className="flex w-full min-h-full sm:justify-center">
       {isLoading && (
         <div className="absolute top-0 left-0 h-full w-full z-10 bg-white">
           <Loading />
@@ -79,7 +85,7 @@ export default function Auth() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -50 }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="bg-white/50 backdrop-blur-md rounded-lg shadow-lg p-2 flex flex-col w-full"
+          className="bg-white/50 backdrop-blur-md rounded-lg shadow-lg p-2 flex flex-col w-full sm:w-[400px]"
         >
           {authPage === "signup" ? <SignUp setLoading={handleLoading} /> : <LogIn setLoading={handleLoading} />}
           <motion.button
@@ -92,6 +98,6 @@ export default function Auth() {
           </motion.button>
         </motion.div>
       </AnimatePresence>
-    </>
+    </div>
   );
 }
