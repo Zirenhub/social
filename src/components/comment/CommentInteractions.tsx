@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { CommentLike } from "@prisma/client";
 import { Heart, MessageSquare, Share2 } from "lucide-react";
 
@@ -14,6 +15,7 @@ type Props = {
 };
 
 export default function CommentInteractions({ comment, queryKey }: Props) {
+  const router = useRouter();
   const { handleLike, isLiked, likeCount, isPending } = useLikeToggle<CommentWithCounts, CommentLike>({
     itemId: comment.id,
     initialIsLiked: comment.likes.length > 0,
@@ -31,7 +33,7 @@ export default function CommentInteractions({ comment, queryKey }: Props) {
   });
 
   const handleReply = () => {
-    // Placeholder for reply action
+    router.push(`/create/reply/${comment.id}`);
   };
 
   return (

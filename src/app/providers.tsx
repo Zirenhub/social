@@ -28,9 +28,9 @@ export default function Providers({ children, session }: ProviderProps) {
     <SessionProvider session={session}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <QueryClientProvider client={queryClient}>
-          <IsMobileProvider>
-            <ModalProvider>{children}</ModalProvider>
-          </IsMobileProvider>
+          <ModalProvider>
+            <IsMobileProvider>{children}</IsMobileProvider>
+          </ModalProvider>
         </QueryClientProvider>
       </ThemeProvider>
     </SessionProvider>

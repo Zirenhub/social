@@ -1,17 +1,28 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
 import CreatePost from "@/components/ui/CreatePost";
+import CreateReply from "@/components/ui/CreateReply";
 import { useModal } from "@/context/ModalProvider";
 import useProfile from "@/hooks/profile/useProfile";
 
 export default function Page() {
+  const [isReplyingTo, setIsReplyingTo] = useState<string | null>(null);
   const router = useRouter();
+  const params = useParams();
   const { data: session, status } = useSession();
   const { openModal, closeModal } = useModal();
+
+  useEffect(() => {
+    if (params?.slug) {
+      if (params.slug[0] === "reply" && typeof params.slug[1] === "string") {
+        setIsReplyingTo(params.slug[1]);
+      }
+    }
+  }, [params]);
 
   const profileId = session?.user.profile ?? "";
   const shouldFetchProfile = status === "authenticated" && !!profileId;
@@ -38,13 +49,19 @@ export default function Page() {
     }
 
     if (profile) {
-      openModal(<CreatePost onSuccess={closeModal} />, {
-        title: "Create a post",
-        profile,
-        onClose: goBack,
-      });
+      if (!isReplyingTo) {
+        openModal(<CreatePost onSuccess={closeModal} />, {
+          title: "Create a post",
+          profile,
+          onClose: goBack,
+        });
+        return;
+      } else {
+        // maybe just do this inside comment interactions ?
+        openModal(<CreateReply commentId={isReplyingTo} />, { profile, title: "Create a reply.", onClose: goBack });
+      }
     }
-  }, [status, session, isLoading, error, profile, openModal, closeModal, goBack]);
+  }, [isReplyingTo, status, session, isLoading, error, profile, openModal, closeModal, goBack]);
 
   return null;
 }
