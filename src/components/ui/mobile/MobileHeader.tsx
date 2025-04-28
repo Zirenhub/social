@@ -108,8 +108,9 @@ function MobileHeaderComponent({ profile }: MobileHeaderProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               className="fixed inset-0 z-[60] bg-black/20 dark:bg-white/10"
+              style={{ willChange: "opacity" }}
             />
           </>
         )}
@@ -118,16 +119,17 @@ function MobileHeaderComponent({ profile }: MobileHeaderProps) {
       <motion.header
         ref={headerRef}
         initial={false}
-        animate={{ y: showHeader ? 0 : -100 }} // changed height to 100
-        transition={{ duration: 0.3, ease: "easeInOut" }}
+        animate={{ y: showHeader ? 0 : -100 }}
+        transition={{ duration: 0.25, ease: "easeOut" }}
         className={clsx(
           "fixed top-0 left-0 right-0 z-50",
           "flex flex-col",
-          "transition-all duration-300 backdrop-blur-xl",
+          "transition-transform duration-300", //  backdrop-blur-xl
           "border-b border-gray-200/80 dark:border-gray-800",
           "bg-white/80 dark:bg-gray-800 shadow-sm",
           "p-2 w-full"
         )}
+        style={{ willChange: "transform" }}
       >
         {header.avatar && (
           <div onClick={openSidebar}>
