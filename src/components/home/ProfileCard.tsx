@@ -35,8 +35,8 @@ export default async function ProfileCard() {
 
       {/* Profile Info Section */}
       <div className="mt-8 flex flex-col items-center">
-        <h2 className="text-xl font-semibold text-center">{`${firstName} ${lastName}`}</h2>
-        <p className="text-gray-600 dark:text-white/60">@{username}</p>
+        <h2 className="text-lg font-medium text-center">{`${firstName} ${lastName}`}</h2>
+        <p className="text-sm text-gray-600 dark:text-white/60">@{username}</p>
         <p className="mt-2 text-gray-700 dark:text-white/80 text-center">{bio}</p>
       </div>
 

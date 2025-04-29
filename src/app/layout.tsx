@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 
 import { auth } from "@/auth";
@@ -6,7 +7,10 @@ import Providers from "./providers";
 
 import "./globals.css";
 
-import { headers } from "next/headers";
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Social app",
@@ -20,10 +24,8 @@ export default async function RootLayout({
 }>) {
   const session = await auth();
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-      // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="en" suppressHydrationWarning className={inter.className}>
+      <body>
         <Providers session={session}>
           {children}
           <ToastContainer />

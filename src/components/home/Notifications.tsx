@@ -86,7 +86,7 @@ export default function Notifications() {
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="text-lg font-['bold'] text-gray-900 dark:text-white truncate">{notification.user}</p>
+              <p className="text-lg font-medium text-gray-900 dark:text-white truncate">{notification.user}</p>
               <p className="text-sm text-gray-600 dark:text-gray-300">{notification.content}</p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{notification.time}</p>
             </div>

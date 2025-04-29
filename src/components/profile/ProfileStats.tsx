@@ -10,8 +10,8 @@ export default function ProfileStats({ postsCount, followersCount, followingCoun
   return (
     <div className="flex gap-8">
       {counts.map(({ count, label }) => (
-        <div key={label} className="text-center flex flex-col items-center text-xs sm:text-base">
-          <div className="font-semibold text-[var(--color-dark-500)] dark:text-white">{count}</div>
+        <div key={label} className="text-center flex flex-col items-center text-xs sm:text-sm">
+          <div className="font-medium text-[var(--color-dark-500)]/80 dark:text-white">{count}</div>
           <div className="text-[var(--color-dark-500)]/60 dark:text-white/60">{label}</div>
         </div>
       ))}

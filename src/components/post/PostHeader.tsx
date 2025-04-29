@@ -1,11 +1,11 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { useDebouncedCallback } from "use-debounce";
 
 import { formatCreatedAtDate } from "@/helpers/formatDate";
+import useHover from "@/hooks/generic/useHover";
 import useProfile from "@/hooks/profile/useProfile";
 import { SimpleProfile } from "@/types/post";
 import Avatar from "../ui/Avatar";
@@ -17,20 +17,11 @@ type Props = { profile: SimpleProfile & { id: string }; post: { createdAt: Date 
 
 export default function PostHeader({ profile, post }: Props) {
   const router = useRouter();
-  const [hover, setHover] = useState<boolean>(false);
+  const { hover, showHover, hideHover } = useHover();
   const { profile: data, error, isLoading } = useProfile(profile.id, hover);
 
   const handleNavigateToProfile = () => {
     router.push(`/profile/${profile.id}`);
-  };
-
-  const debouncedShowHover = useDebouncedCallback(() => {
-    setHover(true);
-  }, 300);
-
-  const hideHover = () => {
-    debouncedShowHover.cancel();
-    setHover(false);
   };
 
   if (error) return <div>Error: {error.message}</div>;
@@ -42,7 +33,7 @@ export default function PostHeader({ profile, post }: Props) {
           e.stopPropagation();
           handleNavigateToProfile();
         }}
-        onMouseEnter={debouncedShowHover}
+        onMouseEnter={showHover}
         onMouseLeave={hideHover}
         className="flex cursor-pointer gap-2 items-start"
       >
@@ -63,7 +54,7 @@ export default function PostHeader({ profile, post }: Props) {
           </Suspense>
         )}
 
-        <div className="mt-0.5">
+        <div>
           <ProfileMeta profile={profile} createdAt={formatCreatedAtDate(post.createdAt)} />
         </div>
       </div>

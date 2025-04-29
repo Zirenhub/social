@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+/* 
 @font-face {
   font-family: "regular";
   font-weight: 400;
@@ -16,15 +16,20 @@
   font-family: "thin";
   font-weight: 100;
   src: url("../../public/fonts/thin.otf") format("opentype");
-}
+} */
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-sans: var(--font-inter);
 }
 
-body {
+/* body {
   font-family: "regular", sans-serif;
+} */
+
+html {
+  font-family: var(--font-sans), system-ui, sans-serif;
 }
 
 @layer base {
@@ -80,7 +85,7 @@ body {
   }
 
   .container-title {
-    @apply text-lg font-['bold'] bg-gradient-to-r from-[var(--color-cyan-500)] to-[var(--color-blue-500)] bg-clip-text text-transparent;
+    @apply text-lg font-bold bg-gradient-to-r from-[var(--color-cyan-500)] to-[var(--color-blue-500)] bg-clip-text text-transparent;
   }
 
   .top-seperator {

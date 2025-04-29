@@ -9,8 +9,9 @@ type Props = {
 };
 
 export default function MainLayout({ children }: Props) {
+  /* md:pr-[72px]  on main div */
   return (
-    <div className="md:flex md:items-start md:text-lg md:justify-between md:mx-14 md:pr-[72px]">
+    <div className="md:flex md:items-start md:text-lg md:justify-between md:mx-14">
       {/* Left Sidebar */}
       <aside className="hidden lg:flex flex-col gap-4 h-[calc(100vh-2rem)] top-4 sticky flex-shrink-0 justify-center">
         <ProfileCard />
