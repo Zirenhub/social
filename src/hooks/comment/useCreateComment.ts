@@ -11,9 +11,10 @@ import { CACHE_TAGS } from "@/types/constants";
 
 type Props = {
   postId: string;
+  parentId?: string;
 };
 
-export const useCreateComment = ({ postId }: Props) => {
+export const useCreateComment = ({ postId, parentId }: Props) => {
   const queryClient = useQueryClient();
   const formMethods = useForm<CommentContentZ>({
     resolver: zodResolver(CommentContent),
@@ -35,6 +36,7 @@ export const useCreateComment = ({ postId }: Props) => {
     const result = await createComment({
       content: formData.content,
       postId,
+      parentId,
     });
     if (result.success) {
       await queryClient.invalidateQueries({
@@ -66,6 +68,7 @@ export const useCreateComment = ({ postId }: Props) => {
     formErrors: errors,
     register,
     isSubmitting: formMethods.formState.isSubmitting,
+    isSuccess: formMethods.formState.isSubmitSuccessful,
     charProps: { charCount, maxChars: MAX_COMMENT_CHARS },
   };
 };

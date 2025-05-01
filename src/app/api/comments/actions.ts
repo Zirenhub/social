@@ -9,7 +9,15 @@ import { CACHE_TAGS } from "@/types/constants";
 import { updateLastActive } from "../auth/actions";
 import successResponse, { errorResponse } from "../response";
 
-export async function createComment({ content, postId }: { content: string; postId: string }) {
+export async function createComment({
+  content,
+  postId,
+  parentId,
+}: {
+  content: string;
+  postId: string;
+  parentId?: string;
+}) {
   try {
     const session = await getSession();
     const parsed = CommentContent.parse({ content });
@@ -18,6 +26,7 @@ export async function createComment({ content, postId }: { content: string; post
         content: parsed.content,
         profileId: session.user.profile,
         postId,
+        parentId,
       },
     });
 
