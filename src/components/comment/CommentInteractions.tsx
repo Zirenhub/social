@@ -1,13 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { CommentLike } from "@prisma/client";
 import { Heart, MessageSquare, Share2 } from "lucide-react";
 
 import { likeComment } from "@/app/api/comments/actions";
+import { useModal } from "@/context/ModalProvider";
 import { useLikeToggle } from "@/hooks/generic/useLike";
 import { CommentWithCounts } from "@/types/comment";
-import { CACHE_TAGS } from "@/types/constants";
+import CreateReply from "../ui/modal/CreateReply";
 
 type Props = {
   comment: CommentWithCounts;
@@ -15,7 +15,7 @@ type Props = {
 };
 
 export default function CommentInteractions({ comment, queryKey }: Props) {
-  const router = useRouter();
+  const { openModal } = useModal();
   const { handleLike, isLiked, likeCount, isPending } = useLikeToggle<CommentWithCounts, CommentLike>({
     itemId: comment.id,
     initialIsLiked: comment.likes.length > 0,
@@ -33,7 +33,7 @@ export default function CommentInteractions({ comment, queryKey }: Props) {
   });
 
   const handleReply = () => {
-    router.push(`/create/reply/${comment.id}`);
+    openModal(<CreateReply content={comment} />, { title: "Reply" });
   };
 
   return (
