@@ -26,7 +26,7 @@ const postWithCountsArgs = (userProfileId: string) =>
           avatarUrl: true,
         },
       } as const,
-      _count: { select: { likes: true, comments: true } } as const,
+      _count: { select: { likes: true, comments: { where: { parentId: null } } } } as const,
       likes: {
         where: {
           profileId: userProfileId,
