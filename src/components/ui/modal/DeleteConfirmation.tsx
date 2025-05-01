@@ -1,18 +1,13 @@
-import LoaderPlaceholder from "../ui/LoaderPlaceholder";
+import LoaderPlaceholder from "../LoaderPlaceholder";
 
-type DeleteConfirmationModalProps = {
+type DeleteConfirmationProps = {
   contentType: string;
   isPending: boolean;
   onCancel: () => void;
   onDelete: () => void;
 };
 
-export default function DeleteConfirmationModal({
-  contentType,
-  isPending,
-  onCancel,
-  onDelete,
-}: DeleteConfirmationModalProps) {
+export default function DeleteConfirmation({ contentType, isPending, onCancel, onDelete }: DeleteConfirmationProps) {
   return (
     <>
       <p className="mb-6 text-[var(--color-dark-500)]/70 dark:text-white/70">

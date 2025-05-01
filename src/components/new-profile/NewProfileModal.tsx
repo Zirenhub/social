@@ -162,7 +162,7 @@ export default function NewProfileModal({ profile }: Props) {
             disabled={
               formMethods.formState.isSubmitting || charProps.charCount > charProps.maxChars || charProps.charCount <= 0
             }
-            className="primary-button"
+            className="primary-button py-2 px-1"
           >
             {formMethods.formState.isSubmitting ? "Saving..." : "Save Profile"}
           </button>

@@ -6,7 +6,7 @@ import { useModal } from "@/context/ModalProvider";
 import useDelete from "@/hooks/comment/useDelete";
 import { CommentWithCounts } from "@/types/comment";
 import BaseOptionsDropdown from "../ui/BaseOptionsDropdown";
-import DeleteConfirmationModal from "../ui/DeleteConfirmationModal";
+import DeleteConfirmation from "../ui/modal/DeleteConfirmation";
 
 type CommentsOptionsProps = { comment: CommentWithCounts; postId: string };
 
@@ -23,7 +23,7 @@ export default function CommentOptions({ comment, postId }: CommentsOptionsProps
 
   const handleOpenDeleteModal = () => {
     openModal(
-      <DeleteConfirmationModal
+      <DeleteConfirmation
         contentType="comment"
         isPending={isPending}
         onCancel={closeModal}

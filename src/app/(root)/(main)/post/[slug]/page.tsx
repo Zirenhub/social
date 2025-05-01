@@ -28,7 +28,7 @@ export default async function Post({ params }: Props) {
     <div className="flex flex-col md:gap-3">
       <HeaderSlot content={<SimpleHeader title="Post" />} avatar={false} />
       <PostContainer post={post} />
-      <CreateComment post={{ id: post.id, profile: { username: post.profile.username } }} profile={profile} />
+      <CreateComment post={post} profile={profile} />
       <CommentFeed postId={post.id} />
     </div>
   );

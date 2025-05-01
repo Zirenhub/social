@@ -76,7 +76,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
                       <h3 className="text-lg font-semibold text-zinc-800 dark:text-white">{options.title}</h3>
                     )}
                   </div>
-                  <button onClick={closeModal} className="text-zinc-500 hover:text-pink-500">
+                  <button onClick={closeModal} className="text-zinc-500 hover:text-pink-500 cursor-pointer">
                     <X size={20} />
                   </button>
                 </div>

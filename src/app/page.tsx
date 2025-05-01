@@ -41,7 +41,7 @@ export default function Auth() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -50 }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="bg-white/50 backdrop-blur-md rounded-lg shadow-lg p-2 flex flex-col w-full sm:w-[400px]"
+          className="bg-white/50 p-2 flex flex-col w-full sm:w-[400px]"
         >
           {authPage === "signup" ? <SignUp setLoading={handleLoading} /> : <LogIn setLoading={handleLoading} />}
 
