@@ -6,7 +6,6 @@ import CreateComment from "@/components/ui/CreateComment";
 import { SimpleHeader } from "@/components/ui/mobile/headers";
 import { HeaderSlot } from "@/components/ui/mobile/MobileHeader";
 import getSession from "@/lib/getSession";
-import { PostWithCounts } from "@/types/post";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -15,7 +14,7 @@ type Props = {
 export default async function Post({ params }: Props) {
   const { slug } = await params;
   const auth = await getSession();
-  const post: PostWithCounts = await getPost({
+  const post = await getPost({
     postId: slug,
     userProfileId: auth.user.profile,
   });

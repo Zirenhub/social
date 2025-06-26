@@ -3,23 +3,24 @@
 import { Send } from "lucide-react";
 
 import { useCreateComment } from "@/hooks/comment/useCreateComment";
+import { CommentWithCounts } from "@/types/comment";
+import { PostWithCounts } from "@/types/post";
 import { GetProfileType } from "@/types/profile";
 import Avatar from "./Avatar";
 import LoaderPlaceholder from "./LoaderPlaceholder";
 import Textarea from "./Textarea";
 
 type Props = {
-  post: {
-    id: string;
-    profile: {
-      username: string;
-    };
-  };
+  post: PostWithCounts;
+  comment?: CommentWithCounts;
   profile: GetProfileType;
 };
 
-export default function CreateComment({ post, profile }: Props) {
-  const { submit, formErrors, register, isSubmitting, charProps } = useCreateComment({ postId: post.id });
+export default function CreateComment({ post, comment, profile }: Props) {
+  const { submit, formErrors, register, isSubmitting, charProps } = useCreateComment({
+    postId: post.id,
+    comment,
+  });
 
   return (
     <form
@@ -27,7 +28,10 @@ export default function CreateComment({ post, profile }: Props) {
       className="flex flex-col bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 text-xs md:text-sm md:rounded-lg md:shadow-sm"
     >
       <p className="leading-none text-gray-400 text-sm">
-        Replying to <span className="text-[var(--color-cyan-500)]">@{post.profile.username}</span>
+        Replying to{" "}
+        <span className="text-[var(--color-cyan-500)]">
+          @{comment ? comment.profile.username : post.profile.username}
+        </span>
       </p>
       <div className="flex justify-between w-full gap-3 mt-2">
         <Avatar profile={profile} className="h-7 w-7" />

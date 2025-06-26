@@ -6,13 +6,15 @@ import { useModal } from "@/context/ModalProvider";
 import useDelete from "@/hooks/post/useDelete";
 import { PostWithCounts } from "@/types/post";
 import BaseOptionsDropdown from "../ui/BaseOptionsDropdown";
-import DeleteConfirmationModal from "../ui/DeleteConfirmationModal";
+import DeleteConfirmation from "../ui/modal/DeleteConfirmation";
 
 type PostOptionsProps = { post: PostWithCounts };
 
 export default function PostOptions({ post }: PostOptionsProps) {
   const session = useSession();
+
   const { openModal, closeModal } = useModal();
+
   const isOwner = (session.data?.user.profile ?? "") === post.profileId;
 
   const { isPending, handleDeletePost } = useDelete({
@@ -20,14 +22,13 @@ export default function PostOptions({ post }: PostOptionsProps) {
     onSuccess: closeModal,
   });
 
+  if (session.status === "loading") {
+    return <p>Loading...</p>;
+  }
+
   const handleOpenDeleteModal = () => {
     openModal(
-      <DeleteConfirmationModal
-        contentType="post"
-        isPending={isPending}
-        onCancel={closeModal}
-        onDelete={handleDeletePost}
-      />,
+      <DeleteConfirmation contentType="post" isPending={isPending} onCancel={closeModal} onDelete={handleDeletePost} />,
       { title: "Are you sure you want to delete this post?" }
     );
   };

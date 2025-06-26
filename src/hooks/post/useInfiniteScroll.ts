@@ -7,16 +7,20 @@ import { useDebounce } from "use-debounce";
 
 import { fetcher } from "@/lib/fetcher";
 import { PaginatedData } from "@/types/api";
+import { CommentWithCounts } from "@/types/comment";
 
-type UseInfiniteScrollOptions = { endpoint: string; filter: string; queryKey: string[] };
+type UseInfiniteScrollOptions = { endpoint: string; filter: string; queryKey: string[]; comment?: CommentWithCounts };
 
-export default function useInfiniteScroll<T>({ endpoint, filter, queryKey }: UseInfiniteScrollOptions) {
+export default function useInfiniteScroll<T>({ endpoint, filter, queryKey, comment }: UseInfiniteScrollOptions) {
   const { data, error, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, refetch, isError } =
     useInfiniteQuery<PaginatedData<T>, Error, { pages: PaginatedData<T>[] }, string[], string | null>({
       queryKey,
       queryFn: async ({ pageParam }) => {
         const params = new URLSearchParams();
         params.append("filter", filter);
+        if (comment) {
+          params.append("parentId", comment.id);
+        }
         if (pageParam) params.append("cursor", pageParam);
 
         return await fetcher(`${endpoint}?${params.toString()}`);

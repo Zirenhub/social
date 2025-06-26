@@ -11,9 +11,10 @@ import CommentContainer from "./CommentContainer";
 
 type Props = {
   postId: string;
+  comment?: CommentWithCounts;
 };
 
-export default function CommentFeed({ postId }: Props) {
+export default function CommentFeed({ postId, comment }: Props) {
   const [filter, setFilter] = useState<CommentsFilter>("newest");
 
   const queryKey = [CACHE_TAGS.COMMENTS(postId), filter];
@@ -22,11 +23,12 @@ export default function CommentFeed({ postId }: Props) {
     endpoint: `/api/comments/${postId}`,
     filter,
     queryKey,
+    comment,
   });
 
   return (
     <div className="p-2">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-4 dark:border-gray-800">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b mb-4 border-gray-100 pb-4 dark:border-gray-800">
         <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-1 dark:bg-gray-800">
           <button
             onClick={() => setFilter("newest")}

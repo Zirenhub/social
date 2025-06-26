@@ -123,7 +123,13 @@ async function getTrendingPosts({ profileId, cursor }: filterProps) {
   };
 }
 
-export async function getPost({ postId, userProfileId }: { postId: string; userProfileId: string }) {
+export async function getPost({
+  postId,
+  userProfileId,
+}: {
+  postId: string;
+  userProfileId: string;
+}): Promise<PostWithCounts> {
   "use cache";
   cacheTag(CACHE_TAGS.POST(postId));
   try {

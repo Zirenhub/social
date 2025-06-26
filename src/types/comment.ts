@@ -2,6 +2,7 @@ import { Comment, Prisma } from "@prisma/client";
 import { z } from "zod";
 
 import { getMaxCharError, getMinCharError } from "@/helpers/charLenghtError";
+import { PostWithCounts } from "./post";
 
 export const MAX_COMMENT_CHARS = 256;
 
@@ -41,4 +42,6 @@ export const commentArgs = (userProfileId: string) =>
   Prisma.validator<Prisma.CommentFindManyArgs>()(commentWithCountsArgs(userProfileId));
 type CommentWithCounts = Prisma.CommentGetPayload<ReturnType<typeof commentArgs>>;
 
-export type { CommentContentZ, Comment, CommentWithCounts, CommentsFilter };
+type CommentWithReplies = { comment: CommentWithCounts; parents: CommentWithCounts[]; post: PostWithCounts };
+
+export type { CommentContentZ, Comment, CommentWithCounts, CommentsFilter, CommentWithReplies };

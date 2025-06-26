@@ -14,6 +14,7 @@ export async function GET(
     const searchParams = request.nextUrl.searchParams;
     const filter = (searchParams.get("filter") as CommentsFilter) || "newest";
     const cursor = searchParams.get("cursor") ?? undefined;
+    const parentId = searchParams.get("parentId") ?? undefined;
 
     const { slug } = await params;
     const session = await getSession();
@@ -23,6 +24,7 @@ export async function GET(
       postId: slug,
       userProfileId: session.user.profile,
       cursor,
+      parentId,
     });
 
     return NextResponse.json(successResponse(comments));

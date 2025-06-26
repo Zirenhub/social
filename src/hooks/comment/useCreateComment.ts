@@ -6,15 +6,15 @@ import { toast } from "react-toastify";
 
 import { createComment } from "@/app/api/comments/actions";
 import { setFormErrors } from "@/helpers/setFormErrors";
-import { CommentContent, CommentContentZ, MAX_COMMENT_CHARS } from "@/types/comment";
+import { CommentContent, CommentContentZ, CommentWithCounts, MAX_COMMENT_CHARS } from "@/types/comment";
 import { CACHE_TAGS } from "@/types/constants";
 
 type Props = {
   postId: string;
-  parentId?: string;
+  comment?: CommentWithCounts;
 };
 
-export const useCreateComment = ({ postId, parentId }: Props) => {
+export const useCreateComment = ({ postId, comment }: Props) => {
   const queryClient = useQueryClient();
   const formMethods = useForm<CommentContentZ>({
     resolver: zodResolver(CommentContent),
@@ -36,7 +36,7 @@ export const useCreateComment = ({ postId, parentId }: Props) => {
     const result = await createComment({
       content: formData.content,
       postId,
-      parentId,
+      comment,
     });
     if (result.success) {
       await queryClient.invalidateQueries({

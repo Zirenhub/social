@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { CommentLike } from "@prisma/client";
 import { Heart, MessageSquare, Share2 } from "lucide-react";
 
@@ -11,11 +12,17 @@ import CreateReply from "../ui/modal/CreateReply";
 
 type Props = {
   comment: CommentWithCounts;
-  queryKey: string[];
+  queryKey?: string[];
 };
 
 export default function CommentInteractions({ comment, queryKey }: Props) {
   const { openModal } = useModal();
+  // when on the post page this works because on like we will update the page data,
+  // but if we are on the /comment/123 page for example and we like that comment
+  // this will attempt to update the liked comment inside the comments page query
+  // solution 1 (?): inside toggle check if we have comment parent id, if we do dont update!, then ??
+  // solution 2 (?): take prop from container and decide accoridngly
+  // regardless, finally after doing 1 or 2, if we update cache dont do anything else, if we dont update cache, invalidate query so fresh data is shown next time.
   const { handleLike, isLiked, likeCount, isPending } = useLikeToggle<CommentWithCounts, CommentLike>({
     itemId: comment.id,
     initialIsLiked: comment.likes.length > 0,
@@ -32,15 +39,19 @@ export default function CommentInteractions({ comment, queryKey }: Props) {
     }),
   });
 
-  const handleReply = () => {
+  const handleReply = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.stopPropagation();
     openModal(<CreateReply content={comment} />, { title: "Reply" });
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3 px-2 text-sm">
+    <div className="flex flex-wrap md:items-center gap-3 md:px-2 text-sm">
       <button
-        onClick={handleLike}
-        className={`group flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-colors font-medium ${
+        onClick={(e) => {
+          e.stopPropagation();
+          handleLike();
+        }}
+        className={`group flex items-center gap-1 md:gap-1.5 rounded-full md:px-3 py-1.5 transition-colors font-medium ${
           isLiked
             ? "bg-[var(--color-magenta-500)]/10 text-[var(--color-magenta-500)]"
             : "text-gray-500 dark:text-gray-400 hover:text-[var(--color-magenta-500)] hover:bg-[var(--color-magenta-500)]/10"
@@ -56,13 +67,13 @@ export default function CommentInteractions({ comment, queryKey }: Props) {
 
       <button
         onClick={handleReply}
-        className="group flex items-center gap-1.5 rounded-full px-3 py-1.5 font-medium text-gray-500 dark:text-gray-400 transition-all hover:text-[var(--color-cyan-500)] hover:bg-[var(--color-cyan-500)]/10"
+        className="group flex items-center gap-1 md:gap-1.5 rounded-full md:px-3 py-1.5 font-medium text-gray-500 dark:text-gray-400 transition-all hover:text-[var(--color-cyan-500)] hover:bg-[var(--color-cyan-500)]/10"
       >
         <MessageSquare className="h-4 w-4" />
         <span>Reply</span>
       </button>
 
-      <button className="group flex items-center gap-1.5 rounded-full px-3 py-1.5 font-medium text-gray-500 dark:text-gray-400 transition-all hover:text-[var(--color-lime-500)] hover:bg-[var(--color-lime-500)]/10">
+      <button className="group flex items-center gap-1 md:gap-1.5 rounded-full md:px-3 py-1.5 font-medium text-gray-500 dark:text-gray-400 transition-all hover:text-[var(--color-lime-500)] hover:bg-[var(--color-lime-500)]/10">
         <Share2 className="h-4 w-4 transition-transform group-hover:rotate-12" />
         <span>Share</span>
       </button>

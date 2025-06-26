@@ -4,7 +4,7 @@ import { revalidateTag } from "next/cache";
 
 import getSession from "@/lib/getSession";
 import { prisma } from "@/lib/prisma";
-import { CommentContent } from "@/types/comment";
+import { CommentContent, CommentWithCounts } from "@/types/comment";
 import { CACHE_TAGS } from "@/types/constants";
 import { updateLastActive } from "../auth/actions";
 import successResponse, { errorResponse } from "../response";
@@ -12,11 +12,11 @@ import successResponse, { errorResponse } from "../response";
 export async function createComment({
   content,
   postId,
-  parentId,
+  comment,
 }: {
   content: string;
   postId: string;
-  parentId?: string;
+  comment?: CommentWithCounts;
 }) {
   try {
     const session = await getSession();
@@ -26,7 +26,7 @@ export async function createComment({
         content: parsed.content,
         profileId: session.user.profile,
         postId,
-        parentId,
+        ...(comment ? { parentId: comment.id } : { parentId: null }),
       },
     });
 
@@ -90,6 +90,7 @@ export async function deleteComment({ id }: { id: string }) {
     }
 
     const deletedComment = await prisma.comment.delete({ where: { id } });
+    revalidateTag(CACHE_TAGS.POST(deletedComment.postId));
 
     return successResponse(deletedComment);
   } catch (error) {

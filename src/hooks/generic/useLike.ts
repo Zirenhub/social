@@ -11,7 +11,7 @@ type UseLikeToggleParams<T, A> = {
   initialIsLiked: boolean;
   initialLikeCount: number;
   mutationFn: (itemId: string) => Promise<ApiResponse<A | null>>;
-  queryKey: unknown[];
+  queryKey?: unknown[];
   updateItemLikes: (item: T, result: ApiResponse<A | null>) => T;
 };
 
@@ -44,20 +44,22 @@ export function useLikeToggle<T, A>({
           throw new Error(result.error?.message || "Like action failed");
         }
 
-        queryClient.setQueriesData<{
-          pages: PaginatedData<T>[];
-          pageParam: string[];
-        }>({ queryKey }, (oldData) => {
-          if (!oldData) return oldData;
+        if (queryKey) {
+          queryClient.setQueriesData<{
+            pages: PaginatedData<T>[];
+            pageParam: string[];
+          }>({ queryKey }, (oldData) => {
+            if (!oldData) return oldData;
 
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page) => ({
-              ...page,
-              data: page.data.map((item) => ((item as any).id === itemId ? updateItemLikes(item, result) : item)),
-            })),
-          };
-        });
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page) => ({
+                ...page,
+                data: page.data.map((item) => ((item as any).id === itemId ? updateItemLikes(item, result) : item)),
+              })),
+            };
+          });
+        }
       } catch (err) {
         setLikesStatus((prev) => ({
           isLiked: !prev.isLiked,
