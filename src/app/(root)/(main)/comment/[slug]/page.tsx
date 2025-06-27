@@ -41,7 +41,7 @@ export default async function Comment({ params }: Props) {
       <div className="mt-4 mb-2">
         <CommentContainer post={post} comment={comment} isRooted isFocused />
       </div>
-      <CreateComment post={post} comment={comment} profile={profile} />
+      <CreateComment post={post} comment={comment} profile={profile} parents={parents} />
       <CommentFeed post={post} comment={comment} />
     </div>
   );

@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import PostHeader from "@/components/post/PostHeader";
 import { useModal } from "@/context/ModalProvider";
 import { useCreateComment } from "@/hooks/comment/useCreateComment";
+import useCombineUsernames from "@/hooks/generic/useCombineUsernames";
 import useProfile from "@/hooks/profile/useProfile";
 import { CommentWithCounts } from "@/types/comment";
 import { PostWithCounts } from "@/types/post";
@@ -19,14 +20,13 @@ type Props = {
 };
 
 export default function CreateReply({ post, comment, parents }: Props) {
-  const [replyingTo, setReplyingTo] = useState<Set<string>>(new Set());
-
   const { closeModal } = useModal();
   const { submit, formErrors, register, isSubmitting, charProps, isSuccess } = useCreateComment({
     postId: post.id,
     comment,
   });
   const { data: session, status } = useSession();
+  const { replyingTo } = useCombineUsernames({ post, comment, parents });
 
   const profileId = session?.user.profile ?? "";
   const shouldFetchProfile = status === "authenticated" && !!profileId;
@@ -37,19 +37,6 @@ export default function CreateReply({ post, comment, parents }: Props) {
       closeModal();
     }
   }, [isSuccess, closeModal]);
-
-  useEffect(() => {
-    const combinedUsernames: string[] = [post.profile.username];
-    if (comment) {
-      combinedUsernames.push(comment.profile.username);
-    }
-    if (parents) {
-      const parentUsernames = parents.map((parent) => parent.profile.username);
-      combinedUsernames.push(...parentUsernames);
-    }
-
-    setReplyingTo(new Set(combinedUsernames));
-  }, [post, comment, parents]);
 
   if (isLoading) {
     return <p>Loading...</p>;
