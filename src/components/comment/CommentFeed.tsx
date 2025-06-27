@@ -18,7 +18,7 @@ type Props = {
 export default function CommentFeed({ post, comment }: Props) {
   const [filter, setFilter] = useState<CommentsFilter>("newest");
 
-  const queryKey = [CACHE_TAGS.COMMENTS(post.id), filter];
+  const queryKey = [CACHE_TAGS.COMMENTS(comment ? comment.id : post.id), filter];
 
   const { isLoading, isEmpty, result, isError, error } = useInfiniteScroll<CommentWithCounts>({
     endpoint: `/api/comments/${post.id}`,
