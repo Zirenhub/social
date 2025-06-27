@@ -32,17 +32,17 @@ export default async function Comment({ params }: Props) {
           {parents.map((parent) => {
             return (
               <div key={parent.id} className="mt-4">
-                <CommentContainer comment={parent} isRooted />
+                <CommentContainer post={post} comment={parent} isRooted />
               </div>
             );
           })}
         </div>
       )}
       <div className="mt-4 mb-2">
-        <CommentContainer comment={comment} isRooted isFocused />
+        <CommentContainer post={post} comment={comment} isRooted isFocused />
       </div>
       <CreateComment post={post} comment={comment} profile={profile} />
-      <CommentFeed postId={post.id} comment={comment} />
+      <CommentFeed post={post} comment={comment} />
     </div>
   );
 }

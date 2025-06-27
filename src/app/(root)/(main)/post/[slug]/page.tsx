@@ -28,7 +28,7 @@ export default async function Post({ params }: Props) {
       <HeaderSlot content={<SimpleHeader title="Post" />} avatar={false} />
       <PostContainer post={post} />
       <CreateComment post={post} profile={profile} />
-      <CommentFeed postId={post.id} />
+      <CommentFeed post={post} />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { formatCreatedAtDate } from "@/helpers/formatDate";
 import useHover from "@/hooks/generic/useHover";
 import useProfile from "@/hooks/profile/useProfile";
 import { CommentWithCounts } from "@/types/comment";
+import { PostWithCounts } from "@/types/post";
 import ProfileHover from "../post/ProfileHover";
 import Avatar from "../ui/Avatar";
 import ProfileMeta from "../ui/ProfileMeta";
@@ -15,13 +16,15 @@ import CommentInteractions from "./CommentInteractions";
 import CommentOptions from "./CommentOptions";
 
 type CommentProps = {
+  post: PostWithCounts;
   comment: CommentWithCounts;
+  parents?: CommentWithCounts[];
   isRooted?: boolean;
   isFocused?: boolean;
   queryKey?: string[];
 };
 
-export default function CommentContainer({ comment, isRooted, queryKey, isFocused }: CommentProps) {
+export default function CommentContainer({ post, comment, parents, isRooted, queryKey, isFocused }: CommentProps) {
   const router = useRouter();
   const { hover, showHover, hideHover } = useHover();
   const { profile: data, error, isLoading } = useProfile(comment.profileId, hover);
@@ -74,7 +77,6 @@ export default function CommentContainer({ comment, isRooted, queryKey, isFocuse
               "md:rounded-2xl md:border md:border-gray-200/60 md:shadow-xl md:backdrop-blur-sm md:transition-all md:hover:bg-gray-200/10 md:cursor-pointer",
               isFocused ? "bg-blue-500/10 p-2 md:p-0" : "md:dark:border-gray-700 md:bg-white/70 md:dark:bg-gray-800/60"
             )}
-            // MAKE IT SO THAT FOCUESED WORKS ON DESKTOP
           >
             <div className="flex justify-between md:px-4 md:pt-3">
               <div
@@ -95,7 +97,7 @@ export default function CommentContainer({ comment, isRooted, queryKey, isFocuse
             <p className="md:px-4 md:pb-2 pt-2 text-base text-gray-700 dark:text-gray-300">{comment.content}</p>
           </div>
 
-          <CommentInteractions comment={comment} queryKey={queryKey} />
+          <CommentInteractions post={post} comment={comment} parents={parents} queryKey={queryKey} />
         </div>
       </div>
     </div>

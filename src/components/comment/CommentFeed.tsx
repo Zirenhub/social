@@ -6,21 +6,22 @@ import { MessageSquare, RefreshCw } from "lucide-react";
 import useInfiniteScroll from "@/hooks/post/useInfiniteScroll";
 import { CommentsFilter, CommentWithCounts } from "@/types/comment";
 import { CACHE_TAGS } from "@/types/constants";
+import { PostWithCounts } from "@/types/post";
 import ContainerPlaceholder from "../ui/ContainerPlaceholder";
 import CommentContainer from "./CommentContainer";
 
 type Props = {
-  postId: string;
+  post: PostWithCounts;
   comment?: CommentWithCounts;
 };
 
-export default function CommentFeed({ postId, comment }: Props) {
+export default function CommentFeed({ post, comment }: Props) {
   const [filter, setFilter] = useState<CommentsFilter>("newest");
 
-  const queryKey = [CACHE_TAGS.COMMENTS(postId), filter];
+  const queryKey = [CACHE_TAGS.COMMENTS(post.id), filter];
 
   const { isLoading, isEmpty, result, isError, error } = useInfiniteScroll<CommentWithCounts>({
-    endpoint: `/api/comments/${postId}`,
+    endpoint: `/api/comments/${post.id}`,
     filter,
     queryKey,
     comment,
@@ -78,7 +79,7 @@ export default function CommentFeed({ postId, comment }: Props) {
         <div className="space-y-4">
           {result.map((comment) => (
             <div key={comment.id} className="space-y-2">
-              <CommentContainer comment={comment} queryKey={queryKey} />
+              <CommentContainer post={post} comment={comment} queryKey={queryKey} />
             </div>
           ))}
         </div>

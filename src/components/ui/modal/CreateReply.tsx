@@ -1,10 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Send } from "lucide-react";
 import { useSession } from "next-auth/react";
 
 import PostHeader from "@/components/post/PostHeader";
 import { useModal } from "@/context/ModalProvider";
-import getReplyTarget from "@/helpers/getReplyTarget";
 import { useCreateComment } from "@/hooks/comment/useCreateComment";
 import useProfile from "@/hooks/profile/useProfile";
 import { CommentWithCounts } from "@/types/comment";
@@ -14,15 +13,18 @@ import LoaderPlaceholder from "../LoaderPlaceholder";
 import Textarea from "../Textarea";
 
 type Props = {
-  content: CommentWithCounts | PostWithCounts;
+  post: PostWithCounts;
+  comment?: CommentWithCounts;
+  parents?: CommentWithCounts[];
 };
 
-export default function CreateReply({ content }: Props) {
+export default function CreateReply({ post, comment, parents }: Props) {
+  const [replyingTo, setReplyingTo] = useState<Set<string>>(new Set());
+
   const { closeModal } = useModal();
-  const { postId, parentId } = getReplyTarget(content);
   const { submit, formErrors, register, isSubmitting, charProps, isSuccess } = useCreateComment({
-    postId,
-    parentId,
+    postId: post.id,
+    comment,
   });
   const { data: session, status } = useSession();
 
@@ -35,6 +37,19 @@ export default function CreateReply({ content }: Props) {
       closeModal();
     }
   }, [isSuccess, closeModal]);
+
+  useEffect(() => {
+    const combinedUsernames: string[] = [post.profile.username];
+    if (comment) {
+      combinedUsernames.push(comment.profile.username);
+    }
+    if (parents) {
+      const parentUsernames = parents.map((parent) => parent.profile.username);
+      combinedUsernames.push(...parentUsernames);
+    }
+
+    setReplyingTo(new Set(combinedUsernames));
+  }, [post, comment, parents]);
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -52,15 +67,33 @@ export default function CreateReply({ content }: Props) {
     <form onSubmit={submit} className="flex flex-col">
       <div className="bg-gray-200/20 dark:bg-gray-800/70 rounded-md px-2 pt-2 shadow-sm">
         <div className="flex justify-between items-start">
-          <PostHeader profile={{ ...content.profile, id: content.profileId }} post={{ createdAt: content.createdAt }} />
+          {comment ? (
+            <PostHeader
+              profile={{ ...comment.profile, id: comment.profileId }}
+              post={{ createdAt: comment.createdAt }}
+            />
+          ) : (
+            <PostHeader profile={{ ...post.profile, id: post.profileId }} post={{ createdAt: post.createdAt }} />
+          )}
         </div>
 
-        <p className="text-gray-800 dark:text-gray-200 text-base md:text-lg pb-3">{content.content}</p>
+        <p className="text-gray-800 dark:text-gray-200 text-base md:text-lg pb-3">
+          {comment ? comment.content : post.content}
+        </p>
       </div>
 
-      <p className="leading-none text-gray-400 text-sm mt-6 mb-2">
-        Replying to <span className="text-[var(--color-cyan-500)]">@{content.profile.username}</span>
-      </p>
+      <div className="flex leading-none text-gray-400 text-sm mt-6 mb-2">
+        Replying to{" "}
+        <div className="flex gap-1 ml-1">
+          {Array.from(replyingTo).map((replying) => {
+            return (
+              <span key={replying} className="text-[var(--color-cyan-500)]">
+                @{replying}
+              </span>
+            );
+          })}
+        </div>
+      </div>
       <div className="flex gap-3">
         <Avatar profile={profile} />
         <Textarea

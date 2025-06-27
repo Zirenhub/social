@@ -8,14 +8,17 @@ import { likeComment } from "@/app/api/comments/actions";
 import { useModal } from "@/context/ModalProvider";
 import { useLikeToggle } from "@/hooks/generic/useLike";
 import { CommentWithCounts } from "@/types/comment";
+import { PostWithCounts } from "@/types/post";
 import CreateReply from "../ui/modal/CreateReply";
 
 type Props = {
+  post: PostWithCounts;
   comment: CommentWithCounts;
+  parents?: CommentWithCounts[];
   queryKey?: string[];
 };
 
-export default function CommentInteractions({ comment, queryKey }: Props) {
+export default function CommentInteractions({ post, comment, parents, queryKey }: Props) {
   const { openModal } = useModal();
   // when on the post page this works because on like we will update the page data,
   // but if we are on the /comment/123 page for example and we like that comment
@@ -41,7 +44,7 @@ export default function CommentInteractions({ comment, queryKey }: Props) {
 
   const handleReply = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.stopPropagation();
-    openModal(<CreateReply content={comment} />, { title: "Reply" });
+    openModal(<CreateReply post={post} comment={comment} parents={parents} />, { title: "Reply" });
   };
 
   return (

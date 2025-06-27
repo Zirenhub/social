@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Like } from "@prisma/client";
+import clsx from "clsx";
 import { HeartIcon, MessageCircleMoreIcon, RepeatIcon } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -46,10 +47,10 @@ export default function PostInteractions({ post }: Props) {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
   const { openModal } = useModal();
 
   const formattedLikesCount = useMemo(() => formatCount(likeCount, "Like"), [likeCount]);
-
   const formattedCommentsCount = useMemo(() => formatCount(post._count.comments, "Comments"), [post._count.comments]);
 
   const handleCommentClick = useCallback(
@@ -57,15 +58,15 @@ export default function PostInteractions({ post }: Props) {
       console.log("triggered");
       e.stopPropagation();
       // create a seperate create comment modal component, leave create comment component as standalone as differences will be noticable.
-      openModal(<CreateReply content={post} />, { title: "Reply" });
+      openModal(<CreateReply post={post} />, { title: "Reply" });
     },
     [openModal, post]
   );
 
-  const handleShareClick = useCallback(
+  const handleRepostClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       e.stopPropagation();
-      toast.success(`Repost post ${post.id}`);
+      // openModal(<CreateReply content={post} />, { title: "Reply" });
     },
     [post.id]
   );
@@ -95,10 +96,10 @@ export default function PostInteractions({ post }: Props) {
         isPending: false,
       },
       {
-        label: "Share",
+        label: "Repost",
         icon: RepeatIcon,
         status: { isLiked: false, count: 0 },
-        onClick: handleShareClick,
+        onClick: handleRepostClick,
         isPending: false,
       },
     ],
@@ -108,7 +109,7 @@ export default function PostInteractions({ post }: Props) {
       formattedCommentsCount,
       handleLikeClick,
       handleCommentClick,
-      handleShareClick,
+      handleRepostClick,
       isPending,
     ]
   );
@@ -135,7 +136,11 @@ export default function PostInteractions({ post }: Props) {
             disabled={interaction.isPending}
             key={interaction.label}
             onClick={(e) => interaction.onClick(e)}
-            className={`cursor-pointer text-sm md:text-base rounded-full flex items-center gap-1 hover:text-magenta-500 transition-colors px-2 hover:bg-magenta-500/20 ${interaction.status.isLiked ? "bg-magenta-500/20" : ""}`}
+            className={clsx(
+              "cursor-pointer text-sm md:text-base rounded-full flex items-center gap-1 transition-colors px-2",
+              "hover:text-magenta-500 hover:bg-magenta-500/20",
+              interaction.status.isLiked && "bg-magenta-500/20"
+            )}
           >
             <span className="h-[21px] flex items-center">
               {
