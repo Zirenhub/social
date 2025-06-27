@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
 
@@ -24,6 +25,7 @@ export default function CommentContainer({ comment, isRooted, queryKey, isFocuse
   const router = useRouter();
   const { hover, showHover, hideHover } = useHover();
   const { profile: data, error, isLoading } = useProfile(comment.profileId, hover);
+  const elementRef = useRef<HTMLDivElement>(null);
 
   // const isReply = Boolean(comment.parentId);
 
@@ -37,8 +39,14 @@ export default function CommentContainer({ comment, isRooted, queryKey, isFocuse
     router.push(`/comment/${comment.id}`);
   };
 
+  useEffect(() => {
+    if (isFocused) {
+      elementRef.current?.scrollIntoView();
+    }
+  }, [isFocused]);
+
   return (
-    <div className="relative transition-all duration-300 px-2">
+    <div className="relative transition-all duration-300 px-2" ref={elementRef}>
       {/* {isReply && (
         <div className="absolute -left-4 top-6 h-[calc(100%+16px)] w-0.5 bg-gradient-to-b from-[var(--color-cyan-500)] to-transparent opacity-20" />
         )} */}
@@ -63,8 +71,8 @@ export default function CommentContainer({ comment, isRooted, queryKey, isFocuse
           <div
             onClick={handleNavigateToComment}
             className={clsx(
-              "md:rounded-2xl md:border md:border-gray-200/60 md:dark:border-gray-700 md:bg-white/70 md:dark:bg-gray-800/60 md:shadow-xl md:backdrop-blur-sm md:transition-all md:hover:bg-gray-200/10 md:cursor-pointer",
-              isFocused && "bg-blue-500/10 rounded-lg p-2"
+              "md:rounded-2xl md:border md:border-gray-200/60 md:shadow-xl md:backdrop-blur-sm md:transition-all md:hover:bg-gray-200/10 md:cursor-pointer",
+              isFocused ? "bg-blue-500/10 p-2 md:p-0" : "md:dark:border-gray-700 md:bg-white/70 md:dark:bg-gray-800/60"
             )}
             // MAKE IT SO THAT FOCUESED WORKS ON DESKTOP
           >
