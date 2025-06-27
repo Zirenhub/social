@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
 
@@ -10,18 +11,17 @@ import PostOptions from "./PostOptions";
 
 type Props = { post: PostWithCounts; isRooted?: boolean };
 
-export default function PostContainer({ post, isRooted }: Props) {
+function PostContainer({ post, isRooted }: Props) {
   const router = useRouter();
 
   function handleNavigatePost() {
     sessionStorage.setItem("hash", post.id);
     router.push(`/post/${post.id}`);
   }
-
+  console.log(post);
   return (
     <div
       id={post.id}
-      key={post.id}
       onClick={handleNavigatePost}
       className={clsx(
         "dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 hover:bg-gray-50 cursor-pointer md:rounded-xl md:shadow-sm",
@@ -39,3 +39,5 @@ export default function PostContainer({ post, isRooted }: Props) {
     </div>
   );
 }
+
+export default React.memo(PostContainer);

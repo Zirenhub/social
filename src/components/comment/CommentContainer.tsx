@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
 
@@ -24,7 +24,7 @@ type CommentProps = {
   queryKey?: string[];
 };
 
-export default function CommentContainer({ post, comment, parents, isRooted, queryKey, isFocused }: CommentProps) {
+function CommentContainer({ post, comment, parents, isRooted, queryKey, isFocused }: CommentProps) {
   const router = useRouter();
   const { hover, showHover, hideHover } = useHover();
   const { profile: data, error, isLoading } = useProfile(comment.profileId, hover);
@@ -103,3 +103,5 @@ export default function CommentContainer({ post, comment, parents, isRooted, que
     </div>
   );
 }
+
+export default React.memo(CommentContainer);
