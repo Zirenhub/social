@@ -35,6 +35,7 @@ export function DropdownMenu({ trigger, children, align = "right" }: DropdownMen
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
+        type="button"
         className="cursor-pointer"
         aria-label="Menu options"
         aria-expanded={isOpen}
@@ -67,6 +68,7 @@ export function DropdownMenuItem({
 }) {
   return (
     <button
+      type="button"
       disabled={disabled}
       onClick={(e) => {
         e.stopPropagation();

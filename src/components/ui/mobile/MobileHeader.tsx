@@ -26,10 +26,12 @@ function MobileHeaderUpdater({ content, avatar = true }: HeaderProps) {
   return null;
 }
 
-export function HeaderSlot({ content, avatar = true }: HeaderProps) {
+export function HeaderSlot({ content, avatar = true, fallback }: HeaderProps) {
   const isMobile = useIsMobile();
 
-  if (!isMobile) return null;
+  if (!isMobile) {
+    return fallback ? <>{fallback}</> : null;
+  }
 
   return <MobileHeaderUpdater content={content} avatar={avatar} />;
 }

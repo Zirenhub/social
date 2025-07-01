@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { HeaderContext, HeaderProps } from "./HeaderProvider";
 
@@ -11,23 +11,31 @@ export const IsMobileProvider = ({ children }: { children: React.ReactNode }) =>
     avatar: true,
   });
 
-  const setHeader = (content: React.ReactNode, avatar = true) => {
+  const setHeader = useCallback((content: React.ReactNode, avatar = true) => {
     setHeaderState({ content, avatar });
-  };
+  }, []);
 
-  const headerValue = useMemo(() => ({ header, setHeader }), [header]);
+  const headerValue = useMemo(
+    () => ({
+      header,
+      setHeader,
+    }),
+    [header, setHeader]
+  );
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 768px)");
     const handleChange = () => setIsMobile(mediaQuery.matches);
+
     handleChange();
     mediaQuery.addEventListener("change", handleChange);
+
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   return (
     <IsMobileContext.Provider value={isMobile}>
-      {isMobile ? <HeaderContext.Provider value={headerValue}>{children}</HeaderContext.Provider> : children}
+      <HeaderContext.Provider value={headerValue}>{children}</HeaderContext.Provider>
     </IsMobileContext.Provider>
   );
 };

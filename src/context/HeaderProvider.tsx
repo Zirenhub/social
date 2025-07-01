@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 
-export type HeaderProps = { content: React.ReactNode; avatar?: boolean };
+export type HeaderProps = { content: React.ReactNode; avatar?: boolean; fallback?: React.ReactNode };
 
 export type HeaderContextType = {
   header: HeaderProps | null;

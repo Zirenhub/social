@@ -13,12 +13,14 @@ import CommentContainer from "./CommentContainer";
 type Props = {
   post: PostWithCounts;
   comment?: CommentWithCounts;
+  parents?: CommentWithCounts[];
 };
 
-export default function CommentFeed({ post, comment }: Props) {
+export default function CommentFeed({ post, comment, parents }: Props) {
   const [filter, setFilter] = useState<CommentsFilter>("newest");
 
-  const queryKey = [CACHE_TAGS.COMMENTS(comment ? comment.id : post.id), filter];
+  const queryString = comment ? CACHE_TAGS.COMMENTS(comment.id) : CACHE_TAGS.COMMENTS(post.id);
+  const queryKey = [queryString, filter];
 
   const { isLoading, isEmpty, result, isError, error } = useInfiniteScroll<CommentWithCounts>({
     endpoint: `/api/comments/${post.id}`,
@@ -79,7 +81,7 @@ export default function CommentFeed({ post, comment }: Props) {
         <div className="space-y-4">
           {result.map((comment) => (
             <div key={comment.id} className="space-y-2">
-              <CommentContainer post={post} comment={comment} queryKey={queryKey} />
+              <CommentContainer post={post} comment={comment} parents={parents} queryKey={queryString} />
             </div>
           ))}
         </div>

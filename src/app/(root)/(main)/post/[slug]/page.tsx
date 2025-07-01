@@ -25,7 +25,7 @@ export default async function Post({ params }: Props) {
 
   return (
     <div className="flex flex-col md:gap-3">
-      <HeaderSlot content={<SimpleHeader title="Post" />} avatar={false} />
+      <HeaderSlot content={<SimpleHeader title="Post" />} avatar={false} fallback={<SimpleHeader title="Post" />} />
       <PostContainer post={post} />
       <CreateComment post={post} profile={profile} />
       <CommentFeed post={post} />

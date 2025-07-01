@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
@@ -31,6 +32,7 @@ export default function Providers({ children, session }: ProviderProps) {
           <ModalProvider>
             <IsMobileProvider>{children}</IsMobileProvider>
           </ModalProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </ThemeProvider>
     </SessionProvider>

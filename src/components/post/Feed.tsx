@@ -13,7 +13,7 @@ import PostContainer from "./PostContainer";
 type FeedProps = { showCreatePost?: boolean; filter: string; endpoint: string };
 
 export default function Feed({ showCreatePost = true, filter, endpoint }: FeedProps) {
-  const queryKey = [CACHE_TAGS.POSTS, filter];
+  const queryKey = [CACHE_TAGS.POSTS, filter, endpoint];
 
   const { result, error, isEmpty, isFetchingNextPage, isReachingEnd, sentinelRef, isLoading } =
     useInfiniteScroll<PostWithCounts>({ endpoint, filter, queryKey });

@@ -24,7 +24,6 @@ export default async function Home({ searchParams }: Props) {
   const { filter } = await searchParams;
 
   const currentFilter = HOME_PAGE_POSTS_FILTERS.find((x) => x === filter) || "forYou";
-
   return (
     <>
       <HeaderSlot content={<HomeHeader currentFilter={currentFilter} filters={homeFilters} />} />

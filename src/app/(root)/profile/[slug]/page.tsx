@@ -44,7 +44,7 @@ export default async function Profile({ params, searchParams }: Props) {
               <div className="flex flex-col w-full">
                 <ProfilePictureSection profile={profileResult} />
                 <div className="mt-1 text-sm sm:text-base">
-                  <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[var(--color-cyan-500)] to-[var(--color-blue-500)] bg-clip-text text-transparent leading-none whitespace-nowrap">
+                  <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[var(--color-cyan-500)] to-[var(--color-blue-500)] bg-clip-text text-transparent whitespace-nowrap">
                     {`${profileResult.firstName} ${profileResult.lastName}`}
                   </h1>
                   <p className="text-[var(--color-dark-500)]/60 dark:text-white/60">@{profileResult.username}</p>

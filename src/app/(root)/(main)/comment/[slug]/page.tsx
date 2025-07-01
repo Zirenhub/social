@@ -25,24 +25,28 @@ export default async function Comment({ params }: Props) {
 
   return (
     <div className="flex flex-col md:gap-3">
-      <HeaderSlot content={<SimpleHeader title="Comment" />} avatar={false} />
+      <HeaderSlot
+        content={<SimpleHeader title="Comment" />}
+        avatar={false}
+        fallback={<SimpleHeader title="Comment" />}
+      />
       <PostContainer post={post} isRooted />
       {parents.length > 0 && (
         <div>
           {parents.map((parent) => {
             return (
               <div key={parent.id} className="mt-4">
-                <CommentContainer post={post} comment={parent} isRooted />
+                <CommentContainer post={post} comment={parent} parents={parents} isRooted />
               </div>
             );
           })}
         </div>
       )}
       <div className="mt-4 mb-2">
-        <CommentContainer post={post} comment={comment} isRooted isFocused />
+        <CommentContainer post={post} comment={comment} parents={parents} isRooted isFocused />
       </div>
       <CreateComment post={post} comment={comment} profile={profile} parents={parents} />
-      <CommentFeed post={post} comment={comment} />
+      <CommentFeed post={post} comment={comment} parents={parents} />
     </div>
   );
 }

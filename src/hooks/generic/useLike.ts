@@ -1,27 +1,33 @@
 "use client";
 
-import { useCallback, useState, useTransition } from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
+import formatCount from "@/helpers/fomatCount";
 import { ApiResponse, PaginatedData } from "@/types/api";
 
-type UseLikeToggleParams<T, A> = {
+// Define the interface that items must have
+interface LikeableItem {
+  id: string;
+  likes: any[];
+  _count: { likes: number };
+}
+
+type UseLikeToggleParams<T extends LikeableItem, A> = {
   itemId: string;
   initialIsLiked: boolean;
   initialLikeCount: number;
   mutationFn: (itemId: string) => Promise<ApiResponse<A | null>>;
   queryKey?: unknown[];
-  updateItemLikes: (item: T, result: ApiResponse<A | null>) => T;
 };
 
-export function useLikeToggle<T, A>({
+export function useLikeToggle<T extends LikeableItem, A>({
   itemId,
   initialIsLiked,
   initialLikeCount,
   mutationFn,
   queryKey,
-  updateItemLikes,
 }: UseLikeToggleParams<T, A>) {
   const queryClient = useQueryClient();
   const [likesStatus, setLikesStatus] = useState({
@@ -29,6 +35,11 @@ export function useLikeToggle<T, A>({
     count: initialLikeCount,
   });
   const [isPending, startTransition] = useTransition();
+
+  const safeMutation = useCallback((itemId: string) => mutationFn(itemId), [mutationFn]);
+
+  const formattedLikesCount = useMemo(() => formatCount(likesStatus.count, "Like"), [likesStatus.count]);
+  const formattedIsLiked = useMemo(() => likesStatus.isLiked, [likesStatus.isLiked]);
 
   const handleLike = useCallback(() => {
     setLikesStatus((prev) => ({
@@ -38,26 +49,40 @@ export function useLikeToggle<T, A>({
 
     startTransition(async () => {
       try {
-        const result = await mutationFn(itemId);
+        const result = await safeMutation(itemId);
 
         if (!result.success) {
           throw new Error(result.error?.message || "Like action failed");
         }
 
-        if (queryKey) {
-          queryClient.setQueriesData<{
-            pages: PaginatedData<T>[];
-            pageParam: string[];
-          }>({ queryKey }, (oldData) => {
-            if (!oldData) return oldData;
+        if (queryKey?.length) {
+          queryKey.forEach((key) => {
+            queryClient.setQueriesData<{
+              pages: PaginatedData<T>[];
+              pageParam: string[];
+            }>({ queryKey: [key] }, (oldData) => {
+              if (!oldData) return oldData;
 
-            return {
-              ...oldData,
-              pages: oldData.pages.map((page) => ({
-                ...page,
-                data: page.data.map((item) => ((item as any).id === itemId ? updateItemLikes(item, result) : item)),
-              })),
-            };
+              return {
+                ...oldData,
+                pages: oldData.pages.map((page) => ({
+                  ...page,
+                  data: page.data.map((item) => {
+                    if (item.id === itemId) {
+                      return {
+                        ...item,
+                        likes: result.data ? [result.data] : [],
+                        _count: {
+                          ...item._count,
+                          likes: result.data ? item._count.likes + 1 : item._count.likes - 1,
+                        },
+                      } as T;
+                    }
+                    return item;
+                  }),
+                })),
+              };
+            });
           });
         }
       } catch (err) {
@@ -69,12 +94,12 @@ export function useLikeToggle<T, A>({
         toast.error(`Failed to like: ${err instanceof Error ? err.message : "Unknown error"}`);
       }
     });
-  }, [itemId, mutationFn, queryKey, queryClient, updateItemLikes]);
+  }, [itemId, safeMutation, queryKey, queryClient]);
 
   return {
     isPending,
     handleLike,
-    isLiked: likesStatus.isLiked,
-    likeCount: likesStatus.count,
+    isLiked: formattedIsLiked,
+    likeCount: formattedLikesCount,
   };
 }

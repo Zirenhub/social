@@ -8,17 +8,19 @@ import { PostWithCounts } from "@/types/post";
 import PostHeader from "./PostHeader";
 import PostInteractions from "./PostInteractions";
 import PostOptions from "./PostOptions";
+import RepostCard from "./RepostCard";
 
 type Props = { post: PostWithCounts; isRooted?: boolean };
 
 function PostContainer({ post, isRooted }: Props) {
   const router = useRouter();
 
-  function handleNavigatePost() {
+  function handleNavigatePost(e: React.MouseEvent<HTMLDivElement>, repost?: boolean) {
+    e.stopPropagation();
     sessionStorage.setItem("hash", post.id);
-    router.push(`/post/${post.id}`);
+    router.push(`/post/${repost && post.repostOf ? post.repostOf.id : post.id}`);
   }
-  console.log(post);
+
   return (
     <div
       id={post.id}
@@ -34,6 +36,8 @@ function PostContainer({ post, isRooted }: Props) {
       </div>
 
       <p className="text-gray-800 dark:text-gray-200 px-2 pb-2 md:px-4 text-base md:text-lg">{post.content}</p>
+
+      {post.repostOf && <RepostCard repost={post.repostOf} onClick={handleNavigatePost} />}
 
       <PostInteractions post={post} />
     </div>
