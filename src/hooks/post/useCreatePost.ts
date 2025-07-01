@@ -11,9 +11,10 @@ import { MAX_POST_CHARS, PostContent, PostContentZ } from "@/types/post";
 
 type Props = {
   onSuccess?: () => void;
+  repostOfId?: string;
 };
 
-export const useCreatePost = ({ onSuccess }: Props) => {
+export const useCreatePost = ({ onSuccess, repostOfId }: Props) => {
   const queryClient = useQueryClient();
   const formMethods = useForm<PostContentZ>({
     resolver: zodResolver(PostContent),
@@ -34,6 +35,7 @@ export const useCreatePost = ({ onSuccess }: Props) => {
   const onSubmit: SubmitHandler<PostContentZ> = async (formData) => {
     const result = await createPost({
       content: formData.content,
+      repostOfId,
     });
     if (result.success) {
       await queryClient.invalidateQueries({

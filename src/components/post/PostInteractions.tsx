@@ -1,34 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Like } from "@prisma/client";
 import clsx from "clsx";
 import { HeartIcon, MessageCircleMoreIcon, RepeatIcon } from "lucide-react";
-import { toast } from "react-toastify";
 
 import { likePost } from "@/app/api/posts/actions";
 import { useModal } from "@/context/ModalProvider";
+import formatCount from "@/helpers/fomatCount";
 import { useLikeToggle } from "@/hooks/generic/useLike";
 import { CACHE_TAGS } from "@/types/constants";
 import type { PostWithCounts } from "@/types/post";
 import CreateReply from "../ui/modal/CreateReply";
-
-function formatCount(count: number, content: string) {
-  if (count === 0) {
-    return content;
-  }
-  if (count < 1000) {
-    return `${count}`;
-  }
-  if (count >= 1000 && count < 10000) {
-    return `${Math.floor(count / 1000)}k`;
-  }
-  return `${Math.floor(count / 1000)}k`;
-}
+import CreateRepost from "../ui/modal/CreateRepost";
 
 type Props = { post: PostWithCounts };
 
-export default function PostInteractions({ post }: Props) {
+function PostInteractions({ post }: Props) {
   const [isClient, setIsClient] = useState(false);
 
   const { handleLike, isLiked, likeCount, isPending } = useLikeToggle<PostWithCounts, Like>({
@@ -37,12 +25,9 @@ export default function PostInteractions({ post }: Props) {
     initialLikeCount: post._count.likes,
     mutationFn: likePost,
     queryKey: [CACHE_TAGS.POSTS],
-    updateItemLikes: (item, result) => ({
-      ...item,
-      likes: result.data ? [result.data] : [],
-      _count: { ...item._count, likes: result.data ? item._count.likes + 1 : item._count.likes - 1 },
-    }),
   });
+
+  const formattedCommentsCount = useMemo(() => formatCount(post._count.comments, "Comments"), [post._count.comments]);
 
   useEffect(() => {
     setIsClient(true);
@@ -50,12 +35,8 @@ export default function PostInteractions({ post }: Props) {
 
   const { openModal } = useModal();
 
-  const formattedLikesCount = useMemo(() => formatCount(likeCount, "Like"), [likeCount]);
-  const formattedCommentsCount = useMemo(() => formatCount(post._count.comments, "Comments"), [post._count.comments]);
-
   const handleCommentClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      console.log("triggered");
       e.stopPropagation();
       // create a seperate create comment modal component, leave create comment component as standalone as differences will be noticable.
       openModal(<CreateReply post={post} />, { title: "Reply" });
@@ -66,9 +47,9 @@ export default function PostInteractions({ post }: Props) {
   const handleRepostClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       e.stopPropagation();
-      // openModal(<CreateReply content={post} />, { title: "Reply" });
+      openModal(<CreateRepost post={post} />, { title: "Repost" });
     },
-    [post.id]
+    [openModal, post]
   );
 
   const handleLikeClick = useCallback(
@@ -84,7 +65,7 @@ export default function PostInteractions({ post }: Props) {
       {
         label: "Like",
         icon: HeartIcon,
-        status: { isLiked, count: formattedLikesCount },
+        status: { isLiked, count: likeCount },
         onClick: handleLikeClick,
         isPending: isPending,
       },
@@ -103,15 +84,7 @@ export default function PostInteractions({ post }: Props) {
         isPending: false,
       },
     ],
-    [
-      isLiked,
-      formattedLikesCount,
-      formattedCommentsCount,
-      handleLikeClick,
-      handleCommentClick,
-      handleRepostClick,
-      isPending,
-    ]
+    [isLiked, likeCount, formattedCommentsCount, handleLikeClick, handleCommentClick, handleRepostClick, isPending]
   );
 
   // Placeholder component when isClient is false
@@ -158,3 +131,5 @@ export default function PostInteractions({ post }: Props) {
     </div>
   );
 }
+
+export default React.memo(PostInteractions);

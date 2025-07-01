@@ -71,11 +71,15 @@ model Post {
   videoUrl  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  repostOfId  String?  // FK to parent post
+
 
   // Relations
-  profile  Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  likes    Like[]
-  comments Comment[]
+  profile   Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  likes     Like[]
+  comments  Comment[]
+  repostOf  Post?    @relation("Reposts", fields: [repostOfId], references: [id])
+  reposts   Post[]   @relation("Reposts") // reverse relation
 
   @@index([profileId]) // possibly remove
   @@index([createdAt, id])

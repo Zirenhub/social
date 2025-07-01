@@ -11,12 +11,12 @@ import successResponse, { errorResponse } from "../response";
 
 // update last active on actions
 
-export async function createPost({ content }: { content: string }) {
+export async function createPost({ content, repostOfId }: { content: string; repostOfId?: string }) {
   try {
     const session = await getSession();
     const parsed = PostContent.parse({ content });
     const post = await prisma.post.create({
-      data: { content: parsed.content, profileId: session.user.profile },
+      data: { content: parsed.content, profileId: session.user.profile, repostOfId },
     });
 
     await updateLastActive("post");

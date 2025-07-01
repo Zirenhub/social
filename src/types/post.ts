@@ -26,8 +26,26 @@ const postWithCountsArgs = (userProfileId: string) =>
           avatarUrl: true,
         },
       } as const,
-      _count: { select: { likes: true, comments: { where: { parentId: null } } } } as const,
+      repostOf: {
+        include: {
+          profile: {
+            select: {
+              firstName: true,
+              lastName: true,
+              username: true,
+              avatarUrl: true,
+            },
+          } as const,
+        },
+      },
+      _count: { select: { likes: true, comments: { where: { parentId: null } }, reposts: true } } as const,
       likes: {
+        where: {
+          profileId: userProfileId,
+        },
+        take: 1,
+      },
+      reposts: {
         where: {
           profileId: userProfileId,
         },
@@ -41,6 +59,24 @@ type SimpleProfile = PostWithCounts["profile"];
 const validatedArgs = (userProfileId: string) =>
   Prisma.validator<Prisma.PostFindManyArgs>()(postWithCountsArgs(userProfileId));
 type PostWithCounts = Prisma.PostGetPayload<ReturnType<typeof validatedArgs>>;
+type RepostOfType = NonNullable<
+  Prisma.PostGetPayload<{
+    include: {
+      repostOf: {
+        include: {
+          profile: {
+            select: {
+              firstName: true;
+              lastName: true;
+              username: true;
+              avatarUrl: true;
+            };
+          };
+        };
+      };
+    };
+  }>["repostOf"]
+>;
 
 type postQueryProps = {
   profileId?: string;
@@ -57,4 +93,4 @@ export const postQuery = ({ profileId, userProfileId }: postQueryProps): ReturnT
   return query;
 };
 
-export type { PostContentZ, Post, PostWithCounts, SimpleProfile };
+export type { PostContentZ, Post, PostWithCounts, SimpleProfile, RepostOfType };

@@ -3,6 +3,7 @@
 import { Send } from "lucide-react";
 
 import { useCreateComment } from "@/hooks/comment/useCreateComment";
+import useCombineUsernames from "@/hooks/generic/useCombineUsernames";
 import { CommentWithCounts } from "@/types/comment";
 import { PostWithCounts } from "@/types/post";
 import { GetProfileType } from "@/types/profile";
@@ -13,26 +14,34 @@ import Textarea from "./Textarea";
 type Props = {
   post: PostWithCounts;
   comment?: CommentWithCounts;
+  parents?: CommentWithCounts[];
   profile: GetProfileType;
 };
 
-export default function CreateComment({ post, comment, profile }: Props) {
+export default function CreateComment({ post, comment, parents, profile }: Props) {
   const { submit, formErrors, register, isSubmitting, charProps } = useCreateComment({
     postId: post.id,
     comment,
   });
+  const { replyingTo } = useCombineUsernames({ post, comment, parents });
 
   return (
     <form
       onSubmit={submit}
       className="flex flex-col bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 text-xs md:text-sm md:rounded-lg md:shadow-sm"
     >
-      <p className="leading-none text-gray-400 text-sm">
+      <div className="flex leading-none text-gray-400 text-sm mb-2">
         Replying to{" "}
-        <span className="text-[var(--color-cyan-500)]">
-          @{comment ? comment.profile.username : post.profile.username}
-        </span>
-      </p>
+        <div className="flex gap-1 ml-1">
+          {Array.from(replyingTo).map((replying) => {
+            return (
+              <span key={replying} className="text-[var(--color-cyan-500)]">
+                @{replying}
+              </span>
+            );
+          })}
+        </div>
+      </div>
       <div className="flex justify-between w-full gap-3 mt-2">
         <Avatar profile={profile} className="h-7 w-7" />
         <Textarea

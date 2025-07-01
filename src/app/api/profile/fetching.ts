@@ -158,6 +158,30 @@ export const getProfilePosts = async ({
       };
     }
 
+    if (filter === "reposts") {
+      const posts = await prisma.post.findMany({
+        ...postQuery({ profileId, userProfileId }),
+        where: {
+          repostOfId: { not: null },
+          profileId: profileId,
+        },
+        orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+        take: PER_PAGE + 1,
+        ...(cursor && {
+          skip: 1,
+          cursor: { id: cursor },
+        }),
+      });
+
+      const hasMore = posts.length === PER_PAGE + 1;
+      if (hasMore) posts.pop();
+
+      return {
+        data: posts,
+        nextCursor: hasMore ? posts[posts.length - 1]?.id : null,
+      };
+    }
+
     throw new Error("Invalid filter type");
   } catch (error) {
     const err = errorResponse(error, "Failed getting profile posts.");
